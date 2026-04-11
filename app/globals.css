@@ -1,26 +1,165 @@
 @import "tailwindcss";
 
 :root {
+  --primary: #1f2a48;
+  --primary-hover: #2a375a;
+  --action: #d1345b;
+  --action-hover: #b82e51;
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #111827;
+  --sidebar-bg: #1f2a48;
+  --sidebar-text: #e5e7eb;
+  --sidebar-hover: rgba(255,255,255,0.1);
+  --sidebar-active: rgba(209,52,91,0.25);
+  --border: #e5e7eb;
+  --muted: #f9fafb;
+  --muted-foreground: #6b7280;
+  --card: #ffffff;
+  --card-border: #e5e7eb;
+  --code-bg: #f3f4f6;
+  --callout-note: #eff6ff;
+  --callout-note-border: #3b82f6;
+  --callout-warning: #fffbeb;
+  --callout-warning-border: #f59e0b;
+  --callout-danger: #fef2f2;
+  --callout-danger-border: #ef4444;
+  --callout-tip: #f0fdf4;
+  --callout-tip-border: #22c55e;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+[data-theme="dark"] {
+  --primary: #2a375a;
+  --primary-hover: #364a73;
+  --background: #0f1629;
+  --foreground: #e5e7eb;
+  --sidebar-bg: #0a0f1e;
+  --sidebar-text: #d1d5db;
+  --sidebar-hover: rgba(255,255,255,0.08);
+  --sidebar-active: rgba(209,52,91,0.2);
+  --border: #1f2937;
+  --muted: #111827;
+  --muted-foreground: #9ca3af;
+  --card: #111827;
+  --card-border: #1f2937;
+  --code-bg: #1f2937;
+  --callout-note: #1e3a5f;
+  --callout-note-border: #3b82f6;
+  --callout-warning: #1f1a08;
+  --callout-warning-border: #f59e0b;
+  --callout-danger: #1f0808;
+  --callout-danger-border: #ef4444;
+  --callout-tip: #0a1f0e;
+  --callout-tip-border: #22c55e;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground); }
+
+/* Selection */
+::selection { background: rgba(209,52,91,0.2); color: var(--foreground); }
+
+/* Anchor highlight offset */
+[id] { scroll-margin-top: 80px; }
+
+/* Code blocks */
+pre {
+  background: var(--code-bg) !important;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+code:not(pre code) {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+  font-size: 0.85em;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--action);
+}
+
+/* Prose overrides */
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  color: var(--foreground);
+  font-weight: 700;
+}
+
+.prose a {
+  color: var(--action);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s;
+}
+
+.prose a:hover {
+  border-bottom-color: var(--action);
+}
+
+.prose hr {
+  border-color: var(--border);
+}
+
+.prose table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.prose th {
+  background: var(--muted);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+
+.prose td {
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--border);
+  font-size: 0.875rem;
+  vertical-align: top;
+}
+
+.prose tr:nth-child(even) td {
+  background: var(--muted);
+}
+
+/* Gradient text for headings */
+.gradient-text {
+  background: linear-gradient(135deg, #d1345b, #1f2a48);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animated sidebar border */
+@keyframes gradient-border {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
