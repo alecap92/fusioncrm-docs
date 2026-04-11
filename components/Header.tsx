@@ -26,11 +26,11 @@ export default function Header({ onMobileMenuOpen }: HeaderProps) {
   return (
     <>
       <header
-        className="sticky top-0 z-30 h-14 flex items-center px-4 lg:px-6 gap-4 border-b backdrop-blur-sm"
+        className="sticky top-0 z-30 flex items-center px-6 gap-4 border-b backdrop-blur-sm"
         style={{
-          backgroundColor: "rgba(var(--background-rgb, 255,255,255), 0.9)",
+          minHeight: "64px",
+          backgroundColor: "color-mix(in srgb, var(--background) 90%, transparent)",
           borderColor: "var(--border)",
-          background: "color-mix(in srgb, var(--background) 90%, transparent)",
         }}
       >
         <MobileMenuButton onClick={onMobileMenuOpen} />
