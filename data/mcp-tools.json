@@ -1,0 +1,2817 @@
+{
+  "schemaVersion": "1.0.0",
+  "endpoint": "/api/mcp",
+  "transport": "streamable-http",
+  "source": "src/mcp/createFusionMcpServer.ts",
+  "toolCount": 92,
+  "tools": [
+    {
+      "name": "add_contacts_to_list",
+      "description": "Agregar contactos a una lista ESTÁTICA existente por sus IDs. Solo funciona en listas de tipo static.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID de la lista"
+          },
+          "contactIds": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array de IDs de contactos a agregar"
+          }
+        },
+        "required": [
+          "id",
+          "contactIds"
+        ]
+      },
+      "group": "contacts"
+    },
+    {
+      "name": "add_conversation_message",
+      "description": "Añadir mensaje a una conversación (POST .../messages).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID de conversación"
+          },
+          "payload": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {},
+            "description": "Cuerpo del mensaje"
+          }
+        },
+        "required": [
+          "id",
+          "payload"
+        ]
+      },
+      "group": "conversations"
+    },
+    {
+      "name": "change_conversation_pipeline",
+      "description": "Cambia una conversación a otro pipeline, opcionalmente a una etapa inicial específica. Si no se pasa initialStageId, se usa el primer stage (por order) del pipeline destino. Escribe un log de cambio y dispara el webhook del stage destino si está habilitado.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ObjectId de la conversación"
+          },
+          "pipelineId": {
+            "type": "string",
+            "description": "ObjectId del pipeline destino"
+          },
+          "initialStageId": {
+            "description": "ObjectId del stage inicial en el nuevo pipeline. Opcional; default = primer stage por order.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "pipelineId"
+        ]
+      },
+      "group": "conversations"
+    },
+    {
+      "name": "conversations_summary",
+      "description": "Summary of conversations in a date range: counts and by source (sample up to 1000 per page).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "dateFrom": {
+            "type": "string",
+            "description": "dd/mm/yyyy"
+          },
+          "dateTo": {
+            "type": "string",
+            "description": "dd/mm/yyyy"
+          },
+          "dateField": {
+            "description": "Date field to filter on (default: createdAt)",
+            "type": "string",
+            "enum": [
+              "createdAt",
+              "updatedAt",
+              "lastMessageTimestamp"
+            ]
+          },
+          "timezone": {
+            "description": "UTC offset, default -5 (Colombia)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "dateFrom",
+          "dateTo"
+        ]
+      },
+      "group": "conversations"
+    },
+    {
+      "name": "create_company",
+      "description": "Crear una empresa (o actualizarla si ya existe: upsert por idNumber/NIT primero y por name después). Body plano → properties: name, industry, website, email, phone, address, city, country, idType, idNumber, size, notes y cualquier propiedad custom. Requiere name o idNumber. Permiso companies:write.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Nombre de la empresa (requerido si no hay idNumber)",
+            "type": "string"
+          },
+          "idNumber": {
+            "description": "NIT / número de documento (clave de upsert preferida)",
+            "type": "string"
+          }
+        },
+        "additionalProperties": {}
+      },
+      "group": "companies"
+    },
+    {
+      "name": "create_contact",
+      "description": "Create (or update if exists) a contact. At least one of email, mobile, or whatsapp_phone required. Buenas prácticas: llena SIEMPRE que se pueda source (de dónde salió el lead), companyType (Personal/Empresa/Proveedor/Cliente/Otro u opciones de la org) y city — un contacto sin segmentación no sirve para filtrar ni para campañas. Si no tienes esos datos, pregúntale al usuario.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "string"
+          },
+          "whatsapp_phone": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "companyName": {
+            "type": "string"
+          },
+          "source": {
+            "description": "Origen del lead, ej. 'whatsapp', 'referido', 'feria'",
+            "type": "string"
+          },
+          "companyType": {
+            "description": "Tipo de empresa (select de la org, default: Personal/Empresa/Proveedor/Cliente/Otro)",
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "position": {
+            "description": "Cargo del contacto",
+            "type": "string"
+          },
+          "idNumber": {
+            "description": "NIT / documento",
+            "type": "string"
+          },
+          "phone": {
+            "description": "Teléfono fijo (mobile es el principal)",
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          }
+        }
+      },
+      "group": "contacts"
+    },
+    {
+      "name": "create_conversation",
+      "description": "Crear conversación. Para descubrir los stageId disponibles usá list_pipeline_stages.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Título de la conversación (requerido)"
+          },
+          "pipeline": {
+            "description": "ID del pipeline (usa default si se omite)",
+            "type": "string"
+          },
+          "stage": {
+            "description": "ObjectId del stage inicial (usa el primero por order si se omite)",
+            "type": "string"
+          },
+          "assignedTo": {
+            "description": "ID del usuario asignado",
+            "type": "string"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "tags": {
+            "description": "Array de tags, ej: [\"venta\", \"soporte\"]",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "whatsapp",
+              "facebook",
+              "instagram"
+            ]
+          },
+          "metadata": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "key",
+                "value"
+              ]
+            }
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "group": "conversations"
+    },
+    {
+      "name": "create_deal",
+      "description": "Create a deal (cuerpo igual que POST /api/deals). Acepta companyId opcional para asociar una empresa (debe pertenecer a la organización); si no se envía y el contacto principal tiene empresa vinculada, el deal la HEREDA automáticamente.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "companyId": {
+            "description": "ID de la empresa (Company) a asociar al deal. Opcional: si se omite se hereda la del contacto principal.",
+            "type": "string"
+          }
+        },
+        "additionalProperties": {}
+      },
+      "group": "deals"
+    },
+    {
+      "name": "create_dynamic_contact_list",
+      "description": "Crear una lista DINÁMICA de contactos.\nA diferencia de la estática, los contactos que pertenecen a la lista se recalculan en tiempo real\ncada vez que se consultan, aplicando los filtros almacenados contra la base de datos actual.\n\nSe REQUIERE al menos un filtro.\nEstructura de un filtro: { key: 'city', operator: 'contains', value: 'Bogotá' }\nOperadores: contains, equals, 'starts with', 'ends with', 'is empty', 'is not empty', greater_than, less_than.\nClaves de ejemplo: firstName, lastName, email, mobile, company, city, country, source, companyType, leadScore.\nFiltro especial: { key: 'hasDeals', operator: 'equals', value: true } para contactos con/sin negocios.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre de la lista"
+          },
+          "description": {
+            "description": "Descripción opcional",
+            "type": "string"
+          },
+          "filters": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "description": "Campo del contacto"
+                },
+                "operator": {
+                  "type": "string",
+                  "enum": [
+                    "contains",
+                    "equals",
+                    "starts with",
+                    "ends with",
+                    "is empty",
+                    "is not empty",
+                    "greater_than",
+                    "less_than"
+                  ],
+                  "description": "Operador del filtro"
+                },
+                "value": {
+                  "description": "Valor a comparar",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "key",
+                "operator"
+              ]
+            },
+            "description": "Filtros requeridos para la lista dinámica"
+          }
+        },
+        "required": [
+          "name",
+          "filters"
+        ]
+      },
+      "group": "contact-lists"
+    },
+    {
+      "name": "create_fragment",
+      "description": "Crear un fragment. El 'atajo' debe ser único globalmente (índice único en BD).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre del fragment"
+          },
+          "text": {
+            "type": "string",
+            "description": "Contenido del fragment"
+          },
+          "atajo": {
+            "type": "string",
+            "description": "Atajo/shortcut único"
+          },
+          "format": {
+            "description": "Formato del contenido: \"text\" (texto plano / WhatsApp) o \"html\" (correo con formato). Por defecto \"text\".",
+            "type": "string",
+            "enum": [
+              "text",
+              "html"
+            ]
+          },
+          "asunto": {
+            "description": "Asunto del correo (solo aplica a fragmentos de formato \"html\").",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "text",
+          "atajo"
+        ]
+      },
+      "group": "fragments"
+    },
+    {
+      "name": "create_invoice",
+      "description": "Crear factura (cuerpo según POST /api/invoices).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": {}
+      },
+      "group": "invoices"
+    },
+    {
+      "name": "create_product",
+      "description": "Crear producto.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": {}
+      },
+      "group": "products"
+    },
+    {
+      "name": "create_project",
+      "description": "Crear proyecto.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": {}
+      },
+      "group": "projects"
+    },
+    {
+      "name": "create_project_task",
+      "description": "Crear tarea dentro de un proyecto (POST /projects/:id/tasks).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string"
+          },
+          "payload": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {},
+            "description": "Campos: title, dueDate, responsibleId, etc."
+          }
+        },
+        "required": [
+          "projectId",
+          "payload"
+        ]
+      },
+      "group": "projects"
+    },
+    {
+      "name": "create_quotation",
+      "description": "Crear cotización (cuerpo igual que POST /api/quotations).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": {}
+      },
+      "group": "quotations"
+    },
+    {
+      "name": "create_static_contact_list",
+      "description": "Crear una lista ESTÁTICA de contactos. Existen tres modos:\n\n1. Lista vacía: pasar solo name (y opcionalmente description). Se puede poblar después con add_contacts_to_list.\n2. Por IDs directos: pasar contactIds (array de IDs de contacto). Máximo 2000 contactos.\n3. Por filtros de propiedades: pasar filters para buscar y capturar los contactos que coincidan en el momento de creación.\n   Los filtros son snapshots — el grupo no cambia automáticamente después (para eso usar create_dynamic_contact_list).\n\nEstructura de un filtro: { key: 'city', operator: 'contains', value: 'Bogotá' }\nOperadores soportados: contains, equals, 'starts with', 'ends with', 'is empty', 'is not empty', greater_than, less_than.\nClaves de ejemplo: firstName, lastName, email, mobile, company, city, country, source, companyType, leadScore.\nLímite: 5000 coincidencias al filtrar (usar filtros más específicos si se supera).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre de la lista"
+          },
+          "description": {
+            "description": "Descripción opcional",
+            "type": "string"
+          },
+          "contactIds": {
+            "description": "IDs de contactos a incluir directamente (modo 2)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "filters": {
+            "description": "Filtros para poblar la lista automáticamente (modo 3)",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "description": "Campo del contacto (ej. city, company, email)"
+                },
+                "operator": {
+                  "type": "string",
+                  "enum": [
+                    "contains",
+                    "equals",
+                    "starts with",
+                    "ends with",
+                    "is empty",
+                    "is not empty",
+                    "greater_than",
+                    "less_than"
+                  ],
+                  "description": "Operador del filtro"
+                },
+                "value": {
+                  "description": "Valor a comparar (no requerido para is empty / is not empty)",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "key",
+                "operator"
+              ]
+            }
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "group": "contact-lists"
+    },
+    {
+      "name": "create_task",
+      "description": "Crear tarea (POST /api/tasks). Incluir projectId en el cuerpo si aplica.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": {}
+      },
+      "group": "tasks"
+    },
+    {
+      "name": "deals_summary",
+      "description": "Sales summary for a date range filtered by closingDate (fecha de cierre). Total deals, won deals, total sold, avg ticket, top 5 by amount. Use this for monthly/period sales reports.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "closingFrom": {
+            "type": "string",
+            "description": "Start of closing date range (YYYY-MM-DD)"
+          },
+          "closingTo": {
+            "type": "string",
+            "description": "End of closing date range (YYYY-MM-DD)"
+          }
+        },
+        "required": [
+          "closingFrom",
+          "closingTo"
+        ]
+      },
+      "group": "deals"
+    },
+    {
+      "name": "delete_company",
+      "description": "Eliminar empresa por ID (permiso companies:delete). Los contactos y deals vinculados NO se borran: solo se desvinculan de la empresa.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "companies"
+    },
+    {
+      "name": "delete_contact",
+      "description": "Eliminar contacto por ID (permiso contacts:delete).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "contacts"
+    },
+    {
+      "name": "delete_contact_list",
+      "description": "Eliminar una lista de contactos por ID. No elimina los contactos, solo la lista.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID de la lista a eliminar"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "contact-lists"
+    },
+    {
+      "name": "delete_conversation",
+      "description": "Eliminar conversación por ID (permiso conversations:delete).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "conversations"
+    },
+    {
+      "name": "delete_deal",
+      "description": "Eliminar negocio por ID (permiso deals:delete).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "deals"
+    },
+    {
+      "name": "delete_fragment",
+      "description": "Eliminar un fragment por ID (permiso fragments:delete).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "fragments"
+    },
+    {
+      "name": "delete_knowledge_base_document",
+      "description": "Elimina un documento de la base de conocimiento (RAG) por ID, incluyendo sus chunks/embeddings. IRREVERSIBLE. Usa list_knowledge_base_documents para obtener el ID. Requiere permiso rag:delete.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID del documento (de list_knowledge_base_documents)"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "knowledge-base"
+    },
+    {
+      "name": "delete_project",
+      "description": "Eliminar proyecto por ID (permiso projects:delete).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "projects"
+    },
+    {
+      "name": "delete_quotation",
+      "description": "Eliminar cotización por ID (permiso quotations:delete).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "quotations"
+    },
+    {
+      "name": "delete_task",
+      "description": "Eliminar tarea por ID (permiso tasks:delete).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "tasks"
+    },
+    {
+      "name": "download_quotation_pdf",
+      "description": "Descargar PDF de cotización por número (quotationNumber). Devuelve base64; puede ser pesado.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "description": "Número de cotización"
+          }
+        },
+        "required": [
+          "number"
+        ]
+      },
+      "group": "quotations"
+    },
+    {
+      "name": "filter_contacts",
+      "description": "Filtro avanzado cruzado: combina condiciones sobre propiedades de contactos Y condiciones sobre sus deals para retornar una lista paginada.\n\nCondiciones para contactFilters: equals | not_equals | contains | not_contains | is_empty | is_not_empty\nCondiciones para dealFilters:    equals | not_equals | contains | not_contains | greater_than | less_than | between | last_deal_before | last_deal_after\n\nCampos especiales en dealFilters:\n  - field \"hasDeals\" (sin condition): filtra si el contacto tiene (true) o no (false) deals que cumplan los demás filtros\n  - field \"lastDeal\" con condition \"last_deal_before\"/\"last_deal_after\": filtra según la fecha del deal más reciente del contacto\n  - field \"amount\" con greater_than/less_than/between: filtra por monto del deal (between requiere también \"valueTo\")\n  - cualquier campo real del deal: title, closingDate, createdAt, etc.\n\nEjemplos de uso:\n  - Hoteles sin pedidos en 60 días: contactFilters=[{field:\"companyType\",condition:\"equals\",value:\"Hoteles y Piscinas\"}], dealFilters=[{field:\"hasDeals\",value:true},{field:\"lastDeal\",condition:\"last_deal_before\",value:\"2026-02-09\"}]\n  - Clientes de Bogotá con deals > $500k: contactFilters=[{field:\"lifeCycle\",condition:\"equals\",value:\"Cliente\"},{field:\"city\",condition:\"equals\",value:\"Bogota\"}], dealFilters=[{field:\"amount\",condition:\"greater_than\",value:\"500000\"}]\n  - Contactos sin categoría: contactFilters=[{field:\"companyType\",condition:\"is_empty\"}]",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "contactFilters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "description": "Clave de propiedad del contacto: companyType, city, lifeCycle, source, country, etc."
+                },
+                "condition": {
+                  "type": "string",
+                  "enum": [
+                    "equals",
+                    "not_equals",
+                    "contains",
+                    "not_contains",
+                    "is_empty",
+                    "is_not_empty"
+                  ]
+                },
+                "value": {
+                  "description": "Valor a comparar (no requerido para is_empty/is_not_empty)",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "field",
+                "condition"
+              ]
+            },
+            "description": "Filtros sobre propiedades del contacto, combinados con AND"
+          },
+          "dealFilters": {
+            "description": "Filtros sobre los deals asociados al contacto",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "description": "Campo del deal o especial: hasDeals | lastDeal | amount | title | createdAt | closingDate"
+                },
+                "condition": {
+                  "description": "Operador de comparación (no requerido para field=hasDeals)",
+                  "type": "string",
+                  "enum": [
+                    "equals",
+                    "not_equals",
+                    "contains",
+                    "not_contains",
+                    "greater_than",
+                    "less_than",
+                    "between",
+                    "last_deal_before",
+                    "last_deal_after"
+                  ]
+                },
+                "value": {
+                  "description": "Valor principal del filtro",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "valueTo": {
+                  "description": "Valor superior para condición between",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "field"
+              ]
+            }
+          },
+          "page": {
+            "description": "Página (default 1)",
+            "type": "number"
+          },
+          "limit": {
+            "description": "Resultados por página (default 50, máx 500)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "contactFilters"
+        ]
+      },
+      "group": "contacts"
+    },
+    {
+      "name": "find_conversation_by_phone",
+      "description": "Find conversation by contact phone. Includes messages.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string"
+          },
+          "messagesLimit": {
+            "description": "Messages to include (default 50, max 200)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "phone"
+        ]
+      },
+      "group": "conversations"
+    },
+    {
+      "name": "fusion_request",
+      "description": "Petición cruda a rutas FusionCRM bajo /api (quotations, tasks, products, etc.).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "enum": [
+              "GET",
+              "POST",
+              "PUT",
+              "DELETE"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "description": "Ej. /quotations?page=1 — se añade prefijo /api si no viene"
+          },
+          "body": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "required": [
+          "method",
+          "path"
+        ]
+      },
+      "group": "general"
+    },
+    {
+      "name": "get_company",
+      "description": "Obtener una empresa por ID, incluyendo sus contactos vinculados, sus deals y un resumen (totalRevenue, totalDeals, totalContacts, lastDeal). Permiso companies:read.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "companies"
+    },
+    {
+      "name": "get_contact",
+      "description": "Get a single contact by ID.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "contacts"
+    },
+    {
+      "name": "get_contact_list",
+      "description": "Obtener una lista de contactos por su ID.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID de la lista"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "contact-lists"
+    },
+    {
+      "name": "get_contact_list_contacts",
+      "description": "Obtener los contactos de una lista (estática o dinámica) con paginación.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID de la lista"
+          },
+          "page": {
+            "description": "Página (default 1)",
+            "type": "number"
+          },
+          "limit": {
+            "description": "Contactos por página (default 10)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "contact-lists"
+    },
+    {
+      "name": "get_conversation",
+      "description": "Get a conversation by ID with messages, lastMessage populated, and contact data.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "messagesLimit": {
+            "description": "Messages to include (default 50, max 200)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "conversations"
+    },
+    {
+      "name": "get_conversation_stage_history",
+      "description": "Devuelve el historial de cambios de etapa de una conversación (logs CONVERSATION_STAGE_CHANGE) ordenado por timestamp descendente. Cada item incluye fromStage, toStage, pipeline, user y triggeredBy (user/automation/system).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ObjectId de la conversación"
+          },
+          "page": {
+            "description": "Página (default 1)",
+            "type": "number"
+          },
+          "limit": {
+            "description": "Items por página (default 100, máx 1000)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "conversations"
+    },
+    {
+      "name": "get_deal",
+      "description": "Get a deal by ID.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "deals"
+    },
+    {
+      "name": "get_form",
+      "description": "Obtener un formulario por ID, incluyendo el link público, el snippet de embed y la URL del webhook (panel Compartir).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID del formulario"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "forms"
+    },
+    {
+      "name": "get_form_responses",
+      "description": "Respuestas (envíos) de un formulario, más recientes primero. Cada una trae el contacto creado/actualizado, el negocio si se creó, las respuestas y el origen (UTMs, página). Los sospechosos (honeypot) se excluyen salvo includeSuspicious.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID del formulario"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "created",
+              "updated",
+              "not_created"
+            ]
+          },
+          "since": {
+            "description": "ISO date: solo envíos desde esa fecha",
+            "type": "string"
+          },
+          "includeSuspicious": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "forms"
+    },
+    {
+      "name": "get_fragment",
+      "description": "Obtener un fragment por ID. La respuesta incluye su \"format\" (\"text\" o \"html\").",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "fragments"
+    },
+    {
+      "name": "get_invoice",
+      "description": "Obtener factura por ID.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "invoices"
+    },
+    {
+      "name": "get_library_file",
+      "description": "Obtener un archivo de la Biblioteca por ID, con su mediaURL, tags y metadatos.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "library"
+    },
+    {
+      "name": "get_product",
+      "description": "Obtener producto por ID.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "products"
+    },
+    {
+      "name": "get_project",
+      "description": "Obtener proyecto por ID.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "projects"
+    },
+    {
+      "name": "get_quotation",
+      "description": "Obtener cotización por ID (Mongo).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "quotations"
+    },
+    {
+      "name": "get_task",
+      "description": "Obtener tarea por ID.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "tasks"
+    },
+    {
+      "name": "link_contact_to_company",
+      "description": "Vincular un contacto a una empresa (setea companyId en el contacto y sincroniza su propiedad de texto 'company' con el nombre de la empresa). Enviar companyId null o \"\" DESVINCULA al contacto de su empresa actual. Para vinculación masiva usar fusion_request con POST /api/companies/:id/contacts { contactIds: [...] }. Permisos contacts:write (+ companies:read para validar).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "contactId": {
+            "type": "string",
+            "description": "ID del contacto"
+          },
+          "companyId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "ID de la empresa; null o \"\" desvincula"
+          }
+        },
+        "required": [
+          "contactId",
+          "companyId"
+        ]
+      },
+      "group": "companies"
+    },
+    {
+      "name": "list_companies",
+      "description": "Listar empresas (companies) con búsqueda, rango de fechas y filtros por propiedades (permiso companies:read).\n\nFiltros de propiedades (se combinan con AND, case-insensitive por defecto):\n- Campos canónicos: name, industry, city, country, idNumber (NIT).\n- extraFilters: objeto libre { key: value } para filtrar por CUALQUIER propiedad custom no listada (ej. { size: '50-100' }).\n- matchMode: 'contains' (default, regex case-insensitive con escape) o 'exact' (igualdad exacta).\n\nsearch: texto libre sobre name, industry, email, phone, website, city, idNumber.\nRango de fechas (createdAt) vía createdFrom/createdTo en ISO (YYYY-MM-DD).\nOrdenable por createdAt/updatedAt asc|desc. Paginación con page/limit.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "search": {
+            "description": "Texto libre; busca en name, industry, email, phone, website, city, idNumber.",
+            "type": "string"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "createdFrom": {
+            "description": "ISO date (YYYY-MM-DD)",
+            "type": "string"
+          },
+          "createdTo": {
+            "description": "ISO date (YYYY-MM-DD)",
+            "type": "string"
+          },
+          "name": {
+            "description": "Nombre de la empresa",
+            "type": "string"
+          },
+          "industry": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "idNumber": {
+            "description": "NIT / número de documento",
+            "type": "string"
+          },
+          "extraFilters": {
+            "description": "Filtros adicionales por propiedades custom, ej. { size: '50-100' }.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "matchMode": {
+            "description": "'contains' (default) usa regex case-insensitive; 'exact' exige igualdad estricta.",
+            "type": "string",
+            "enum": [
+              "contains",
+              "exact"
+            ]
+          },
+          "sortBy": {
+            "type": "string",
+            "enum": [
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "sortOrder": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "group": "companies"
+    },
+    {
+      "name": "list_company_contacts",
+      "description": "Listar los contactos vinculados a una empresa (GET /api/companies/:id/contacts). Permiso companies:read.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID de la empresa"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "companies"
+    },
+    {
+      "name": "list_contact_lists",
+      "description": "Obtener todas las listas de contactos (estáticas y dinámicas) de la organización.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {}
+      },
+      "group": "contact-lists"
+    },
+    {
+      "name": "list_contacts",
+      "description": "Listar contactos con búsqueda, rango de fechas y filtros por propiedades.\n\nFiltros de propiedades (se combinan con AND, case-insensitive por defecto):\n- Campos canónicos: firstName, lastName, email, mobile, phone, company, position, city, country, source, idNumber, companyType.\n- extraFilters: objeto libre { key: value } para filtrar por CUALQUIER propiedad custom no listada (ej. { industry: 'retail' }).\n- matchMode: 'contains' (default, regex case-insensitive con escape) o 'exact' (igualdad exacta).\n\nFiltros de presencia (ideales para auditar calidad de datos y organizar contactos):\n- missing: lista separada por comas de claves que DEBEN estar ausentes o vacías. Ej: 'companyType,city' trae contactos sin companyType o con companyType=''.\n- exists: lista separada por comas de claves que DEBEN existir con valor no vacío. Ej: 'email,mobile' trae contactos con ambos campos.\n\nRango de fechas (createdAt) vía createdFrom/createdTo en ISO (YYYY-MM-DD).\nOrdenable por createdAt/updatedAt asc|desc. Paginación con page/limit.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "search": {
+            "description": "Texto libre; busca en firstName, lastName, email, mobile, phone, company, companyName.",
+            "type": "string"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "createdFrom": {
+            "description": "ISO date (YYYY-MM-DD)",
+            "type": "string"
+          },
+          "createdTo": {
+            "description": "ISO date (YYYY-MM-DD)",
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "company": {
+            "description": "Clave canónica para nombre de empresa.",
+            "type": "string"
+          },
+          "companyType": {
+            "description": "Solo útil si tus contactos tienen la propiedad 'companyType'.",
+            "type": "string"
+          },
+          "position": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "idNumber": {
+            "type": "string"
+          },
+          "extraFilters": {
+            "description": "Filtros adicionales por propiedades custom, ej. { industry: 'retail' }.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "matchMode": {
+            "description": "'contains' (default) usa regex case-insensitive; 'exact' exige igualdad estricta.",
+            "type": "string",
+            "enum": [
+              "contains",
+              "exact"
+            ]
+          },
+          "missing": {
+            "description": "Claves separadas por coma que deben estar ausentes o vacías. Ej: 'companyType,city'.",
+            "type": "string"
+          },
+          "exists": {
+            "description": "Claves separadas por coma que deben existir con valor no vacío. Ej: 'email,mobile'.",
+            "type": "string"
+          },
+          "sortBy": {
+            "type": "string",
+            "enum": [
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "sortOrder": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "group": "contacts"
+    },
+    {
+      "name": "list_conversation_pipelines",
+      "description": "Lista los pipelines de conversación de la organización (id, nombre, isDefault). Úsalo antes de list_pipeline_stages si querés un pipeline específico que no sea el default.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {}
+      },
+      "group": "conversations"
+    },
+    {
+      "name": "list_conversations",
+      "description": "List conversations with filters, messages included. Dates dd/mm/yyyy; timezone = UTC offset (e.g. -5 Colombia). dateField controls which date column is filtered (createdAt, updatedAt, lastMessageTimestamp).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "pipeline": {
+            "description": "ObjectId del pipeline para filtrar conversaciones",
+            "type": "string"
+          },
+          "stage": {
+            "description": "ObjectId del stage (currentStage) para filtrar conversaciones",
+            "type": "string"
+          },
+          "assignedTo": {
+            "description": "ObjectId del usuario/agente asignado",
+            "type": "string"
+          },
+          "tags": {
+            "description": "Tags separados por coma (ej. 'vip,urgente')",
+            "type": "string"
+          },
+          "dateFrom": {
+            "type": "string"
+          },
+          "dateTo": {
+            "type": "string"
+          },
+          "dateField": {
+            "description": "Date field to filter on (default: createdAt)",
+            "type": "string",
+            "enum": [
+              "createdAt",
+              "updatedAt",
+              "lastMessageTimestamp"
+            ]
+          },
+          "timezone": {
+            "type": "number"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "whatsapp",
+              "facebook",
+              "instagram"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "search": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "string"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "messagesLimit": {
+            "description": "Messages per conversation (default 50, max 200)",
+            "type": "number"
+          },
+          "sortBy": {
+            "type": "string",
+            "enum": [
+              "lastMessageTimestamp",
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "sortOrder": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "group": "conversations"
+    },
+    {
+      "name": "list_conversations_config",
+      "description": "Devuelve todos los pipelines de conversación con sus stages embebidos en una sola llamada. Úsalo para conocer los stageId disponibles antes de crear o mover conversaciones. Evita tener que llamar list_conversation_pipelines y list_pipeline_stages por separado.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {}
+      },
+      "group": "conversations"
+    },
+    {
+      "name": "list_deals",
+      "description": "List deals with optional date range, search, and pagination. Dates YYYY-MM-DD. Use closingFrom/closingTo to filter by closing date (for sales reports). Use createdFrom/createdTo to filter by creation date.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "pipeline": {
+            "description": "ObjectId del pipeline para filtrar deals",
+            "type": "string"
+          },
+          "status": {
+            "description": "Estado del deal (ej. 'open', 'won', 'lost')",
+            "type": "string"
+          },
+          "contactId": {
+            "description": "ObjectId del contacto asociado al deal",
+            "type": "string"
+          },
+          "amountMin": {
+            "description": "Monto mínimo del deal",
+            "type": "number"
+          },
+          "amountMax": {
+            "description": "Monto máximo del deal",
+            "type": "number"
+          },
+          "createdFrom": {
+            "description": "Filter by creation date start (YYYY-MM-DD)",
+            "type": "string"
+          },
+          "createdTo": {
+            "description": "Filter by creation date end (YYYY-MM-DD)",
+            "type": "string"
+          },
+          "closingFrom": {
+            "description": "Filter by closing date start (YYYY-MM-DD) — use this for sales reports",
+            "type": "string"
+          },
+          "closingTo": {
+            "description": "Filter by closing date end (YYYY-MM-DD) — use this for sales reports",
+            "type": "string"
+          },
+          "search": {
+            "type": "string"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "sortBy": {
+            "type": "string",
+            "enum": [
+              "createdAt",
+              "updatedAt",
+              "amount",
+              "closingDate"
+            ]
+          },
+          "sortOrder": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "group": "deals"
+    },
+    {
+      "name": "list_deals_config",
+      "description": "Devuelve todos los pipelines de deals con sus etapas embebidas en una sola llamada. Úsalo para conocer los stageId disponibles antes de crear o mover deals. Evita llamadas separadas.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {}
+      },
+      "group": "deals"
+    },
+    {
+      "name": "list_forms",
+      "description": "Listar los formularios de captación de la organización (nombre, slug público, campos, si crea negocio, total de envíos).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "active": {
+            "description": "true = solo activos, false = solo pausados",
+            "type": "boolean"
+          }
+        }
+      },
+      "group": "forms"
+    },
+    {
+      "name": "list_fragments",
+      "description": "Listar fragments (snippets de texto reutilizables) de la organización. Soporta paginación y búsqueda por nombre, texto o atajo. Cada fragment incluye su \"format\" (\"text\" o \"html\").",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "search": {
+            "description": "Busca en name, text y atajo (case-insensitive)",
+            "type": "string"
+          },
+          "sortBy": {
+            "type": "string",
+            "enum": [
+              "createdAt",
+              "updatedAt",
+              "name",
+              "atajo"
+            ]
+          },
+          "sortOrder": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "group": "fragments"
+    },
+    {
+      "name": "list_invoices",
+      "description": "Listar facturas (direction outgoing/incoming, etc.).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "outgoing",
+              "incoming"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "type_document_id": {
+            "type": "number"
+          },
+          "contactId": {
+            "type": "string"
+          },
+          "search": {
+            "type": "string"
+          },
+          "dateFrom": {
+            "type": "string"
+          },
+          "dateTo": {
+            "type": "string"
+          },
+          "sortBy": {
+            "type": "string",
+            "enum": [
+              "date",
+              "createdAt",
+              "number"
+            ]
+          },
+          "sortOrder": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "group": "invoices"
+    },
+    {
+      "name": "list_knowledge_base_documents",
+      "description": "Lista los documentos de la base de conocimiento (RAG) de la organización: título, estado de indexación (processing/ready/failed), tags y cantidad de chunks. Útil para saber qué información hay disponible antes de buscar con search_knowledge_base.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "status": {
+            "description": "Filtrar por estado de indexación",
+            "type": "string",
+            "enum": [
+              "processing",
+              "ready",
+              "failed"
+            ]
+          },
+          "tag": {
+            "type": "string"
+          }
+        }
+      },
+      "group": "knowledge-base"
+    },
+    {
+      "name": "list_library_files",
+      "description": "Listar archivos de la Biblioteca (library) de la organización: imágenes, PDFs, videos, etc. ya subidos.\nDevuelve id, name, fileType, mediaURL (URL pública del archivo), tags y fechas.\n\nIMPORTANTE: esta tool NO sube archivos. El MCP solo puede consultar y editar metadatos\nde archivos que ya existen; para subir uno nuevo hay que usar la app o la web de FusionCRM.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "search": {
+            "description": "Busca en el nombre del archivo (case-insensitive)",
+            "type": "string"
+          },
+          "tag": {
+            "description": "Filtrar por un tag (se normaliza a minúsculas)",
+            "type": "string"
+          },
+          "fileType": {
+            "description": "Filtrar por tipo: \"image\", \"video\", \"application\", \"audio\", \"text\"",
+            "type": "string"
+          },
+          "sortBy": {
+            "type": "string",
+            "enum": [
+              "createdAt",
+              "updatedAt",
+              "name"
+            ]
+          },
+          "sortOrder": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "group": "library"
+    },
+    {
+      "name": "list_library_tags",
+      "description": "Listar los tags únicos en uso en la Biblioteca de la organización. Útil para saber qué tags existen antes de reetiquetar un archivo con update_library_file.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {}
+      },
+      "group": "library"
+    },
+    {
+      "name": "list_pipeline_stages",
+      "description": "Lista las etapas (stages) de un pipeline de conversación, ordenadas por order. Devuelve _id, name, order, color, autoAssign, webhookEnabled. Si no pasas pipelineId se usa el pipeline default de la organización. Necesario para conocer los stageId antes de mover o crear conversaciones.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "pipelineId": {
+            "description": "ObjectId del pipeline. Opcional; default = pipeline default de la org.",
+            "type": "string"
+          }
+        }
+      },
+      "group": "conversations"
+    },
+    {
+      "name": "list_products",
+      "description": "Listar productos con filtros.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "search": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "string"
+          },
+          "hasVariants": {
+            "type": "boolean"
+          },
+          "priceMin": {
+            "type": "number"
+          },
+          "priceMax": {
+            "type": "number"
+          },
+          "sortBy": {
+            "type": "string",
+            "enum": [
+              "createdAt",
+              "updatedAt",
+              "name",
+              "unitPrice"
+            ]
+          },
+          "sortOrder": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "group": "products"
+    },
+    {
+      "name": "list_project_tasks",
+      "description": "Listar tareas de un proyecto (GET /projects/:id/tasks).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "contactId": {
+            "type": "string"
+          },
+          "search": {
+            "type": "string"
+          },
+          "createdFrom": {
+            "type": "string"
+          },
+          "createdTo": {
+            "type": "string"
+          },
+          "sortBy": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        },
+        "required": [
+          "projectId"
+        ]
+      },
+      "group": "projects"
+    },
+    {
+      "name": "list_projects",
+      "description": "Listar proyectos.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          },
+          "search": {
+            "type": "string"
+          },
+          "createdFrom": {
+            "type": "string"
+          },
+          "createdTo": {
+            "type": "string"
+          },
+          "sortBy": {
+            "type": "string",
+            "enum": [
+              "createdAt",
+              "updatedAt",
+              "name",
+              "startDate",
+              "endDate"
+            ]
+          },
+          "sortOrder": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "group": "projects"
+    },
+    {
+      "name": "list_quotations",
+      "description": "Listar cotizaciones con filtros y paginación.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          },
+          "contactId": {
+            "type": "string"
+          },
+          "createdFrom": {
+            "type": "string"
+          },
+          "createdTo": {
+            "type": "string"
+          },
+          "search": {
+            "type": "string"
+          },
+          "sortBy": {
+            "type": "string",
+            "enum": [
+              "creationDate",
+              "lastModified",
+              "total",
+              "quotationNumber"
+            ]
+          },
+          "sortOrder": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "group": "quotations"
+    },
+    {
+      "name": "list_tasks",
+      "description": "Listar tareas (opcional projectId en query para filtrar).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "contactId": {
+            "type": "string"
+          },
+          "search": {
+            "type": "string"
+          },
+          "createdFrom": {
+            "type": "string"
+          },
+          "createdTo": {
+            "type": "string"
+          },
+          "sortBy": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "group": "tasks"
+    },
+    {
+      "name": "list_whatsapp_templates",
+      "description": "Listar las plantillas de WhatsApp (Meta/Facebook Marketing) aprobadas para la organización. Devuelve nombre, idioma, categoría, estado y componentes (BODY/HEADER/FOOTER con su texto) para que la IA pueda elegir la plantilla adecuada antes de enviarla con send_whatsapp_template. Requiere permiso whatsapp:send en el token.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {}
+      },
+      "group": "whatsapp"
+    },
+    {
+      "name": "move_conversation_stage",
+      "description": "Mueve una conversación a otra etapa dentro del mismo pipeline. Escribe un log de cambio y dispara el webhook configurado en la etapa destino si está habilitado. El stageId debe pertenecer al pipeline actual de la conversación (usar list_pipeline_stages para obtenerlo).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ObjectId de la conversación"
+          },
+          "stageId": {
+            "type": "string",
+            "description": "ObjectId del stage destino"
+          }
+        },
+        "required": [
+          "id",
+          "stageId"
+        ]
+      },
+      "group": "conversations"
+    },
+    {
+      "name": "remove_contacts_from_list",
+      "description": "Quitar contactos de una lista ESTÁTICA existente por sus IDs (DELETE /lists/:id/contacts). No borra los contactos, solo su pertenencia a la lista. Los IDs que no estaban se cuentan en skipped.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID de la lista"
+          },
+          "contactIds": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array de IDs de contactos a quitar"
+          }
+        },
+        "required": [
+          "id",
+          "contactIds"
+        ]
+      },
+      "group": "contacts"
+    },
+    {
+      "name": "search_contact_by_phone",
+      "description": "Search contact by phone number for this organization.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "phone"
+        ]
+      },
+      "group": "contacts"
+    },
+    {
+      "name": "search_conversations",
+      "description": "Buscar conversaciones por título, nombre/apellido del contacto o teléfono (query q, substring sin distinguir mayúsculas). NO busca dentro del contenido de los mensajes — para localizar una conversación por lo que se dijo en ella, usar list_conversations y revisar mensajes, o buscar por el contacto.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "q": {
+            "type": "string"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "messagesLimit": {
+            "description": "Messages per conversation (default 50, max 200)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "q"
+        ]
+      },
+      "group": "conversations"
+    },
+    {
+      "name": "search_knowledge_base",
+      "description": "Busca en la base de conocimiento PROPIA de la organización (RAG multi-tenant):\ndocumentos que la organización subió a FusionCRM (catálogos, información de\nproductos, políticas, precios propios, manuales internos, etc.).\nDevuelve los fragmentos más relevantes con score de similitud y documento de origen.\nSi no hay resultados, la organización quizá no ha subido documentos aún\n(la subida se hace desde la app en /api/v1/rag/documents).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Pregunta o tema a buscar en los documentos de la organización"
+          },
+          "top_k": {
+            "description": "Número de fragmentos a retornar (default: 5, máx: 20)",
+            "type": "number"
+          },
+          "min_score": {
+            "description": "Similitud coseno mínima entre 0 y 1 (default: 0.25)",
+            "type": "number"
+          },
+          "tag": {
+            "description": "Limitar la búsqueda a documentos con este tag",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "group": "knowledge-base"
+    },
+    {
+      "name": "send_email",
+      "description": "Enviar un correo por SMTP del usuario (mismo envío que la app web). Solo texto/HTML, sin adjuntos. Requiere que el usuario tenga SMTP configurado. Registra una actividad 'Correo' en los contactos cuyo email coincida con los destinatarios. Si un destinatario está desuscrito del email marketing, el resultado incluye un campo 'warning' (el envío 1:1 no se bloquea) — tenlo en cuenta antes de enviar contenido comercial.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "to": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Destinatarios (emails)."
+          },
+          "subject": {
+            "type": "string",
+            "description": "Asunto del correo."
+          },
+          "content": {
+            "type": "string",
+            "description": "Cuerpo del correo (HTML o texto plano segun contentFormat)."
+          },
+          "cc": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bcc": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "contentFormat": {
+            "description": "'html' (default) o 'text'.",
+            "type": "string",
+            "enum": [
+              "html",
+              "text"
+            ]
+          }
+        },
+        "required": [
+          "to",
+          "subject",
+          "content"
+        ]
+      },
+      "group": "email"
+    },
+    {
+      "name": "send_whatsapp_message",
+      "description": "Enviar mensaje WhatsApp. organizationId se rellena automáticamente; requiere to, y message si type=text.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": {}
+      },
+      "group": "whatsapp"
+    },
+    {
+      "name": "send_whatsapp_template",
+      "description": "Enviar una plantilla de WhatsApp (Meta/Facebook Marketing) a un número. FLUJO EN 2 PASOS: (1) llama SIN confirm (o confirm=false) → NO envía nada, devuelve un PREVIEW del estado (si el contacto existe y qué campos de segmentación le faltan; si la conversación existe, su etapa y si un agente IA la atiende; las etapas disponibles del pipeline). Muestra ese plan al usuario y pregúntale: a qué etapa debe ir la conversación (stageId), si el agente IA debe atenderla (assignTo) y qué datos del contacto completar (bloque contact). (2) re-llama con confirm=true y los parámetros elegidos → envía de verdad. Usa list_whatsapp_templates primero para obtener templateName, language y components. 'to' sin '+'. 'components' en formato oficial de Meta. Requiere permiso whatsapp:send. Nota: la conversación nueva NO se asigna al agente IA por defecto (el primer entrante suele ser un autorespondedor del cliente y el bot conversaría con otra máquina).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "string",
+            "description": "Número destino en formato internacional sin '+', ej. 573001234567"
+          },
+          "templateName": {
+            "type": "string",
+            "description": "Nombre exacto de la plantilla aprobada en Meta"
+          },
+          "language": {
+            "description": "Código de idioma de la plantilla, ej. 'es', 'en_US'. Default: 'es'",
+            "type": "string"
+          },
+          "components": {
+            "description": "Componentes con parámetros según el formato de Meta (body/header/button)",
+            "type": "array",
+            "items": {}
+          },
+          "confirm": {
+            "description": "false/ausente = solo PREVIEW (no envía). true = enviar de verdad, después de que el usuario confirmó el plan.",
+            "type": "boolean"
+          },
+          "stageId": {
+            "description": "Etapa inicial si se CREA la conversación (del preview.availableStages). Sin él cae en la primera etapa del pipeline.",
+            "type": "string"
+          },
+          "assignTo": {
+            "description": "Quién atiende la conversación NUEVA: 'human' (default, dueño del token) o 'agent' (agente IA auto-asignable — responderá a todos los entrantes).",
+            "type": "string",
+            "enum": [
+              "human",
+              "agent"
+            ]
+          },
+          "contact": {
+            "description": "Segmentación del contacto: se crea si no existe (siempre, mínimo con el mobile) y estos campos se fijan/actualizan en el mismo envío.",
+            "type": "object",
+            "properties": {
+              "firstName": {
+                "type": "string"
+              },
+              "lastName": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "company": {
+                "type": "string"
+              },
+              "companyType": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "country": {
+                "type": "string"
+              },
+              "position": {
+                "type": "string"
+              },
+              "idNumber": {
+                "type": "string"
+              },
+              "notes": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "to",
+          "templateName"
+        ]
+      },
+      "group": "whatsapp"
+    },
+    {
+      "name": "submit_form",
+      "description": "Enviar un formulario en nombre de un contacto (server-to-server). Pasa por el mismo camino que la página pública: busca el contacto por email/celular y lo crea o actualiza sin duplicar, registra el origen, crea el negocio si el form lo tiene configurado y avisa al dueño. `values` = { claveDeCampo: valor }; opcionales utm_source/utm_medium/utm_campaign/page_url.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID del formulario"
+          },
+          "values": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {},
+            "description": "Respuestas por clave de campo, p. ej. { email, mobile, firstName }"
+          }
+        },
+        "required": [
+          "id",
+          "values"
+        ]
+      },
+      "group": "forms"
+    },
+    {
+      "name": "update_company",
+      "description": "Actualizar una empresa por ID (merge de properties por key: los campos enviados se actualizan o agregan, el resto se conserva). Si cambia el name se sincroniza en los contactos vinculados. Permiso companies:write.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": {}
+      },
+      "group": "companies"
+    },
+    {
+      "name": "update_contact",
+      "description": "Update a contact by ID (fields además de id se envían al PUT /contacts/:id).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": {}
+      },
+      "group": "contacts"
+    },
+    {
+      "name": "update_contact_list",
+      "description": "Actualizar una lista existente (PUT /lists/:id).\n\n- name / description: siempre editables.\n- filters: solo aplican a listas DINÁMICAS. Reemplazan los filtros existentes. Formato idéntico a create_dynamic_contact_list.\n- contactIds: solo aplican a listas ESTÁTICAS. Reemplazan la lista completa de miembros (útil para eliminar contactos).\n  Si quieres AGREGAR miembros sin reemplazar, usar add_contacts_to_list.\nNo está permitido cambiar el tipo de lista.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID de la lista a actualizar"
+          },
+          "name": {
+            "description": "Nuevo nombre",
+            "type": "string"
+          },
+          "description": {
+            "description": "Nueva descripción",
+            "type": "string"
+          },
+          "filters": {
+            "description": "Nuevos filtros para listas dinámicas (reemplaza los existentes)",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "operator": {
+                  "type": "string",
+                  "enum": [
+                    "contains",
+                    "equals",
+                    "starts with",
+                    "ends with",
+                    "is empty",
+                    "is not empty",
+                    "greater_than",
+                    "less_than"
+                  ]
+                },
+                "value": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "key",
+                "operator"
+              ]
+            }
+          },
+          "contactIds": {
+            "description": "Nueva lista completa de miembros para listas estáticas (reemplaza). Máx 2000.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "contact-lists"
+    },
+    {
+      "name": "update_conversation",
+      "description": "Actualizar conversación por ID. Para mover entre etapas usá move_conversation_stage (no pases currentStage aquí).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID de la conversación"
+          },
+          "title": {
+            "type": "string"
+          },
+          "assignedTo": {
+            "description": "ID del usuario asignado",
+            "type": "string"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "tags": {
+            "description": "Array de tags, ej: [\"venta\", \"soporte\"]",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "metadata": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "key",
+                "value"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "conversations"
+    },
+    {
+      "name": "update_deal",
+      "description": "Update a deal by ID. Campos editables: title, amount, pipeline, status, closingDate, customFields, contact y companyId.\n\nPara asociar un contacto a un deal existente enviar `contact`:\n  - { \"id\": \"<contactId>\" } para usar un contacto ya existente de la organización\n  - { \"mobile\": \"573001234567\", \"name\": \"...\", \"company\": \"...\" } para buscarlo por teléfono y crearlo si no existe\n  - `null` para desasociar el contacto actual.\n\nPara asociar una empresa enviar `companyId` (debe pertenecer a la organización); `null` o \"\" desasocia la empresa actual.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "contact": {
+            "description": "Contacto a asociar: { id } o { mobile, ... }; null desasocia",
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "companyId": {
+            "description": "Empresa a asociar al deal; null o \"\" desasocia",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": {}
+      },
+      "group": "deals"
+    },
+    {
+      "name": "update_fragment",
+      "description": "Actualizar un fragment por ID. Campos editables: name, text, atajo, format, asunto.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "atajo": {
+            "type": "string"
+          },
+          "format": {
+            "description": "Formato del contenido: \"text\" (texto plano / WhatsApp) o \"html\" (correo con formato). Por defecto \"text\".",
+            "type": "string",
+            "enum": [
+              "text",
+              "html"
+            ]
+          },
+          "asunto": {
+            "description": "Asunto del correo (solo aplica a fragmentos de formato \"html\").",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "fragments"
+    },
+    {
+      "name": "update_library_file",
+      "description": "Editar los METADATOS de un archivo YA subido a la Biblioteca. Campos editables: name y tags.\n\nNO sube archivos, NO reemplaza el contenido del archivo y NO cambia su mediaURL:\núnicamente renombra y reetiqueta algo que ya está en la Biblioteca.\nOjo: 'tags' REEMPLAZA la lista completa de tags (no agrega). Para añadir uno,\nlee los tags actuales con get_library_file y envía la lista completa ya con el nuevo.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "description": "Nuevo nombre visible del archivo",
+            "type": "string"
+          },
+          "tags": {
+            "description": "Lista COMPLETA de tags que reemplaza a la actual (se normalizan a minúsculas)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "library"
+    },
+    {
+      "name": "update_product",
+      "description": "Actualizar producto por ID.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": {}
+      },
+      "group": "products"
+    },
+    {
+      "name": "update_project",
+      "description": "Actualizar proyecto por ID.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": {}
+      },
+      "group": "projects"
+    },
+    {
+      "name": "update_quotation",
+      "description": "Actualizar cotización por ID.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": {}
+      },
+      "group": "quotations"
+    },
+    {
+      "name": "update_task",
+      "description": "Actualizar tarea por ID.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": {}
+      },
+      "group": "tasks"
+    },
+    {
+      "name": "upload_knowledge_base_text",
+      "description": "Sube un documento de TEXTO PLANO a la base de conocimiento (RAG) de la organización.\nLa indexación (chunking + embeddings) corre en segundo plano: el documento queda en\nstatus 'processing' y pasa a 'ready' en segundos (verificable con\nlist_knowledge_base_documents). Solo texto plano; archivos binarios (PDF, DOCX) se\nsuben desde la app. Requiere permiso rag:write.\nPara REEMPLAZAR un documento existente (p. ej. una lista de precios), sube primero la\nversión nueva y luego elimina la vieja con delete_knowledge_base_document — si quedan\nlas dos, la búsqueda puede mezclar información desactualizada.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Título del documento (visible en el listado)"
+          },
+          "text": {
+            "type": "string",
+            "description": "Contenido en texto plano (máx 2 MB)"
+          },
+          "tags": {
+            "description": "Tags para filtrar búsquedas (p. ej. ['precios'])",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "title",
+          "text"
+        ]
+      },
+      "group": "knowledge-base"
+    }
+  ]
+}

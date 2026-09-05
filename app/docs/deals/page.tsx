@@ -16,6 +16,8 @@ const toc = [
   { id: "filters", label: "Filtros y búsqueda" },
   { id: "products", label: "Productos en deals" },
   { id: "activities", label: "Actividades y notas" },
+  { id: "requirements", label: "Requisitos por etapa" },
+  { id: "owner", label: "Dueño y previsión" },
 ];
 
 export default function DealsPage() {
@@ -225,8 +227,40 @@ export default function DealsPage() {
           </ul>
         </section>
 
+        <section id="requirements" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Requisitos por etapa</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Cada pipeline puede exigir que ciertos campos o ítems del checklist estén completos
+            antes de <strong style={{ color: "var(--foreground)" }}>llegar</strong> a una etapa. Se configuran en
+            Configuración → Módulos del CRM → Negocios: en cada campo personalizado y en cada ítem
+            del checklist eliges «obligatorio para llegar a…» y si <em>bloquea</em> o solo{" "}
+            <em>avisa</em>.
+          </p>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• Los requisitos son acumulativos hacia adelante: para pasar a «Negociación» deben cumplirse también los de las etapas anteriores (se puede desactivar por pipeline).</li>
+            <li>• Retroceder de etapa nunca valida; la etapa de «perdido» solo exige lo suyo.</li>
+            <li>• Aplica igual al arrastrar en el kanban, al editar en el modal, por API y por MCP: la app te muestra qué falta antes de intentar mover.</li>
+          </ul>
+          <Callout type="note">
+            El checklist de cierre y la probabilidad de la etapa son dos cosas distintas: el
+            checklist mide avance (y ahora puede bloquear), la probabilidad alimenta la previsión de
+            ventas. Ninguno mueve el negocio de etapa por sí solo.
+          </Callout>
+        </section>
+
+        <section id="owner" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Dueño y previsión</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Cada negocio tiene un asesor responsable (se hereda del dueño del contacto al crearlo y
+            se puede cambiar). Con eso y la probabilidad de cada etapa, la página de Informes
+            muestra la <strong style={{ color: "var(--foreground)" }}>previsión ponderada</strong> por mes, etapa y
+            vendedor. Marca cada etapa como abierta, ganada o perdida en la configuración del
+            pipeline: es lo que decide qué cuenta como venta cerrada en todos los informes.
+          </p>
+        </section>
+
         <DocNav
-          prev={{ href: "/docs/contacts", title: "Contactos" }}
+          prev={{ href: "/docs/forms", title: "Formularios web" }}
           next={{ href: "/docs/pipelines", title: "Pipelines" }}
         />
       </article>

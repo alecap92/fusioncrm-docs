@@ -98,7 +98,7 @@ export default function CalendarPage() {
         </section>
 
         <DocNav
-          prev={{ href: "/docs/workflows", title: "Automatizaciones" }}
+          prev={{ href: "/docs/agentes-ia", title: "Agentes IA" }}
           next={{ href: "/docs/projects", title: "Proyectos" }}
         />
       </article>

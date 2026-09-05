@@ -123,11 +123,19 @@ export default function QuotesPage() {
           <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
             <li>• <strong style={{ color: "var(--foreground)" }}>Por email:</strong> Haz clic en "Enviar por email" para abrir el compositor con la cotización como PDF adjunto.</li>
             <li>• <strong style={{ color: "var(--foreground)" }}>Por WhatsApp:</strong> Descarga el PDF y envíalo desde el módulo de Conversaciones.</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Link de vista:</strong> Genera un link único para que el cliente vea la cotización en línea sin descargar PDF.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Link público:</strong> cada cotización puede tener un enlace <code>/q/&lt;código&gt;</code> que muestra la misma cotización del PDF en el navegador, sin sesión. Se incluye en el correo y puedes copiarlo para WhatsApp. Caduca a los 120 días y lo puedes revocar cuando quieras.</li>
           </ul>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Al enviarla, la cotización pasa de <em>Borrador</em> a <em>Enviada</em> y queda una actividad
+            «Cotización enviada» en la ficha del contacto, sin importar si salió por el compositor
+            de correo o por la API.
+          </p>
           <Callout type="tip">
-            Cuando envías la cotización por email desde FusionCRM y el cliente la abre, recibirás
-            una notificación. Esto te permite hacer seguimiento en el momento justo.
+            Cuando el cliente abre el link público se registra una vista (varias aperturas del mismo
+            lector en 30 minutos cuentan como una). Con el disparador <em>Cotización vista</em> de
+            automatizaciones puedes avisarle al asesor en la primera apertura, o solo cuando el
+            cliente la abre por tercera vez. La apertura del correo es una señal más débil: los
+            clientes de correo la marcan solos.
           </Callout>
         </section>
 

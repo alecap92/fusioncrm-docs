@@ -14,8 +14,8 @@ const toc = [
   { id: "integrations", label: "Integraciones" },
   { id: "email-settings", label: "Configuración de email" },
   { id: "lead-scoring", label: "Lead Scoring" },
-  { id: "mcp", label: "MCP Connectors" },
-  { id: "api-keys", label: "API Keys" },
+  { id: "mcp", label: "Conectores MCP" },
+  { id: "api-keys", label: "Tokens de API" },
   { id: "security", label: "Seguridad" },
   { id: "plan", label: "Plan y facturación" },
 ];
@@ -175,88 +175,83 @@ export default function SettingsPage() {
         </section>
 
         <section id="mcp" className="mb-10">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>MCP Connectors</h2>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Conectores MCP</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            El protocolo MCP (Model Context Protocol) permite conectar FusionCRM con modelos
-            de inteligencia artificial externos como Claude (Anthropic), GPT-4 (OpenAI) y otros.
+            En <strong style={{ color: "var(--foreground)" }}>Configuración → Desarrollador → Conectores MCP</strong> (solo
+            propietarios) creas las credenciales con las que Claude, ChatGPT o Cursor se conectan al
+            servidor MCP de FusionCRM y operan el CRM con más de 90 herramientas.
           </p>
-          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Con los conectores MCP puedes:
-          </p>
-          <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Dar acceso a una IA a los datos del CRM para responder preguntas</li>
-            <li>• Permitir que la IA cree contactos, deals o actividades desde una conversación</li>
-            <li>• Conectar agentes de IA personalizados al flujo de atención al cliente</li>
-            <li>• Integrar con herramientas como Claude Desktop o n8n con IA</li>
-          </ul>
-          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Configurar un conector MCP</h3>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. Ve a Configuración → MCP Connectors</li>
-            <li>2. Haz clic en "+ Nuevo conector"</li>
-            <li>3. Selecciona el tipo de cliente MCP (Claude, GPT, personalizado)</li>
-            <li>4. Configura los permisos de acceso (lectura, escritura)</li>
-            <li>5. Copia la URL del servidor MCP generada</li>
-            <li>6. Configura el cliente MCP externo con esa URL</li>
+            <li>1. <em>Crear conector MCP</em> y ponle un nombre que diga desde dónde se conecta (ej. «Claude Desktop - Producción»).</li>
+            <li>2. Copia el <strong style={{ color: "var(--foreground)" }}>Client ID</strong> y el <strong style={{ color: "var(--foreground)" }}>Secreto</strong>; el secreto se muestra una sola vez.</li>
+            <li>3. En tu cliente de IA agrega un conector personalizado con la URL <code style={{ color: "#d1345b" }}>https://api.fusioncol.com/api/mcp</code> y esas credenciales.</li>
+            <li>4. Revócalo desde la misma lista cuando ya no lo uses.</li>
           </ol>
-          <Callout type="warning">
-            Los conectores MCP tienen acceso a datos sensibles del CRM. Configura solo los
-            permisos mínimos necesarios y revisa regularmente qué acciones ejecuta la IA.
-          </Callout>
+          <p style={{ color: "var(--muted-foreground)" }}>
+            Guía completa, clientes soportados y lista de herramientas en{" "}
+            <a href="/docs/mcp" style={{ color: "#d1345b" }}>MCP: el CRM desde tu IA</a>.
+          </p>
         </section>
 
         <section id="api-keys" className="mb-10">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>API Keys</h2>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Tokens de API</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Las API Keys permiten a aplicaciones externas interactuar con FusionCRM a través
-            de la API REST.
+            Los tokens de API permiten a tus sistemas leer y escribir en FusionCRM por la API REST
+            (y también sirven para el MCP). Se crean en{" "}
+            <strong style={{ color: "var(--foreground)" }}>Configuración → Desarrollador → API</strong> (solo propietarios).
           </p>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. Ve a Configuración → API</li>
-            <li>2. Haz clic en "+ Generar nueva API Key"</li>
-            <li>3. Asigna un nombre descriptivo (ej. "Integración N8N")</li>
-            <li>4. Copia y guarda la clave. Solo se muestra una vez.</li>
+            <li>1. <em>Crear nuevo token</em>: nombre (ej. «integracion-n8n») y descripción.</li>
+            <li>2. Expiración: 30 días, 90 días, 1 año o sin expiración.</li>
+            <li>3. Permisos: usa un preset (Solo lectura, Ventas, Acceso completo) o marca uno por uno.</li>
+            <li>4. Copia el token: solo se muestra una vez. Revócalo desde la misma lista si se filtra.</li>
           </ol>
-          <Callout type="danger">
-            Nunca compartas tu API Key públicamente ni la incluyas en código del lado del cliente.
-            Si una clave se compromete, revócala inmediatamente desde este panel y genera una nueva.
-          </Callout>
+          <p style={{ color: "var(--muted-foreground)" }}>
+            Headers, tabla de permisos y referencia completa en{" "}
+            <a href="/docs/api" style={{ color: "#d1345b" }}>API REST</a>. La API y el MCP hacen parte
+            del módulo API del plan.
+          </p>
         </section>
 
         <section id="security" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Seguridad</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Opciones de seguridad disponibles en Configuración → Seguridad:
+            Lo que encuentras en Configuración → General → Seguridad:
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• <strong style={{ color: "var(--foreground)" }}>2FA (autenticación de dos factores):</strong> Activa para toda la organización</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Políticas de contraseña:</strong> Longitud mínima, complejidad requerida</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Sesiones activas:</strong> Ver y revocar sesiones activas de usuarios</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Log de auditoría:</strong> Registro de acciones realizadas por usuarios</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>IP permitidas:</strong> Restricción de acceso por rango de IP (plan Enterprise)</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Verificación en dos pasos (2FA):</strong> cada usuario la activa con una app de códigos (Google Authenticator, 1Password…). El propietario puede exigirla a toda la organización: quien no la tenga configurada solo podrá activarla hasta hacerlo.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Sesiones por dispositivo:</strong> ves desde qué navegadores y dispositivos hay sesión abierta y puedes cerrar cualquiera al instante. El propietario puede cerrar todas las sesiones de la organización.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Aviso de dispositivo nuevo:</strong> un correo cuando alguien entra desde un equipo desconocido.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Credenciales cifradas:</strong> las claves de integraciones (WhatsApp, OpenAI, correo) se guardan cifradas en reposo.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Habeas Data:</strong> desde la ficha de un contacto el propietario exporta todos sus datos (JSON o Excel) con consentimientos, origen y respuestas de formularios, para atender una solicitud de la Ley 1581.</li>
           </ul>
         </section>
 
         <section id="plan" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Plan y facturación</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Desde Configuración → Plan puedes:
+            Hay tres planes: <strong style={{ color: "var(--foreground)" }}>Free</strong>,{" "}
+            <strong style={{ color: "var(--foreground)" }}>Pro</strong> y{" "}
+            <strong style={{ color: "var(--foreground)" }}>Unlimited</strong>. Los precios y límites vigentes
+            están siempre en <a href="https://www.fusioncol.com/precios" style={{ color: "#d1345b" }}>fusioncol.com/precios</a>.
+            Desde Configuración → General → Plan puedes:
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Ver el plan actual y sus límites (usuarios, contactos, almacenamiento)</li>
-            <li>• Actualizar a un plan superior</li>
-            <li>• Ver el historial de facturas</li>
-            <li>• Actualizar el método de pago</li>
-            <li>• Cancelar la suscripción</li>
+            <li>• Ver tu plan, su uso (contactos, usuarios, cotizaciones…) y qué incluye.</li>
+            <li>• Subir de plan pagando con tarjeta (Wompi); la renovación es mensual y automática.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Asientos:</strong> cada plan incluye cierto número de usuarios; puedes comprar asientos adicionales en cualquier momento (se cobra la parte proporcional del mes) y liberarlos después. Los usuarios con rol <em>lector</em> no consumen asiento.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Módulos:</strong> la facturación electrónica y el acceso por API/MCP se contratan aparte y se activan por organización.</li>
+            <li>• Ver el historial de pagos.</li>
           </ul>
           <Callout type="tip">
-            Para descuentos por volumen o planes Enterprise personalizados, contacta al equipo
-            comercial en <strong style={{ color: "#d1345b" }}>ventas@fusioncol.com</strong>.
+            Si necesitas condiciones especiales, escribe a{" "}
+            <strong style={{ color: "#d1345b" }}>ventas@fusioncol.com</strong>.
           </Callout>
         </section>
 
         <DocNav
           prev={{ href: "/docs/projects", title: "Proyectos" }}
-          next={{ href: "/docs/api", title: "API Externa" }}
+          next={{ href: "/docs/api", title: "API REST" }}
         />
       </article>
 

@@ -10,7 +10,7 @@ const toc = [
   { id: "overview", label: "Integraciones disponibles" },
   { id: "whatsapp", label: "WhatsApp Business" },
   { id: "n8n", label: "N8N" },
-  { id: "webhooks", label: "Webhooks entrantes" },
+  { id: "webhooks", label: "Webhooks y datos entrantes" },
   { id: "social", label: "Redes sociales" },
   { id: "gmail", label: "Gmail y Outlook" },
 ];
@@ -33,12 +33,12 @@ export default function IntegrationsPage() {
               { name: "WhatsApp Business", status: "Nativo", color: "#25D366", desc: "Canal principal de mensajería" },
               { name: "Gmail", status: "OAuth", color: "#EA4335", desc: "Email de Google Workspace" },
               { name: "Outlook / M365", status: "OAuth", color: "#0078D4", desc: "Email de Microsoft" },
-              { name: "N8N", status: "Webhook", color: "#EA5B0C", desc: "Automatizaciones avanzadas" },
-              { name: "Facebook", status: "API", color: "#1877F2", desc: "Leads y mensajes FB" },
-              { name: "Instagram", status: "API", color: "#E4405F", desc: "DMs y comentarios" },
-              { name: "LinkedIn", status: "Próximo", color: "#0A66C2", desc: "Prospectos B2B" },
-              { name: "Webhooks", status: "REST", color: "#6b7280", desc: "Cualquier sistema con API" },
-              { name: "MCP (IA)", status: "Nativo", color: "#1f2a48", desc: "Modelos de lenguaje" },
+              { name: "N8N / Make / Zapier", status: "API", color: "#EA5B0C", desc: "Por la API REST y peticiones HTTP" },
+              { name: "Facebook Messenger", status: "OAuth", color: "#1877F2", desc: "Mensajes de la página" },
+              { name: "Instagram", status: "OAuth", color: "#E4405F", desc: "Mensajes directos" },
+              { name: "API REST", status: "Nativo", color: "#6b7280", desc: "98 operaciones con tokens por permiso" },
+              { name: "MCP (IA)", status: "Nativo", color: "#1f2a48", desc: "Claude, ChatGPT, Cursor" },
+              { name: "Formularios web", status: "Nativo", color: "#0f766e", desc: "Link, embed o webhook" },
             ].map((i) => (
               <div key={i.name} className="p-4 rounded-lg border" style={{ borderColor: "var(--border)" }}>
                 <div className="flex items-center justify-between mb-2">
@@ -101,17 +101,17 @@ export default function IntegrationsPage() {
         <section id="n8n" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>N8N</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            N8N es una plataforma de automatización de flujos de trabajo open-source. La integración
-            con FusionCRM permite construir automatizaciones más complejas que las que ofrece el
-            editor de workflows nativo.
+            N8N (igual que Make o Zapier) es una plataforma de automatización externa. Úsala cuando
+            necesites conectar FusionCRM con sistemas que el editor de automatizaciones nativo no
+            alcanza: un ERP, una hoja de cálculo, Slack, un enriquecedor de datos.
           </p>
           <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Casos de uso con N8N</h3>
           <div className="space-y-3 mb-4">
             {[
               { case: "Sincronización con ERP", desc: "Cuando se crea una factura en FusionCRM, crea la misma entrada en tu ERP contable." },
-              { case: "Lead desde formulario web", desc: "Captura leads de tu sitio web (Typeform, Google Forms) y crea contactos en FusionCRM automáticamente." },
-              { case: "Notificaciones en Slack/Teams", desc: "Cuando se cierra un deal importante, notifica al equipo en el canal de Slack." },
-              { case: "Enriquecimiento de datos", desc: "Cuando se crea un contacto, busca información adicional en LinkedIn o Clearbit y actualiza el perfil." },
+              { case: "Lead desde otra fuente", desc: "Un formulario de Typeform o una hoja de Google crea el contacto con POST /contacts (para tu propio sitio usa mejor los Formularios web nativos)." },
+              { case: "Notificaciones en Slack/Teams", desc: "Una automatización con la acción Petición HTTP llama a tu flujo de n8n cuando un negocio cambia de etapa o llega una cotización." },
+              { case: "Enriquecimiento de datos", desc: "Cuando se crea un contacto, n8n consulta un proveedor externo y actualiza el perfil con PUT /contacts/{id}." },
             ].map((c) => (
               <div key={c.case} className="p-4 rounded-lg border" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
                 <p className="font-semibold text-sm mb-1" style={{ color: "var(--foreground)" }}>{c.case}</p>
@@ -122,41 +122,42 @@ export default function IntegrationsPage() {
 
           <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Conectar N8N</h3>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. En N8N, agrega el nodo HTTP Request</li>
-            <li>2. Usa la URL base de la API de FusionCRM: <code style={{ color: "#d1345b" }}>https://api.fusioncol.com/v1</code></li>
-            <li>3. Configura la autenticación con tu API Key en el header Authorization</li>
-            <li>4. Para recibir eventos de FusionCRM, usa el nodo Webhook de N8N y configúralo en Configuración → Webhooks</li>
+            <li>1. Crea un token en Configuración → Desarrollador → API con los permisos que necesite el flujo.</li>
+            <li>2. En n8n usa el nodo <em>HTTP Request</em> contra <code style={{ color: "#d1345b" }}>https://api.fusioncol.com/api</code> con el header <code>Authorization: Bearer &lt;token&gt;</code>.</li>
+            <li>3. Para que FusionCRM llame a n8n, crea una automatización con el disparador que te interese y la acción <em>Petición HTTP</em> apuntando a la URL del nodo <em>Webhook</em> de n8n; o pon esa URL como webhook de una columna del pipeline de conversaciones.</li>
           </ol>
           <Callout type="tip">
-            FusionCRM también tiene un nodo nativo en N8N. Busca "FusionCRM" en la biblioteca
-            de nodos de N8N para una integración simplificada sin configuración manual.
+            No hay un nodo «FusionCRM» en n8n: con el nodo HTTP Request y la{" "}
+            <a href="/docs/api" style={{ color: "#d1345b" }}>referencia de la API</a> tienes todo. Si
+            lo que quieres es que una IA opere el CRM, mira <a href="/docs/mcp" style={{ color: "#d1345b" }}>MCP</a>.
           </Callout>
         </section>
 
         <section id="webhooks" className="mb-10">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Webhooks entrantes</h2>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Webhooks y datos entrantes</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            FusionCRM puede recibir webhooks de sistemas externos para crear o actualizar datos
-            automáticamente. Útil para integrar formularios web, e-commerce, ERPs y más.
+            <strong style={{ color: "var(--foreground)" }}>Hacia FusionCRM</strong> hay dos puertas: la API (cualquier
+            recurso, con token) y el webhook de un <a href="/docs/forms" style={{ color: "#d1345b" }}>formulario web</a>,
+            pensado para leads: deduplica por correo o celular, guarda el origen y puede abrir un
+            negocio y avisar al equipo. Cada formulario tiene su URL con una clave pública revocable:
           </p>
-          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Configurar webhook entrante</h3>
-          <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. Ve a Configuración → Integraciones → Webhooks entrantes</li>
-            <li>2. Crea un nuevo webhook y obtén la URL única generada</li>
-            <li>3. Configura el mapping de campos (qué campo del JSON va a qué campo del CRM)</li>
-            <li>4. Configura el sistema externo para enviar un POST a esa URL</li>
-          </ol>
           <div className="rounded-lg p-4 mb-4" style={{ backgroundColor: "var(--code-bg)", border: "1px solid var(--border)" }}>
-            <p className="text-xs font-semibold mb-2" style={{ color: "var(--muted-foreground)" }}>Ejemplo: Crear contacto desde formulario web</p>
-            <pre className="text-sm" style={{ color: "var(--foreground)" }}>{`POST https://api.fusioncol.com/webhooks/abc123xyz
+            <p className="text-xs font-semibold mb-2" style={{ color: "var(--muted-foreground)" }}>Ejemplo: lead desde un formulario propio</p>
+            <pre className="text-sm overflow-x-auto" style={{ color: "var(--foreground)" }}>{`POST https://forms.fusioncol.com/api/v1/forms/submit/<formId>?key=fk_xxxxxxxx
 {
-  "name": "María López",
+  "nombre": "María López",
   "email": "maria@empresa.com",
-  "phone": "3109876543",
-  "company": "Empresa SAS",
-  "source": "landing-page-enero-2025"
+  "celular": "3109876543",
+  "utm_source": "google",
+  "utm_campaign": "landing-enero"
 }`}</pre>
           </div>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <strong style={{ color: "var(--foreground)" }}>Desde FusionCRM</strong> hacia tu sistema: el webhook de
+            etapa del pipeline de conversaciones y la acción <em>Petición HTTP</em> de las
+            automatizaciones. Los cuerpos exactos están documentados en{" "}
+            <a href="/docs/api#webhooks" style={{ color: "#d1345b" }}>API REST → Webhooks salientes</a>.
+          </p>
         </section>
 
         <section id="social" className="mb-10">
@@ -200,8 +201,8 @@ export default function IntegrationsPage() {
         </section>
 
         <DocNav
-          prev={{ href: "/docs/api", title: "API Externa" }}
-          next={{ href: "/docs/spikey", title: "Spikey AI" }}
+          prev={{ href: "/docs/mcp", title: "MCP: el CRM desde tu IA" }}
+          next={{ href: "/docs/agentes-ia", title: "Agentes IA" }}
         />
       </article>
 

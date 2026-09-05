@@ -25,9 +25,12 @@ const cards = [
   { icon: <Calendar size={20} />, title: "Calendario", desc: "Gestión de citas, eventos y actividades.", href: "/docs/calendar", color: "#0ea5e9" },
   { icon: <FolderKanban size={20} />, title: "Proyectos", desc: "Gestión de proyectos y equipos de trabajo.", href: "/docs/projects", color: "#64748b" },
   { icon: <Settings size={20} />, title: "Configuración", desc: "Organización, usuarios, integraciones y seguridad.", href: "/docs/settings", color: "#6b7280" },
-  { icon: <Code2 size={20} />, title: "API Externa", desc: "Endpoints REST, autenticación y ejemplos de integración.", href: "/docs/api", color: "#1f2a48" },
-  { icon: <Puzzle size={20} />, title: "Integraciones", desc: "WhatsApp Business, N8N, webhooks y redes sociales.", href: "/docs/integrations", color: "#0f766e" },
-  { icon: <Star size={20} />, title: "Spikey AI", desc: "Asistente de IA integrado en todo el CRM.", href: "/docs/spikey", color: "#d1345b" },
+  { icon: <Code2 size={20} />, title: "API REST", desc: "98 operaciones documentadas, tokens por permiso y webhooks salientes.", href: "/docs/api", color: "#1f2a48" },
+  { icon: <Star size={20} />, title: "MCP (IA)", desc: "Usa el CRM desde Claude, ChatGPT o Cursor con más de 90 herramientas.", href: "/docs/mcp", color: "#d1345b" },
+  { icon: <Puzzle size={20} />, title: "Integraciones", desc: "WhatsApp Business, n8n, Messenger, Instagram y correo.", href: "/docs/integrations", color: "#0f766e" },
+  { icon: <Briefcase size={20} />, title: "Empresas", desc: "Cuentas B2B con contactos, negocios y facturas agrupados.", href: "/docs/companies", color: "#0ea5e9" },
+  { icon: <Send size={20} />, title: "Formularios web", desc: "Leads desde tu sitio sin duplicados y con su campaña de origen.", href: "/docs/forms", color: "#16a34a" },
+  { icon: <Zap size={20} />, title: "Agentes IA", desc: "Un asistente que atiende WhatsApp con el contexto del cliente.", href: "/docs/agentes-ia", color: "#7c3aed" },
 ];
 
 export default function DocsIndexPage() {

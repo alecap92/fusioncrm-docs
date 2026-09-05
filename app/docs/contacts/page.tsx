@@ -305,7 +305,7 @@ María,López,maria@empresa.com,3109876543,Otra Empresa,Medellín`}
 
         <DocNav
           prev={{ href: "/docs/getting-started", title: "Primeros Pasos" }}
-          next={{ href: "/docs/deals", title: "Deals" }}
+          next={{ href: "/docs/companies", title: "Empresas" }}
         />
       </article>
 

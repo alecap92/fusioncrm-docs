@@ -22,9 +22,12 @@ const labels: Record<string, string> = {
   calendar: "Calendario",
   projects: "Proyectos",
   settings: "Configuración",
-  api: "API Externa",
+  api: "API REST",
+  mcp: "MCP",
   integrations: "Integraciones",
-  spikey: "Spikey AI",
+  companies: "Empresas",
+  forms: "Formularios web",
+  "agentes-ia": "Agentes IA",
 };
 
 export default function Breadcrumbs() {

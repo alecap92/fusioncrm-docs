@@ -145,15 +145,17 @@ export default function LeadScoringPage() {
         </section>
 
         <section id="ai-scoring" className="mb-10">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Scoring con IA (Spikey)</h2>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Scoring y agentes IA</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Además del scoring basado en reglas, FusionCRM incluye scoring asistido por IA
-            a través de Spikey. La IA analiza patrones en conversaciones, actividad histórica
-            y datos del contacto para sugerir una calificación adicional.
+            El puntaje se recalcula con cada evento que tus reglas miren: un negocio que cambia de
+            etapa (desde el kanban, el modal, la API o el MCP), un mensaje, un formulario enviado.
+            Un <a href="/docs/agentes-ia" style={{ color: "#d1345b" }}>agente IA</a> que califica
+            leads por WhatsApp alimenta esas mismas reglas: al mover la conversación de etapa o
+            guardar el estado del lead, el puntaje se actualiza como si lo hubiera hecho una persona.
           </p>
           <Callout type="tip">
-            El scoring de IA complementa (no reemplaza) las reglas manuales. Úsalo para
-            descubrir patrones que no habías considerado en tus reglas.
+            El puntaje de una empresa es el más alto entre sus contactos; úsalo para priorizar
+            cuentas, no solo personas.
           </Callout>
         </section>
 

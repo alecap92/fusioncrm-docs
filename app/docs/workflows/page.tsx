@@ -206,7 +206,7 @@ export default function WorkflowsPage() {
 
         <DocNav
           prev={{ href: "/docs/lead-scoring", title: "Lead Scoring" }}
-          next={{ href: "/docs/calendar", title: "Calendario" }}
+          next={{ href: "/docs/agentes-ia", title: "Agentes IA" }}
         />
       </article>
 

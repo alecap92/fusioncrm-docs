@@ -174,7 +174,6 @@ export default function GettingStartedPage() {
             <li><strong style={{ color: "var(--foreground)" }}>Búsqueda global:</strong> Busca contactos, deals o conversaciones desde cualquier pantalla.</li>
             <li><strong style={{ color: "var(--foreground)" }}>Notificaciones:</strong> Alertas de actividad, menciones y recordatorios.</li>
             <li><strong style={{ color: "var(--foreground)" }}>Perfil de usuario:</strong> Acceso a tu perfil, cambio de contraseña y cierre de sesión.</li>
-            <li><strong style={{ color: "var(--foreground)" }}>Spikey AI:</strong> Botón para abrir el asistente de inteligencia artificial.</li>
           </ul>
         </section>
 

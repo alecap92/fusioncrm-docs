@@ -40,6 +40,26 @@ const navigation: NavItem[] = [
     ],
   },
   {
+    title: "Empresas",
+    icon: <Briefcase size={16} />,
+    badge: "B2B",
+    children: [
+      { title: "Personas y cuentas", href: "/docs/companies" },
+      { title: "Crear y vincular", href: "/docs/companies#create" },
+      { title: "La ficha de la empresa", href: "/docs/companies#detail" },
+    ],
+  },
+  {
+    title: "Formularios web",
+    icon: <Send size={16} />,
+    children: [
+      { title: "Para qué sirven", href: "/docs/forms" },
+      { title: "Link, embed o webhook", href: "/docs/forms#share" },
+      { title: "Qué pasa con cada envío", href: "/docs/forms#submit" },
+      { title: "Después del envío", href: "/docs/forms#after" },
+    ],
+  },
+  {
     title: "Deals / Negocios",
     icon: <Briefcase size={16} />,
     children: [
@@ -48,6 +68,7 @@ const navigation: NavItem[] = [
       { title: "Etapas y movimiento", href: "/docs/deals#stages" },
       { title: "Filtros y búsqueda", href: "/docs/deals#filters" },
       { title: "Productos en deals", href: "/docs/deals#products" },
+      { title: "Requisitos por etapa", href: "/docs/deals#requirements" },
     ],
   },
   {
@@ -148,6 +169,17 @@ const navigation: NavItem[] = [
     ],
   },
   {
+    title: "Agentes IA",
+    icon: <Star size={16} />,
+    badge: "IA",
+    children: [
+      { title: "¿Qué es un agente IA?", href: "/docs/agentes-ia" },
+      { title: "Crear un agente", href: "/docs/agentes-ia#setup" },
+      { title: "Habilidades (tools)", href: "/docs/agentes-ia#tools" },
+      { title: "Base de conocimiento", href: "/docs/agentes-ia#knowledge" },
+    ],
+  },
+  {
     title: "Calendario",
     icon: <Calendar size={16} />,
     children: [
@@ -171,21 +203,33 @@ const navigation: NavItem[] = [
       { title: "Integraciones", href: "/docs/settings#integrations" },
       { title: "Campos personalizados", href: "/docs/settings#fields" },
       { title: "Lead Scoring config", href: "/docs/settings#lead-scoring" },
-      { title: "MCP Connectors", href: "/docs/settings#mcp" },
-      { title: "API Keys", href: "/docs/settings#api-keys" },
-      { title: "Plan y facturación", href: "/docs/settings#plan" },
+      { title: "Seguridad y 2FA", href: "/docs/settings#security" },
+      { title: "Conectores MCP", href: "/docs/settings#mcp" },
+      { title: "Tokens de API", href: "/docs/settings#api-keys" },
+      { title: "Plan, asientos y módulos", href: "/docs/settings#plan" },
     ],
   },
   {
-    title: "API Externa",
+    title: "API REST",
     icon: <Code2 size={16} />,
     badge: "REST",
     children: [
-      { title: "Autenticación", href: "/docs/api" },
-      { title: "Contactos API", href: "/docs/api#contacts" },
-      { title: "Deals API", href: "/docs/api#deals" },
-      { title: "Conversaciones API", href: "/docs/api#conversations" },
-      { title: "Webhooks", href: "/docs/api#webhooks" },
+      { title: "Autenticación y tokens", href: "/docs/api#auth" },
+      { title: "Permisos", href: "/docs/api#permissions" },
+      { title: "Referencia de endpoints", href: "/docs/api#reference" },
+      { title: "Webhooks salientes", href: "/docs/api#webhooks" },
+      { title: "Errores y límites", href: "/docs/api#errors" },
+    ],
+  },
+  {
+    title: "MCP (IA)",
+    icon: <Star size={16} />,
+    badge: "MCP",
+    children: [
+      { title: "Qué es MCP", href: "/docs/mcp" },
+      { title: "Conectar Claude, Cursor…", href: "/docs/mcp#connect" },
+      { title: "Permisos y seguridad", href: "/docs/mcp#security" },
+      { title: "Herramientas disponibles", href: "/docs/mcp#tools" },
     ],
   },
   {
@@ -193,20 +237,9 @@ const navigation: NavItem[] = [
     icon: <Puzzle size={16} />,
     children: [
       { title: "WhatsApp Business", href: "/docs/integrations" },
-      { title: "N8N", href: "/docs/integrations#n8n" },
-      { title: "Webhooks entrantes", href: "/docs/integrations#webhooks" },
+      { title: "N8N, Make, Zapier", href: "/docs/integrations#n8n" },
+      { title: "Webhooks y datos entrantes", href: "/docs/integrations#webhooks" },
       { title: "Social Media", href: "/docs/integrations#social" },
-    ],
-  },
-  {
-    title: "Spikey AI",
-    icon: <Star size={16} />,
-    badge: "AI",
-    children: [
-      { title: "¿Qué es Spikey?", href: "/docs/spikey" },
-      { title: "Chat flotante", href: "/docs/spikey#floating-chat" },
-      { title: "AI Comments", href: "/docs/spikey#comments" },
-      { title: "Lead Scoring AI", href: "/docs/spikey#scoring" },
     ],
   },
 ];

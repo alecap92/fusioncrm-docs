@@ -19,6 +19,14 @@ npm run build
 npm start
 ```
 
+## Datos generados desde el backend
+
+- `data/mcp-tools.json` es el catálogo de tools del MCP que publica el API
+  (`https://api.fusioncol.com/api/mcp-tools.json`). La página `/docs/mcp` lo lee en build.
+  Cuando cambien los tools: `node scripts/sync-mcp-tools.mjs` y commit.
+- `/docs/api` embebe Swagger UI (CDN) sobre `https://api.fusioncol.com/api/openapi.json`,
+  que sí se consulta en runtime: no hay nada que sincronizar.
+
 ## Deploy en Vercel
 
 1. Conecta el repositorio en [vercel.com](https://vercel.com)
