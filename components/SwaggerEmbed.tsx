@@ -1,11 +1,14 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 /**
  * Swagger UI cargado desde CDN sobre el spec público del backend
  * (`/api/openapi.json` sale con `Access-Control-Allow-Origin: *`).
  * No se usa un iframe de `/api/docs`: helmet manda `X-Frame-Options`
  * y el navegador lo bloquearía desde docs.fusioncol.com.
+ *
+ * Sin estado de React a propósito: Swagger toma el control del nodo y el
+ * mensaje de carga/error se escribe directo en el DOM.
  */
 const SWAGGER_VERSION = "5.17.14";
 const CDN = `https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/${SWAGGER_VERSION}`;
@@ -20,12 +23,17 @@ interface SwaggerEmbedProps {
   specUrl: string;
 }
 
+const ERROR_HTML =
+  'No se pudo cargar el visor. Abre la referencia directamente en ' +
+  '<a href="https://api.fusioncol.com/api/docs" target="_blank" rel="noopener noreferrer" style="color:#d1345b">api.fusioncol.com/api/docs</a>.';
+
 export default function SwaggerEmbed({ specUrl }: SwaggerEmbedProps) {
   const container = useRef<HTMLDivElement>(null);
-  const [state, setState] = useState<"loading" | "ready" | "error">("loading");
 
   useEffect(() => {
     let cancelled = false;
+    const node = container.current;
+    if (!node) return;
 
     const ensureCss = () => {
       if (document.getElementById("swagger-ui-css")) return;
@@ -57,10 +65,12 @@ export default function SwaggerEmbed({ specUrl }: SwaggerEmbedProps) {
     ensureCss();
     ensureScript()
       .then(() => {
-        if (cancelled || !container.current || !window.SwaggerUIBundle) return;
+        if (cancelled || !window.SwaggerUIBundle) return;
+        node.textContent = "";
+        node.style.minHeight = "400px";
         window.SwaggerUIBundle({
           url: specUrl,
-          domNode: container.current,
+          domNode: node,
           deepLinking: false,
           docExpansion: "list",
           defaultModelsExpandDepth: 0,
@@ -68,10 +78,9 @@ export default function SwaggerEmbed({ specUrl }: SwaggerEmbedProps) {
           tryItOutEnabled: false,
           persistAuthorization: false,
         });
-        setState("ready");
       })
       .catch(() => {
-        if (!cancelled) setState("error");
+        if (!cancelled) node.innerHTML = `<p style="padding:1rem;font-size:0.875rem">${ERROR_HTML}</p>`;
       });
 
     return () => {
@@ -80,26 +89,12 @@ export default function SwaggerEmbed({ specUrl }: SwaggerEmbedProps) {
   }, [specUrl]);
 
   return (
-    <div>
-      {state === "loading" && (
-        <p className="text-sm mb-3" style={{ color: "var(--muted-foreground)" }}>
-          Cargando la referencia de la API…
-        </p>
-      )}
-      {state === "error" && (
-        <p className="text-sm mb-3" style={{ color: "var(--muted-foreground)" }}>
-          No se pudo cargar el visor. Abre la referencia directamente en{" "}
-          <a href="https://api.fusioncol.com/api/docs" target="_blank" rel="noopener noreferrer" style={{ color: "#d1345b" }}>
-            api.fusioncol.com/api/docs
-          </a>
-          .
-        </p>
-      )}
-      <div
-        ref={container}
-        className="swagger-embed rounded-lg border overflow-hidden"
-        style={{ borderColor: "var(--border)", backgroundColor: "#ffffff", minHeight: state === "ready" ? 400 : 0 }}
-      />
+    <div
+      ref={container}
+      className="swagger-embed rounded-lg border overflow-hidden"
+      style={{ borderColor: "var(--border)", backgroundColor: "#ffffff" }}
+    >
+      <p style={{ padding: "1rem", fontSize: "0.875rem", color: "#6b7280" }}>Cargando la referencia de la API…</p>
     </div>
   );
 }
