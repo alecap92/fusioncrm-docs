@@ -146,7 +146,7 @@ Content-Type: application/json
 
         <DocNav
           prev={{ href: "/docs/companies", title: "Empresas" }}
-          next={{ href: "/docs/deals", title: "Deals" }}
+          next={{ href: "/docs/landing-pages", title: "Páginas de aterrizaje" }}
         />
       </article>
 

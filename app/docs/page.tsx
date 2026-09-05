@@ -3,8 +3,7 @@ import Link from "next/link";
 import {
   Users, Briefcase, GitBranch, MessageSquare, Mail, FileText,
   BarChart2, Settings, Code2, Puzzle, Zap, Star, Package, CreditCard,
-  ArrowRight, BookOpen, Send, Calendar, FolderKanban, TrendingUp
-} from "lucide-react";
+  ArrowRight, BookOpen, Send, Calendar, FolderKanban, TrendingUp, LayoutTemplate } from "lucide-react";
 
 export const metadata: Metadata = { title: "Introducción" };
 
@@ -30,6 +29,7 @@ const cards = [
   { icon: <Puzzle size={20} />, title: "Integraciones", desc: "WhatsApp Business, n8n, Messenger, Instagram y correo.", href: "/docs/integrations", color: "#0f766e" },
   { icon: <Briefcase size={20} />, title: "Empresas", desc: "Cuentas B2B con contactos, negocios y facturas agrupados.", href: "/docs/companies", color: "#0ea5e9" },
   { icon: <Send size={20} />, title: "Formularios web", desc: "Leads desde tu sitio sin duplicados y con su campaña de origen.", href: "/docs/forms", color: "#16a34a" },
+  { icon: <LayoutTemplate size={20} />, title: "Páginas de aterrizaje", desc: "Landing pages para tus anuncios que convierten a WhatsApp o formulario, con analítica propia.", href: "/docs/landing-pages", color: "#c2185b" },
   { icon: <Zap size={20} />, title: "Agentes IA", desc: "Un asistente que atiende WhatsApp con el contexto del cliente.", href: "/docs/agentes-ia", color: "#7c3aed" },
 ];
 

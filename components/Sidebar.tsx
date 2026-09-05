@@ -6,8 +6,7 @@ import {
   Home, Users, Briefcase, GitBranch, MessageSquare, Mail, FileText,
   BarChart2, Settings, Code2, Puzzle, Zap, Star, Package, ShoppingCart,
   FileBarChart, Calendar, FolderKanban, ChevronDown, ChevronRight, X, Menu,
-  BookOpen, Send, CreditCard, TrendingUp
-} from "lucide-react";
+  BookOpen, Send, CreditCard, TrendingUp, LayoutTemplate } from "lucide-react";
 
 interface NavItem {
   title: string;
@@ -57,6 +56,17 @@ const navigation: NavItem[] = [
       { title: "Link, embed o webhook", href: "/docs/forms#share" },
       { title: "Qué pasa con cada envío", href: "/docs/forms#submit" },
       { title: "Después del envío", href: "/docs/forms#after" },
+    ],
+  },
+  {
+    title: "Páginas de aterrizaje",
+    icon: <LayoutTemplate size={16} />,
+    children: [
+      { title: "Para qué sirven", href: "/docs/landing-pages" },
+      { title: "Crear una en 10 minutos", href: "/docs/landing-pages#create" },
+      { title: "Los 8 bloques", href: "/docs/landing-pages#blocks" },
+      { title: "Publicar y compartir", href: "/docs/landing-pages#publish" },
+      { title: "Estadísticas", href: "/docs/landing-pages#stats" },
     ],
   },
   {

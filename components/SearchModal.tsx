@@ -30,6 +30,7 @@ const searchIndex = [
   { title: "Gestión de usuarios y permisos", href: "/docs/settings#users", section: "Configuración", keywords: ["usuarios", "permisos", "equipo", "roles"] },
   { title: "Empresas (cuentas B2B)", href: "/docs/companies", section: "Empresas", keywords: ["empresas", "companies", "cuentas", "b2b", "nit"] },
   { title: "Formularios web", href: "/docs/forms", section: "Formularios", keywords: ["formularios", "forms", "leads", "landing", "embed", "webhook", "utm"] },
+  { title: "Páginas de aterrizaje (landing pages)", href: "/docs/landing-pages", section: "Páginas", keywords: ["landing", "landing page", "paginas", "página", "anuncios", "meta ads", "qr", "whatsapp", "conversion", "pixel"] },
   { title: "Requisitos por etapa (blueprints)", href: "/docs/deals#requirements", section: "Deals", keywords: ["requisitos", "blueprint", "obligatorio", "etapa", "checklist"] },
   { title: "Link público y seguimiento de cotizaciones", href: "/docs/quotes#send", section: "Cotizaciones", keywords: ["cotizacion", "link", "vista", "seguimiento", "publico"] },
   { title: "Seguridad, 2FA y sesiones", href: "/docs/settings#security", section: "Configuración", keywords: ["seguridad", "2fa", "dos pasos", "sesiones", "habeas data"] },
