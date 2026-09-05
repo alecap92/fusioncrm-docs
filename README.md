@@ -30,7 +30,7 @@ npm start
 ## Deploy en Vercel
 
 1. Conecta el repositorio en [vercel.com](https://vercel.com)
-2. Directorio raíz: `documentacion_web/`
+2. Directorio raíz: la raíz del repo (proyecto `fusioncrm-docs`, dominio docs.fusioncol.com)
 3. Framework: **Next.js** (auto-detectado)
 4. Vercel despliega automáticamente en cada push a `main`
 
