@@ -28,6 +28,8 @@ const searchIndex = [
   { title: "Proyectos", href: "/docs/projects", section: "Proyectos", keywords: ["proyectos", "project management"] },
   { title: "Configuración de la organización", href: "/docs/settings", section: "Configuración", keywords: ["settings", "configuracion", "organizacion"] },
   { title: "Gestión de usuarios y permisos", href: "/docs/settings#users", section: "Configuración", keywords: ["usuarios", "permisos", "equipo", "roles"] },
+  { title: "Actividad del equipo: qué hacen tus empleados", href: "/docs/team-activity", section: "Actividad del equipo", keywords: ["actividad", "equipo", "empleados", "vendedores", "rendimiento", "log", "ultima actividad", "informe", "productividad", "supervisar"] },
+  { title: "Informe de equipo automático (correo / WhatsApp)", href: "/docs/team-activity#report", section: "Actividad del equipo", keywords: ["informe", "reporte", "diario", "semanal", "programado", "correo", "whatsapp", "automatizacion"] },
   { title: "Empresas (cuentas B2B)", href: "/docs/companies", section: "Empresas", keywords: ["empresas", "companies", "cuentas", "b2b", "nit"] },
   { title: "Formularios web", href: "/docs/forms", section: "Formularios", keywords: ["formularios", "forms", "leads", "landing", "embed", "webhook", "utm"] },
   { title: "Páginas de aterrizaje (landing pages)", href: "/docs/landing-pages", section: "Páginas", keywords: ["landing", "landing page", "paginas", "página", "anuncios", "meta ads", "qr", "whatsapp", "conversion", "pixel"] },

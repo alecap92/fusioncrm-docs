@@ -251,7 +251,7 @@ export default function SettingsPage() {
 
         <DocNav
           prev={{ href: "/docs/projects", title: "Proyectos" }}
-          next={{ href: "/docs/api", title: "API REST" }}
+          next={{ href: "/docs/team-activity", title: "Actividad del equipo" }}
         />
       </article>
 

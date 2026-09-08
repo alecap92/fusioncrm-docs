@@ -28,6 +28,7 @@ const labels: Record<string, string> = {
   companies: "Empresas",
   forms: "Formularios web",
   "landing-pages": "Páginas de aterrizaje",
+  "team-activity": "Actividad del equipo",
   "agentes-ia": "Agentes IA",
 };
 

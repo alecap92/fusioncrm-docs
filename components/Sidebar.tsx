@@ -6,7 +6,7 @@ import {
   Home, Users, Briefcase, GitBranch, MessageSquare, Mail, FileText,
   BarChart2, Settings, Code2, Puzzle, Zap, Star, Package, ShoppingCart,
   FileBarChart, Calendar, FolderKanban, ChevronDown, ChevronRight, X, Menu,
-  BookOpen, Send, CreditCard, TrendingUp, LayoutTemplate } from "lucide-react";
+  BookOpen, Send, CreditCard, TrendingUp, LayoutTemplate, Activity } from "lucide-react";
 
 interface NavItem {
   title: string;
@@ -217,6 +217,16 @@ const navigation: NavItem[] = [
       { title: "Conectores MCP", href: "/docs/settings#mcp" },
       { title: "Tokens de API", href: "/docs/settings#api-keys" },
       { title: "Plan, asientos y módulos", href: "/docs/settings#plan" },
+    ],
+  },
+  {
+    title: "Actividad del equipo",
+    icon: <Activity size={16} />,
+    children: [
+      { title: "Revisa qué hacen tus empleados", href: "/docs/team-activity" },
+      { title: "Qué se registra", href: "/docs/team-activity#what-counts" },
+      { title: "Resumen, Rendimiento y Log", href: "/docs/team-activity#tabs" },
+      { title: "Informe automático", href: "/docs/team-activity#report" },
     ],
   },
   {

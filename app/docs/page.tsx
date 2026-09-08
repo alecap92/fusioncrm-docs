@@ -3,7 +3,7 @@ import Link from "next/link";
 import {
   Users, Briefcase, GitBranch, MessageSquare, Mail, FileText,
   BarChart2, Settings, Code2, Puzzle, Zap, Star, Package, CreditCard,
-  ArrowRight, BookOpen, Send, Calendar, FolderKanban, TrendingUp, LayoutTemplate } from "lucide-react";
+  ArrowRight, BookOpen, Send, Calendar, FolderKanban, TrendingUp, LayoutTemplate, Activity } from "lucide-react";
 
 export const metadata: Metadata = { title: "Introducción" };
 
@@ -31,6 +31,7 @@ const cards = [
   { icon: <Send size={20} />, title: "Formularios web", desc: "Leads desde tu sitio sin duplicados y con su campaña de origen.", href: "/docs/forms", color: "#16a34a" },
   { icon: <LayoutTemplate size={20} />, title: "Páginas de aterrizaje", desc: "Landing pages para tus anuncios que convierten a WhatsApp o formulario, con analítica propia.", href: "/docs/landing-pages", color: "#c2185b" },
   { icon: <Zap size={20} />, title: "Agentes IA", desc: "Un asistente que atiende WhatsApp con el contexto del cliente.", href: "/docs/agentes-ia", color: "#7c3aed" },
+  { icon: <Activity size={20} />, title: "Actividad del equipo", desc: "Revisa qué hacen tus empleados: mensajes, negocios y cotizaciones por persona, con informe diario a tu correo.", href: "/docs/team-activity", color: "#0f766e" },
 ];
 
 export default function DocsIndexPage() {
