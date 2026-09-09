@@ -140,7 +140,7 @@ export default function DocsIndexPage() {
       >
         <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>
           ¿Tienes preguntas? Contacta al equipo de soporte en{" "}
-          <span className="font-semibold" style={{ color: "#d1345b" }}>soporte@fusioncol.com</span>
+          <span className="font-semibold" style={{ color: "#d1345b" }}>comercial@fusioncol.com</span>
         </p>
       </div>
     </div>
