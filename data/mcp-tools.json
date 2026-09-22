@@ -3,7 +3,7 @@
   "endpoint": "/api/mcp",
   "transport": "streamable-http",
   "source": "src/mcp/createFusionMcpServer.ts",
-  "toolCount": 92,
+  "toolCount": 103,
   "tools": [
     {
       "name": "add_contacts_to_list",
@@ -58,6 +58,76 @@
         ]
       },
       "group": "conversations"
+    },
+    {
+      "name": "apply_invoice_withholdings",
+      "description": "Registrar las retenciones que el cliente practicó al pagar una factura de venta (PUT /api/invoices/:id/withholdings o, con prefix+number, PUT /api/invoices/withholdings). Requiere invoices:write. No emite nada ante la DIAN.\nEs lo mismo que el modal 'Aplicar retenciones' de la app: queda pegado a la factura, netea la cartera (saldo = total − retenciones − abonos) y sale en el Excel del contador y en el informe mensual.\nCada ítem lleva key (concepto) y amount O pct. Con pct el servidor calcula sobre la base sin IVA (tax_exclusive_amount); para reteIva calcula sobre el IVA de la factura. Si no mandas ni amount ni pct usa el porcentaje sugerido del concepto. El monto que manda es el que el cliente retuvo de verdad (el comprobante): si difiere del cálculo, manda amount.\nConceptos y % sugerido: compras25 (2.5), compras35 (3.5), serviciosGeneral4 (4), serviciosGeneral6 (6), honorarios10 (10), honorarios11 (11), arrendamientoBienesMuebles (4), arrendamientoBienesRaices (3.5), serviciosAseoVigilancia (2), serviciosHotelesRestaurantes (3.5), transporteCarga (1), reteIva (15, sobre el IVA), reteIca (sin % sugerido: manda amount).\nREEMPLAZA el set completo de la factura (idempotente): para editar, manda todos los ítems otra vez. Con dryRun: true devuelve el cálculo sin guardar; úsalo para mostrarle a la persona el total y el neto antes de aplicar.\nSolo facturas de venta (direction outgoing, tipo factura): notas crédito/débito y facturas de proveedor responden 422 NOT_A_SALES_INVOICE.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "_id de la factura (preferido)",
+            "type": "string"
+          },
+          "prefix": {
+            "description": "Prefijo de la factura, ej. FS (si no tienes el id)",
+            "type": "string"
+          },
+          "number": {
+            "description": "Número de la factura (si no tienes el id)",
+            "type": "number"
+          },
+          "items": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "enum": [
+                    "compras25",
+                    "compras35",
+                    "serviciosGeneral4",
+                    "serviciosGeneral6",
+                    "honorarios10",
+                    "honorarios11",
+                    "arrendamientoBienesMuebles",
+                    "arrendamientoBienesRaices",
+                    "serviciosAseoVigilancia",
+                    "serviciosHotelesRestaurantes",
+                    "transporteCarga",
+                    "reteIva",
+                    "reteIca"
+                  ],
+                  "description": "Concepto de la retención"
+                },
+                "amount": {
+                  "description": "Monto retenido en COP (manda si lo sabes)",
+                  "type": "number"
+                },
+                "pct": {
+                  "description": "Porcentaje sobre la base (sobre el IVA si es reteIva)",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "key"
+              ]
+            },
+            "description": "Retenciones a registrar; reemplazan las que hubiera"
+          },
+          "dryRun": {
+            "description": "true = calcular sin guardar",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "group": "invoices"
     },
     {
       "name": "change_conversation_pipeline",
@@ -284,6 +354,44 @@
           "companyId": {
             "description": "ID de la empresa (Company) a asociar al deal. Opcional: si se omite se hereda la del contacto principal.",
             "type": "string"
+          },
+          "customFields": {
+            "description": "Campos personalizados: [{ \"field\": \"<_id del campo>\", \"value\": \"...\" }]. El `field` es el _id de la definición del campo (el que vive en dealsfields), NO su nombre ni su key: un nombre no se resuelve y la escritura se pierde.",
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "field"
+                  ]
+                }
+              },
+              {
+                "type": "string"
+              }
+            ]
           }
         },
         "additionalProperties": {}
@@ -391,33 +499,152 @@
     },
     {
       "name": "create_invoice",
-      "description": "Crear factura (cuerpo según POST /api/invoices).",
+      "description": "Crear factura electrónica (POST /api/invoices, formato DIAN). Requiere customer con identification_number, invoice_lines no vacío y legal_monetary_totals.payable_amount > 0.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "customer": {
+            "type": "object",
+            "properties": {
+              "identification_number": {
+                "type": "string",
+                "description": "NIT o cédula del cliente"
+              },
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "identification_number"
+            ],
+            "additionalProperties": {}
+          },
+          "invoice_lines": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": {}
+            },
+            "description": "Líneas de la factura en formato DIAN"
+          },
+          "legal_monetary_totals": {
+            "type": "object",
+            "properties": {
+              "payable_amount": {
+                "type": "number",
+                "description": "Total a pagar (> 0)"
+              }
+            },
+            "required": [
+              "payable_amount"
+            ],
+            "additionalProperties": {}
+          },
+          "date": {
+            "description": "Fecha de emisión (YYYY-MM-DD)",
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "customer",
+          "invoice_lines",
+          "legal_monetary_totals"
+        ],
         "additionalProperties": {}
       },
       "group": "invoices"
     },
     {
       "name": "create_product",
-      "description": "Crear producto.",
+      "description": "Crear producto (POST /api/products).",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre del producto"
+          },
+          "unitPrice": {
+            "type": "number",
+            "description": "Precio unitario"
+          },
+          "description": {
+            "type": "string"
+          },
+          "taxes": {
+            "description": "Porcentaje de impuesto, ej. 19",
+            "type": "number"
+          },
+          "cost": {
+            "type": "number"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "unitPrice"
+        ],
         "additionalProperties": {}
       },
       "group": "products"
     },
     {
       "name": "create_project",
-      "description": "Crear proyecto.",
+      "description": "Crear proyecto (POST /api/projects).",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre del proyecto"
+          },
+          "description": {
+            "type": "string"
+          },
+          "startDate": {
+            "description": "Fecha de inicio (ISO)",
+            "type": "string"
+          },
+          "endDate": {
+            "description": "Fecha de fin (ISO), no anterior a startDate",
+            "type": "string"
+          },
+          "budget": {
+            "description": "Presupuesto (número positivo)",
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
         "additionalProperties": {}
       },
       "group": "projects"
@@ -449,12 +676,215 @@
       "group": "projects"
     },
     {
-      "name": "create_quotation",
-      "description": "Crear cotización (cuerpo igual que POST /api/quotations).",
+      "name": "create_purchase",
+      "description": "Registrar una orden de compra a un proveedor (POST /api/purchases). Requiere purchases:write.\nObligatorios: orderNumber, total y paymentMethod. El número de orden lo pone quien registra (no hay consecutivo automático).\nEl proveedor puede ir como supplierId (contacto de la MISMA organización) o simplemente como supplierName + supplierNIT.\nEn cada ítem, si no se envía total se calcula como quantity × unitPrice, y tax vacío se toma como 0.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "orderNumber": {
+            "type": "string",
+            "description": "Número de orden de compra"
+          },
+          "total": {
+            "type": "number",
+            "description": "Total de la compra"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "description": "Forma de pago, ej. 'Transferencia', 'Efectivo'"
+          },
+          "tax": {
+            "description": "Impuesto total. Por defecto 0",
+            "type": "number"
+          },
+          "discounts": {
+            "type": "number"
+          },
+          "supplierId": {
+            "description": "_id de un contacto de la organización",
+            "type": "string"
+          },
+          "supplierName": {
+            "type": "string"
+          },
+          "supplierNIT": {
+            "type": "string"
+          },
+          "purchaseDate": {
+            "description": "Fecha de compra (YYYY-MM-DD). Por defecto hoy",
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "voucherType": {
+            "type": "string",
+            "enum": [
+              "Factura electrónica",
+              "Nota de crédito electrónica",
+              "Documento soporte con no obligados",
+              "Application response",
+              "Otro"
+            ]
+          },
+          "status": {
+            "description": "Por defecto pending",
+            "type": "string",
+            "enum": [
+              "pending",
+              "completed",
+              "canceled"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "type": "number"
+                },
+                "unitPrice": {
+                  "type": "number"
+                },
+                "tax": {
+                  "type": "number"
+                },
+                "total": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "name",
+                "quantity",
+                "unitPrice"
+              ]
+            }
+          }
+        },
+        "required": [
+          "orderNumber",
+          "total",
+          "paymentMethod"
+        ]
+      },
+      "group": "purchases"
+    },
+    {
+      "name": "create_quotation",
+      "description": "Crear cotización (POST /api/quotations). El número lo asigna el sistema. Si el contacto no existe por mobile, se crea.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "Cliente": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Nombre del cliente"
+              },
+              "mobile": {
+                "type": "string",
+                "description": "Celular del cliente (busca/crea el contacto por este dato)"
+              },
+              "email": {
+                "type": "string"
+              },
+              "company": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "mobile"
+            ],
+            "additionalProperties": {},
+            "description": "Datos del cliente. Acepta también Nombre/Mobile en mayúscula"
+          },
+          "cotizacion": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Nombre del ítem"
+                },
+                "quantity": {
+                  "type": "number"
+                },
+                "unitPrice": {
+                  "type": "number"
+                },
+                "taxes": {
+                  "description": "Impuesto del ítem (valor)",
+                  "type": "number"
+                },
+                "total": {
+                  "type": "number"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "productId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "quantity",
+                "unitPrice",
+                "total"
+              ],
+              "additionalProperties": {}
+            },
+            "description": "Ítems de la cotización (mínimo 1)"
+          },
+          "totals": {
+            "type": "object",
+            "properties": {
+              "subtotal": {
+                "type": "number"
+              },
+              "iva": {
+                "type": "number"
+              },
+              "total": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "subtotal",
+              "total"
+            ],
+            "additionalProperties": {}
+          },
+          "name": {
+            "description": "Título de la cotización",
+            "type": "string"
+          },
+          "expirationDate": {
+            "description": "Fecha de vencimiento (ISO)",
+            "type": "string"
+          },
+          "observaciones": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "Cliente",
+          "cotizacion",
+          "totals"
+        ],
         "additionalProperties": {}
       },
       "group": "quotations"
@@ -529,7 +959,52 @@
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {},
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Título de la tarea"
+          },
+          "dueDate": {
+            "type": "string",
+            "description": "Fecha límite (ISO)"
+          },
+          "responsibleId": {
+            "type": "string",
+            "description": "_id del usuario responsable"
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "contactId": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "budget": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "title",
+          "dueDate",
+          "responsibleId"
+        ],
         "additionalProperties": {}
       },
       "group": "tasks"
@@ -921,6 +1396,24 @@
       "group": "general"
     },
     {
+      "name": "get_campaign_stats",
+      "description": "Resultados reales de una campaña masiva de WhatsApp: embudo (listSize → attempted → accepted → delivered → read → replied, y failed/skipped), tasas (entrega, lectura, respuesta, fallo), motivos de fallo agrupados (número sin WhatsApp, plantilla pausada…), tabla por contacto con estado, fechas y conversación del CRM, y las últimas ejecuciones de la cola. 'accepted' es lo que Meta aceptó (HTTP 200); delivered/read llegan por webhook de Meta; 'replied' = contacto con mensaje entrante después del envío; 'skipped' = lo que la lista dejaría fuera hoy (sin celular, fijo, opt-out, marcado sin WhatsApp). Úsalo para responder '¿se enviaron todos?', '¿cuántos respondieron?' o '¿a quién no le llegó y por qué?' sin mirar la base de datos.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID de la campaña (de list_whatsapp_campaigns)"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "general"
+    },
+    {
       "name": "get_company",
       "description": "Obtener una empresa por ID, incluyendo sus contactos vinculados, sus deals y un resumen (totalRevenue, totalDeals, totalContacts, lastDeal). Permiso companies:read.",
       "inputSchema": {
@@ -939,13 +1432,14 @@
     },
     {
       "name": "get_contact",
-      "description": "Get a single contact by ID.",
+      "description": "Get a single contact by ID. Devuelve el contacto aplanado (firstName, lastName, email, mobile, company, properties custom…) más `tags` (string[]) y `attribution`: la atribución first-touch (se fija UNA vez, cuando el contacto entra por un formulario/widget/landing) con firstTouchAt (ISO), channel, utmSource/utmMedium/utmCampaign/utmTerm/utmContent, referrer, landingPage (URL), gclid, fbclid, formId, landingPageId y landingPageName; es null si el contacto no tiene atribución (p. ej. creado a mano o por WhatsApp).",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID del contacto (ObjectId de 24 hex)."
           }
         },
         "required": [
@@ -1154,6 +1648,50 @@
       "group": "invoices"
     },
     {
+      "name": "get_invoice_withholdings",
+      "description": "Retenciones que el cliente le practicó a una factura de venta emitida (GET /api/invoices/:id/withholdings). Requiere invoices:read.\nDevuelve withholdings (null si no tiene): base, iva, items[{key, kind, label, pct, amount}], byKind{rteFuente, rteIva, rteIca}, total, netPayable, appliedAt, source; y netPayable (= total de la factura si no hay retenciones).\nÚsala antes de apply_invoice_withholdings para saber si la factura ya las tiene. El id se obtiene con list_invoices (search por prefijo/número).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "_id de la factura"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "invoices"
+    },
+    {
+      "name": "get_landing_page_stats",
+      "description": "Estadísticas de una landing page en un rango de fechas (default: últimos 30 días): totales (vistas, únicos, sesiones, clics CTA, clics WhatsApp, envíos, negocios ganados y monto, tiempo medio), las dos conversiones (envíos/únicos y WhatsApp/únicos), serie diaria, embudo por sesión (vista → scroll 50% → interacción → conversión → ganado), top utm_source, clics por sección, dispositivo y últimas respuestas.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID de la landing page"
+          },
+          "from": {
+            "description": "YYYY-MM-DD (hora de Bogotá)",
+            "type": "string"
+          },
+          "to": {
+            "description": "YYYY-MM-DD (hora de Bogotá)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "general"
+    },
+    {
       "name": "get_library_file",
       "description": "Obtener un archivo de la Biblioteca por ID, con su mediaURL, tags y metadatos.",
       "inputSchema": {
@@ -1203,6 +1741,23 @@
         ]
       },
       "group": "projects"
+    },
+    {
+      "name": "get_purchase",
+      "description": "Obtener una orden de compra por ID, con el proveedor resuelto. Requiere purchases:read.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "purchases"
     },
     {
       "name": "get_quotation",
@@ -1820,6 +2375,31 @@
       "group": "knowledge-base"
     },
     {
+      "name": "list_landing_pages",
+      "description": "Listar las landing pages (páginas de aterrizaje) de la organización: nombre, slug, estado (draft/published), plantilla, URL pública, formulario asociado y stats acumuladas (vistas, únicos, envíos, clics a WhatsApp). Cada página se sirve en forms.fusioncol.com/p/<slug> y convierte a WhatsApp o a un formulario de captación.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "status": {
+            "description": "Filtra por estado; sin él devuelve todas",
+            "type": "string",
+            "enum": [
+              "draft",
+              "published"
+            ]
+          }
+        }
+      },
+      "group": "general"
+    },
+    {
       "name": "list_library_files",
       "description": "Listar archivos de la Biblioteca (library) de la organización: imágenes, PDFs, videos, etc. ya subidos.\nDevuelve id, name, fileType, mediaURL (URL pública del archivo), tags y fechas.\n\nIMPORTANTE: esta tool NO sube archivos. El MCP solo puede consultar y editar metadatos\nde archivos que ya existen; para subir uno nuevo hay que usar la app o la web de FusionCRM.",
       "inputSchema": {
@@ -2034,6 +2614,63 @@
       "group": "projects"
     },
     {
+      "name": "list_purchases",
+      "description": "Listar órdenes de compra a proveedores (GET /api/purchases). Filtros por estado, proveedor, texto y rango de fechas de compra. Requiere purchases:read y el módulo de facturación en el plan.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "completed",
+              "canceled"
+            ]
+          },
+          "supplierId": {
+            "description": "_id del contacto proveedor",
+            "type": "string"
+          },
+          "search": {
+            "description": "Coincidencia parcial en orderNumber, supplierName, supplierNIT o description",
+            "type": "string"
+          },
+          "dateFrom": {
+            "description": "Fecha de compra desde (YYYY-MM-DD)",
+            "type": "string"
+          },
+          "dateTo": {
+            "description": "Fecha de compra hasta (YYYY-MM-DD)",
+            "type": "string"
+          },
+          "sortBy": {
+            "type": "string",
+            "enum": [
+              "purchaseDate",
+              "createdAt",
+              "total",
+              "orderNumber"
+            ]
+          },
+          "sortOrder": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "group": "purchases"
+    },
+    {
       "name": "list_quotations",
       "description": "Listar cotizaciones con filtros y paginación.",
       "inputSchema": {
@@ -2130,6 +2767,24 @@
       "group": "tasks"
     },
     {
+      "name": "list_whatsapp_campaigns",
+      "description": "Listar las campañas masivas de WhatsApp de la organización (las de /mass-whatsapp), más recientes primero, con un resumen por contacto único según el ÚLTIMO estado que reportó Meta: accepted (Meta aceptó el envío — NO significa entregado), delivered, read, failed y lastSentAt. Para el detalle (quién respondió, motivo de cada fallo, excluidos) usa get_campaign_stats con el id.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "description": "Default 50, máximo 200",
+            "type": "number"
+          }
+        }
+      },
+      "group": "whatsapp"
+    },
+    {
       "name": "list_whatsapp_templates",
       "description": "Listar las plantillas de WhatsApp (Meta/Facebook Marketing) aprobadas para la organización. Devuelve nombre, idioma, categoría, estado y componentes (BODY/HEADER/FOOTER con su texto) para que la IA pueda elegir la plantilla adecuada antes de enviarla con send_whatsapp_template. Requiere permiso whatsapp:send en el token.",
       "inputSchema": {
@@ -2190,14 +2845,33 @@
       "group": "contacts"
     },
     {
+      "name": "remove_invoice_withholdings",
+      "description": "Quitar las retenciones registradas en una factura de venta (DELETE /api/invoices/:id/withholdings). Requiere invoices:write. Idempotente: si no tenía, responde igual con removed: false. La cartera vuelve a cobrar el total completo.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "_id de la factura"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "invoices"
+    },
+    {
       "name": "search_contact_by_phone",
-      "description": "Search contact by phone number for this organization.",
+      "description": "Search contact by phone number for this organization (coincidencia exacta por dígitos y luego parcial, en mobile o phone). Responde `contact` con properties aplanadas, `tags` y `attribution` first-touch (mismo formato que get_contact; null si no tiene).",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
           "phone": {
-            "type": "string"
+            "type": "string",
+            "description": "Teléfono a buscar; se normaliza a solo dígitos (mínimo 3). Ej: '573132925094' o '313 292 5094'."
           }
         },
         "required": [
@@ -2317,12 +2991,46 @@
     },
     {
       "name": "send_whatsapp_message",
-      "description": "Enviar mensaje WhatsApp. organizationId se rellena automáticamente; requiere to, y message si type=text.",
+      "description": "Enviar un mensaje de WhatsApp de sesión (texto o media) a un número. Solo llega si el cliente escribió en las últimas 24 h (ventana de Meta); fuera de la ventana usa send_whatsapp_template. organizationId se rellena automáticamente.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {},
-        "additionalProperties": {}
+        "properties": {
+          "to": {
+            "type": "string",
+            "description": "Número destino en formato internacional sin '+', ej. 573001234567"
+          },
+          "type": {
+            "description": "Tipo de mensaje. Default: 'text'",
+            "type": "string",
+            "enum": [
+              "text",
+              "image",
+              "document",
+              "audio",
+              "video"
+            ]
+          },
+          "message": {
+            "description": "Texto del mensaje. Obligatorio cuando type es 'text' (o ausente)",
+            "type": "string"
+          },
+          "mediaUrl": {
+            "description": "URL pública del archivo cuando type es image/document/audio/video",
+            "type": "string"
+          },
+          "caption": {
+            "description": "Pie del media (image/document/video)",
+            "type": "string"
+          },
+          "replyToMessageId": {
+            "description": "_id del mensaje (en FusionCRM) al que se responde, para citarlo",
+            "type": "string"
+          }
+        },
+        "required": [
+          "to"
+        ]
       },
       "group": "whatsapp"
     },
@@ -2448,6 +3156,44 @@
         "type": "object",
         "properties": {
           "id": {
+            "type": "string",
+            "description": "_id de la empresa"
+          },
+          "name": {
+            "type": "string"
+          },
+          "idType": {
+            "type": "string"
+          },
+          "idNumber": {
+            "description": "NIT / número de documento",
+            "type": "string"
+          },
+          "industry": {
+            "type": "string"
+          },
+          "website": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "size": {
+            "type": "string"
+          },
+          "notes": {
             "type": "string"
           }
         },
@@ -2460,12 +3206,72 @@
     },
     {
       "name": "update_contact",
-      "description": "Update a contact by ID (fields además de id se envían al PUT /contacts/:id).",
+      "description": "Actualizar un contacto por ID (PUT /contacts/:id): merge de properties por key, los campos que no se envían se conservan. companyId null o '' desvincula la empresa.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
           "id": {
+            "type": "string",
+            "description": "_id del contacto"
+          },
+          "email": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "string"
+          },
+          "whatsapp_phone": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "companyName": {
+            "type": "string"
+          },
+          "companyId": {
+            "description": "_id de la empresa; null o '' desvincula",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "type": "string"
+          },
+          "companyType": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "position": {
+            "type": "string"
+          },
+          "idNumber": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "address": {
             "type": "string"
           }
         },
@@ -2636,6 +3442,44 @@
                 "type": "null"
               }
             ]
+          },
+          "customFields": {
+            "description": "Campos personalizados: [{ \"field\": \"<_id del campo>\", \"value\": \"...\" }]. El `field` es el _id de la definición del campo (el que vive en dealsfields), NO su nombre ni su key: un nombre no se resuelve y la escritura se pierde.",
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "field"
+                  ]
+                }
+              },
+              {
+                "type": "string"
+              }
+            ]
           }
         },
         "required": [
@@ -2713,12 +3557,41 @@
     },
     {
       "name": "update_product",
-      "description": "Actualizar producto por ID.",
+      "description": "Actualizar producto por ID (PUT /products/:id). Solo se tocan los campos enviados.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
           "id": {
+            "type": "string",
+            "description": "_id del producto"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "unitPrice": {
+            "type": "number"
+          },
+          "taxes": {
+            "description": "Porcentaje de impuesto, ej. 19",
+            "type": "number"
+          },
+          "cost": {
+            "type": "number"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string"
+          },
+          "notes": {
             "type": "string"
           }
         },
@@ -2731,12 +3604,36 @@
     },
     {
       "name": "update_project",
-      "description": "Actualizar proyecto por ID.",
+      "description": "Actualizar proyecto por ID (PUT /projects/:id). Solo se tocan los campos enviados.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
           "id": {
+            "type": "string",
+            "description": "_id del proyecto"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "startDate": {
+            "description": "ISO",
+            "type": "string"
+          },
+          "endDate": {
+            "description": "ISO, no anterior a startDate",
+            "type": "string"
+          },
+          "budget": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          },
+          "color": {
             "type": "string"
           }
         },
@@ -2748,14 +3645,171 @@
       "group": "projects"
     },
     {
-      "name": "update_quotation",
-      "description": "Actualizar cotización por ID.",
+      "name": "update_purchase",
+      "description": "Actualizar una orden de compra por ID (PUT /api/purchases/:id). Solo se tocan los campos enviados; enviar items los REEMPLAZA. supplierId vacío o null desvincula al proveedor. Requiere purchases:write.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
           "id": {
+            "type": "string",
+            "description": "_id de la orden de compra"
+          },
+          "orderNumber": {
             "type": "string"
+          },
+          "total": {
+            "type": "number"
+          },
+          "tax": {
+            "type": "number"
+          },
+          "discounts": {
+            "type": "number"
+          },
+          "paymentMethod": {
+            "type": "string"
+          },
+          "supplierId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "supplierName": {
+            "type": "string"
+          },
+          "supplierNIT": {
+            "type": "string"
+          },
+          "purchaseDate": {
+            "description": "YYYY-MM-DD",
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "voucherType": {
+            "type": "string",
+            "enum": [
+              "Factura electrónica",
+              "Nota de crédito electrónica",
+              "Documento soporte con no obligados",
+              "Application response",
+              "Otro"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "completed",
+              "canceled"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "type": "number"
+                },
+                "unitPrice": {
+                  "type": "number"
+                },
+                "tax": {
+                  "type": "number"
+                },
+                "total": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "name",
+                "quantity",
+                "unitPrice"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "purchases"
+    },
+    {
+      "name": "update_quotation",
+      "description": "Actualizar cotización por ID (PUT /quotations/:id). El número de cotización no se puede cambiar.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "_id de la cotización"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "sent",
+              "accepted",
+              "rejected",
+              "canceled",
+              "expired"
+            ]
+          },
+          "expirationDate": {
+            "description": "Fecha de vencimiento (ISO)",
+            "type": "string"
+          },
+          "paymentTerms": {
+            "type": "string"
+          },
+          "shippingTerms": {
+            "type": "string"
+          },
+          "observaciones": {
+            "type": "string"
+          },
+          "additionalNotes": {
+            "type": "string"
+          },
+          "items": {
+            "description": "Reemplaza TODOS los ítems (name, quantity, unitPrice, taxes, total…)",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": {}
+            }
+          },
+          "subtotal": {
+            "type": "number"
+          },
+          "taxes": {
+            "type": "number"
+          },
+          "discounts": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
           }
         },
         "required": [
@@ -2767,12 +3821,53 @@
     },
     {
       "name": "update_task",
-      "description": "Actualizar tarea por ID.",
+      "description": "Actualizar tarea por ID (PUT /tasks/:id). Solo se tocan los campos enviados.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
           "id": {
+            "type": "string",
+            "description": "_id de la tarea"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "dueDate": {
+            "description": "ISO",
+            "type": "string"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "budget": {
+            "type": "number"
+          },
+          "timeline": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "responsibleId": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "contactId": {
             "type": "string"
           }
         },
