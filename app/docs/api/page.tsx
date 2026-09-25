@@ -60,8 +60,10 @@ const permissions = [
 ];
 
 const errors = [
-  ["401", "API_TOKEN_MISSING / API_TOKEN_INVALID", "Falta el token, es inválido, expiró o fue revocado."],
+  ["401", "API_TOKEN_MISSING / API_TOKEN_INVALID / API_TOKEN_EXPIRED", "Falta el token, es inválido, expiró o fue revocado."],
+  ["401", "API_TOKEN_NOT_ACCEPTED", "Usó un token de API en /api/v1/*, que es la API interna de la app web. Use /api/*."],
   ["403", "INSUFFICIENT_API_PERMISSIONS", "El token no tiene el permiso de la operación (la respuesta lista requiredPermission)."],
+  ["403", "ORGANIZATION_ID_MISMATCH", "El header X-Organization-Id (o el query organizationId) no coincide con la organización del token. Es opcional: sin él se usa la del token."],
   ["403", "PLAN_MODULE_REQUIRED", "El plan de la organización no incluye el módulo API (o el de facturación, en /invoices)."],
   ["403", "PLAN_LIMIT_REACHED", "Se alcanzó un límite del plan al crear (contactos, cotizaciones, facturas, listas, documentos RAG)."],
   ["400", "—", "Datos inválidos: el cuerpo lleva success:false y error con el motivo."],
@@ -129,6 +131,16 @@ export default function ApiPage() {
             <div><span style={{ color: "#8b5cf6" }}>Authorization</span>: <span style={{ color: "#d1345b" }}>Bearer &lt;token&gt;</span></div>
             <div><span style={{ color: "#8b5cf6" }}>X-API-Key</span>: <span style={{ color: "#d1345b" }}>&lt;token&gt;</span></div>
           </div>
+          <div className="rounded-lg p-4 mb-4" style={codeBox}>
+            <p className="text-xs font-semibold mb-2" style={{ color: "var(--muted-foreground)" }}>Primer paso: verifica a qué organización apunta el token</p>
+            <pre className="text-sm overflow-x-auto" style={{ color: "var(--foreground)" }}>{`curl "${API_BASE}/me" \\
+  -H "Authorization: Bearer <token>"`}</pre>
+          </div>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <code>GET /me</code> no exige ningún permiso y devuelve la organización, el usuario que
+            emitió el token, sus permisos, su vencimiento (<code>expiresAt</code>) y el plan. Úsalo
+            siempre que manejes tokens de varias organizaciones.
+          </p>
           <div className="rounded-lg p-4 mb-4" style={codeBox}>
             <p className="text-xs font-semibold mb-2" style={{ color: "var(--muted-foreground)" }}>Ejemplo: listar contactos</p>
             <pre className="text-sm overflow-x-auto" style={{ color: "var(--foreground)" }}>{`curl "${API_BASE}/contacts?page=1&limit=50" \\
