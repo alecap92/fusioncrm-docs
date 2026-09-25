@@ -49,6 +49,22 @@ const GROUP_LABELS: Record<string, string> = {
   fragments: "Respuestas rápidas",
   library: "Biblioteca",
   "knowledge-base": "Base de conocimiento",
+  account: "Tu cuenta",
+  pipelines: "Configuración: pipelines y etapas",
+  fields: "Configuración: campos personalizados",
+  templates: "Plantillas de correo y documentos",
+  settings: "Configuración de la cuenta",
+  users: "Usuarios",
+  automations: "Automatizaciones (borrador)",
+  campaigns: "Campañas",
+  landings: "Landing pages",
+  activities: "Actividades",
+  calendar: "Calendario",
+  notifications: "Notificaciones",
+  "import-export": "Importar y exportar",
+  purchases: "Compras",
+  agents: "Agentes IA",
+  reports: "Reportes",
   general: "General",
 };
 
@@ -306,7 +322,15 @@ export default function McpPage() {
             completo con los parámetros de cada una está en{" "}
             <a href={CATALOG_URL} target="_blank" rel="noopener noreferrer" style={{ color: "#d1345b" }}>mcp-tools.json</a>.
           </p>
-          <div className="space-y-6">
+          <Callout type="info">
+            Desde septiembre de 2026 la IA también <strong>configura</strong> el CRM: pipelines y
+            etapas, campos personalizados, plantillas, reglas de puntuación, actividades,
+            calendario y landing pages. Dos límites a propósito: las automatizaciones y las
+            campañas se crean siempre como <strong>borrador</strong> (publicarlas o enviarlas se
+            hace en la app, por una persona), y las integraciones solo se leen, sin claves ni
+            contraseñas.
+          </Callout>
+          <div className="space-y-6 mt-6">
             {grouped.map((g) => (
               <div key={g.group}>
                 <h3 className="text-base font-semibold mb-2" style={{ color: "var(--foreground)" }}>
