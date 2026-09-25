@@ -9,16 +9,20 @@ import catalog from "@/data/mcp-tools.json";
 export const metadata: Metadata = { title: "MCP: el CRM desde tu IA" };
 
 const MCP_URL = "https://api.fusioncol.com/api/mcp";
+const API_ME_URL = "https://api.fusioncol.com/api/me";
 const CATALOG_URL = "https://api.fusioncol.com/api/mcp-tools.json";
 
 const toc = [
   { id: "overview", label: "Qué es MCP" },
   { id: "examples", label: "Qué puedes pedirle" },
   { id: "connect", label: "Conectar tu cliente" },
+  { id: "credentials", label: "Qué credencial usar", depth: 3 },
   { id: "claude", label: "Claude (web y escritorio)", depth: 3 },
   { id: "claude-code", label: "Claude Code", depth: 3 },
   { id: "cursor", label: "Cursor y otros", depth: 3 },
+  { id: "verify", label: "Verifica a qué cuenta apunta" },
   { id: "security", label: "Permisos y seguridad" },
+  { id: "troubleshooting", label: "Problemas frecuentes" },
   { id: "tools", label: "Herramientas disponibles" },
 ];
 
@@ -56,6 +60,21 @@ const grouped = GROUP_ORDER
   .filter((g) => g.items.length > 0);
 const unknown = tools.filter((t) => !GROUP_LABELS[t.group]);
 if (unknown.length > 0) grouped.push({ group: "otros", label: "Otros", items: unknown });
+
+const credentials = [
+  ["Claude web, escritorio o móvil", "Conector MCP: Client ID + Secreto", "El cliente hace el flujo OAuth solo y renueva el acceso sin que hagas nada."],
+  ["Claude Code, Cursor, scripts o n8n", "Token de API como Authorization: Bearer", "Crea el token con expiración «Sin expiración» y solo los permisos que necesites."],
+  ["Otros clientes MCP con OAuth", "Conector MCP: Client ID + Secreto", "Si el cliente admite servidores remotos con OAuth; si solo acepta headers fijos, usa un token de API."],
+];
+
+const problems = [
+  ["401", "API_TOKEN_MISSING", "La petición llegó sin token.", "Revisa el header Authorization. Con un conector OAuth la respuesta trae WWW-Authenticate y el cliente vuelve a pedir el login."],
+  ["401", "API_TOKEN_INVALID / API_TOKEN_EXPIRED / API_TOKEN_NOT_FOUND", "El token está mal copiado, venció o fue revocado.", "Genera un token nuevo (o vuelve a autorizar el conector) y reemplázalo en el cliente."],
+  ["401", "API_TOKEN_NOT_ACCEPTED", "Usaste un token de API contra /api/v1/*, que es la API interna de la app web.", "Llama a /api/* (la API REST) o a /api/mcp."],
+  ["403", "INSUFFICIENT_API_PERMISSIONS", "Al token le falta el permiso de esa operación.", "La respuesta indica requiredPermission: crea o edita el token con ese permiso."],
+  ["403", "ORGANIZATION_ID_MISMATCH", "Enviaste X-Organization-Id (u organizationId) de una organización distinta a la del token.", "Quita el header o usa el token de esa organización."],
+  ["403", "PLAN_MODULE_REQUIRED", "El plan de la organización no incluye el módulo API.", "Actívalo desde Configuración → Plan."],
+];
 
 const codeBox = { backgroundColor: "var(--code-bg)", border: "1px solid var(--border)" } as const;
 
@@ -126,9 +145,40 @@ export default function McpPage() {
             así que no hay nada más que configurar:
           </p>
           <ul className="space-y-2 pl-4 mb-6" style={{ color: "var(--muted-foreground)" }}>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Conector MCP (OAuth):</strong> en Configuración → Desarrollador → Conectores MCP creas un conector y obtienes un <em>Client ID</em> y un <em>Secreto</em>. Es lo recomendado para Claude y ChatGPT: el cliente hace el flujo OAuth solo.</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Token de API:</strong> el mismo token de la <Link href="/docs/api#auth" style={{ color: "#d1345b" }}>API REST</Link>, enviado como <code>Authorization: Bearer</code>. Útil en clientes que aceptan headers fijos (Claude Code, Cursor, scripts).</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Conector MCP (OAuth):</strong> en Configuración → Desarrollador → Conectores MCP creas un conector y obtienes un <em>Client ID</em> y un <em>Secreto</em>. El cliente hace el flujo OAuth solo.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Token de API:</strong> el mismo token de la <Link href="/docs/api#auth" style={{ color: "#d1345b" }}>API REST</Link>, enviado como <code>Authorization: Bearer</code>. Para clientes que aceptan headers fijos.</li>
           </ul>
+
+          <h3 id="credentials" className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Qué credencial usar</h3>
+          <div className="rounded-lg overflow-hidden border mb-4" style={{ borderColor: "var(--border)" }}>
+            <table className="w-full text-sm">
+              <thead style={{ backgroundColor: "var(--muted)" }}>
+                <tr>
+                  <th className="text-left p-3 border-b font-semibold" style={{ borderColor: "var(--border)" }}>Si usas</th>
+                  <th className="text-left p-3 border-b font-semibold" style={{ borderColor: "var(--border)" }}>Usa</th>
+                  <th className="text-left p-3 border-b font-semibold" style={{ borderColor: "var(--border)" }}>Por qué</th>
+                </tr>
+              </thead>
+              <tbody>
+                {credentials.map(([client, cred, why]) => (
+                  <tr key={client}>
+                    <td className="p-3 border-b align-top" style={{ borderColor: "var(--border)", color: "var(--foreground)" }}>{client}</td>
+                    <td className="p-3 border-b align-top" style={{ borderColor: "var(--border)", color: "#d1345b" }}>{cred}</td>
+                    <td className="p-3 border-b text-xs align-top" style={{ borderColor: "var(--border)", color: "var(--muted-foreground)" }}>{why}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <Callout type="warning">
+            No uses el Client ID y el Secreto para pedir un token a mano y pegarlo como header: ese
+            token dura 1 hora y no se renueva. Si tu cliente solo acepta headers fijos, crea un token de API.
+          </Callout>
+          <p className="mt-4 mb-6" style={{ color: "var(--muted-foreground)" }}>
+            Los tokens de API funcionan en <code>/api/*</code> (la API REST) y en <code>/api/mcp</code>. No
+            sirven en <code>/api/v1/*</code>, que es la API interna de la app web: ahí responden 401 con
+            el código <code>API_TOKEN_NOT_ACCEPTED</code>.
+          </p>
 
           <h3 id="claude" className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Claude (web y escritorio)</h3>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
@@ -169,6 +219,41 @@ export default function McpPage() {
           </p>
         </section>
 
+        <section id="verify" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Verifica a qué cuenta apunta</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Es el primer paso recomendado después de conectar, y es obligatorio si tienes varias
+            organizaciones conectadas: equivocarse de conexión es enviar un WhatsApp desde el número
+            de otra empresa. Pregúntale a la IA <em>«¿a qué organización estoy conectado?»</em>; usará la
+            herramienta <code style={{ color: "#d1345b" }}>get_current_organization</code>. Con un token de API
+            puedes comprobarlo tú mismo:
+          </p>
+          <div className="rounded-lg p-4 mb-4" style={codeBox}>
+            <pre className="text-sm overflow-x-auto" style={{ color: "var(--foreground)" }}>{`curl ${API_ME_URL} \\
+  -H "Authorization: Bearer <token de API>"`}</pre>
+          </div>
+          <div className="rounded-lg p-4 mb-4" style={codeBox}>
+            <p className="text-xs font-semibold mb-2" style={{ color: "var(--muted-foreground)" }}>Respuesta (recortada)</p>
+            <pre className="text-sm overflow-x-auto" style={{ color: "var(--foreground)" }}>{`{
+  "success": true,
+  "data": {
+    "organization": { "id": "665f…", "name": "Mi Empresa SAS" },
+    "user": { "email": "ana@example.com", "role": "admin" },
+    "token": {
+      "name": "claude-code",
+      "permissions": ["contacts:read", "whatsapp:send"],
+      "expiresAt": null
+    },
+    "plan": { "name": "pro", "modules": { "api": true } }
+  }
+}`}</pre>
+          </div>
+          <Callout type="tip">
+            Hazlo antes de cualquier envío (WhatsApp, correo, campañas) cuando trabajes con más de
+            una cuenta. <code>expiresAt: null</code> significa que el token no vence.
+          </Callout>
+        </section>
+
         <section id="security" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Permisos y seguridad</h2>
           <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
@@ -177,11 +262,41 @@ export default function McpPage() {
             <li>• Todo queda acotado a tu organización: no hay forma de leer datos de otra.</li>
             <li>• Los conectores y tokens se revocan desde la misma pantalla donde se crearon; el cliente pierde acceso al instante.</li>
             <li>• MCP hace parte del módulo API del plan, igual que la API REST.</li>
+            <li>• El header <code>X-Organization-Id</code> (o el query <code>organizationId</code>) es opcional: sin él se usa la organización del token. Si lo envías y no coincide, la respuesta es 403 <code>ORGANIZATION_ID_MISMATCH</code> (en MCP llega como error JSON-RPC con ese código en <code>data.code</code>).</li>
           </ul>
           <Callout type="warning">
             La IA puede ejecutar acciones reales (enviar un WhatsApp, borrar un contacto). Dale a
             cada conector solo lo que necesita y revisa en la app lo que hizo, sobre todo al empezar.
           </Callout>
+        </section>
+
+        <section id="troubleshooting" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Problemas frecuentes</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Cada rechazo trae un <code>code</code> que dice exactamente qué pasó:
+          </p>
+          <div className="rounded-lg overflow-hidden border" style={{ borderColor: "var(--border)" }}>
+            <table className="w-full text-sm">
+              <thead style={{ backgroundColor: "var(--muted)" }}>
+                <tr>
+                  <th className="text-left p-3 border-b font-semibold" style={{ borderColor: "var(--border)" }}>HTTP</th>
+                  <th className="text-left p-3 border-b font-semibold" style={{ borderColor: "var(--border)" }}>code</th>
+                  <th className="text-left p-3 border-b font-semibold" style={{ borderColor: "var(--border)" }}>Causa</th>
+                  <th className="text-left p-3 border-b font-semibold" style={{ borderColor: "var(--border)" }}>Solución</th>
+                </tr>
+              </thead>
+              <tbody>
+                {problems.map(([http, code, cause, fix]) => (
+                  <tr key={code}>
+                    <td className="p-3 border-b font-mono align-top" style={{ borderColor: "var(--border)", color: "var(--foreground)" }}>{http}</td>
+                    <td className="p-3 border-b font-mono text-xs align-top break-all" style={{ borderColor: "var(--border)", color: "#d1345b" }}>{code}</td>
+                    <td className="p-3 border-b text-xs align-top" style={{ borderColor: "var(--border)", color: "var(--muted-foreground)" }}>{cause}</td>
+                    <td className="p-3 border-b text-xs align-top" style={{ borderColor: "var(--border)", color: "var(--muted-foreground)" }}>{fix}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <section id="tools" className="mb-10">
