@@ -31,7 +31,7 @@
     "src/mcp/tools/scoring-rules.ts",
     "src/mcp/tools/users.ts"
   ],
-  "toolCount": 212,
+  "toolCount": 213,
   "tools": [
     {
       "name": "add_contacts_to_list",
@@ -2019,14 +2019,26 @@
     },
     {
       "name": "create_purchase",
-      "description": "Registrar una orden de compra a un proveedor (POST /api/purchases). Requiere purchases:write.\nObligatorios: orderNumber, total y paymentMethod. El número de orden lo pone quien registra (no hay consecutivo automático).\nEl proveedor puede ir como supplierId (contacto de la MISMA organización) o simplemente como supplierName + supplierNIT.\nEn cada ítem, si no se envía total se calcula como quantity × unitPrice, y tax vacío se toma como 0.",
+      "description": "Registrar una compra a un proveedor (POST /api/purchases). Requiere purchases:write.\nkind=invoice (default): factura del proveedor. Obligatorios: orderNumber (el número de la factura del proveedor), total y paymentMethod. Si cubre una OC abierta, manda orderRef con el id de la OC (ver list_open_purchase_orders): la OC queda completed con invoiceRef. 409 si la OC ya está facturada o cancelada.\nkind=order: orden de compra. El servidor genera el consecutivo OC-n (settings.purchases.numberPrefix + contador): NO mandes orderNumber, se ignora. Obligatorios: total y paymentMethod. Sus retenciones son estimadas y no entran en informes ni certificados.\nEl proveedor puede ir como supplierId (contacto de la MISMA organización) o simplemente como supplierName + supplierNIT.\nEn cada ítem, si no se envía total se calcula como quantity × unitPrice, y tax vacío se toma como 0.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "orderNumber": {
+          "kind": {
+            "description": "Por defecto invoice. order = orden de compra con consecutivo OC-n",
             "type": "string",
-            "description": "Número de orden de compra"
+            "enum": [
+              "order",
+              "invoice"
+            ]
+          },
+          "orderNumber": {
+            "description": "Número de la factura del proveedor. Obligatorio si kind=invoice; ignorado si kind=order",
+            "type": "string"
+          },
+          "orderRef": {
+            "description": "Solo con kind=invoice: id de la OC abierta que esta factura cubre",
+            "type": "string"
           },
           "total": {
             "type": "number",
@@ -2112,7 +2124,6 @@
           }
         },
         "required": [
-          "orderNumber",
           "total",
           "paymentMethod"
         ]
@@ -2485,7 +2496,7 @@
     },
     {
       "name": "deals_summary",
-      "description": "Sales summary for a date range filtered by closingDate (fecha de cierre). Total deals, won deals, total sold, avg ticket, top 5 by amount. Use this for monthly/period sales reports.",
+      "description": "Sales summary for a date range filtered by closingDate (fecha de cierre real: al ganar o perder, closingDate pasa a ser el día en que se cerró; wonAt/lostAt llevan la hora). Total deals, won deals, total sold, avg ticket, top 5 by amount. Use this for monthly/period sales reports.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -4821,7 +4832,7 @@
     },
     {
       "name": "list_deals",
-      "description": "List deals with optional date range, search, and pagination. Dates YYYY-MM-DD. Use closingFrom/closingTo to filter by closing date (for sales reports). Use createdFrom/createdTo to filter by creation date.",
+      "description": "List deals with optional date range, search, and pagination. Dates YYYY-MM-DD. Use closingFrom/closingTo to filter by closing date (for sales reports: closingDate is the REAL close date once a deal is won/lost, the estimate while open). wonFrom/wonTo and lostFrom/lostTo filter by the exact won/lost timestamp (wonAt/lostAt). Use createdFrom/createdTo to filter by creation date. Each deal exposes wonAt, lostAt and expectedCloseDate (the original estimate).",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -4860,6 +4871,22 @@
           },
           "closingTo": {
             "description": "Filter by closing date end (YYYY-MM-DD) — use this for sales reports",
+            "type": "string"
+          },
+          "wonFrom": {
+            "description": "Filter by won date start (YYYY-MM-DD, wonAt)",
+            "type": "string"
+          },
+          "wonTo": {
+            "description": "Filter by won date end (YYYY-MM-DD, wonAt)",
+            "type": "string"
+          },
+          "lostFrom": {
+            "description": "Filter by lost date start (YYYY-MM-DD, lostAt)",
+            "type": "string"
+          },
+          "lostTo": {
+            "description": "Filter by lost date end (YYYY-MM-DD, lostAt)",
             "type": "string"
           },
           "search": {
@@ -5298,6 +5325,25 @@
       "group": "notifications"
     },
     {
+      "name": "list_open_purchase_orders",
+      "description": "Órdenes de compra ABIERTAS (kind=order, pending, sin factura enlazada) de un proveedor (GET /api/purchases/open-orders). Sirve para conciliar: antes de registrar la factura de un proveedor, buscar si ya había una OC que la cubra y pasar su id como orderRef en create_purchase.\nEl NIT se compara normalizado (900.480.268-1 = 900480268). Con total, la lista viene ordenada por cercanía y cada OC trae totalDiff (|OC.total − total|). Sin nit devuelve todas las abiertas. Requiere purchases:read.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "nit": {
+            "description": "NIT del proveedor, en cualquier formato",
+            "type": "string"
+          },
+          "total": {
+            "description": "Total de la factura, para ordenar por cercanía y calcular totalDiff",
+            "type": "number"
+          }
+        }
+      },
+      "group": "purchases"
+    },
+    {
       "name": "list_pipeline_stages",
       "description": "Lista las etapas (stages) de un pipeline de conversación, ordenadas por order. Devuelve _id, name, order, color, autoAssign, webhookEnabled. Si no pasas pipelineId se usa el pipeline default de la organización. Necesario para conocer los stageId antes de mover o crear conversaciones.",
       "inputSchema": {
@@ -5490,7 +5536,7 @@
     },
     {
       "name": "list_purchases",
-      "description": "Listar órdenes de compra a proveedores (GET /api/purchases). Filtros por estado, proveedor, texto y rango de fechas de compra. Requiere purchases:read y el módulo de facturación en el plan.",
+      "description": "Listar compras a proveedores (GET /api/purchases): facturas de proveedor (kind=invoice) y órdenes de compra (kind=order). Sin `kind` devuelve ambas. Filtros por estado, proveedor, texto y rango de fechas de compra. Requiere purchases:read y el módulo de facturación en el plan.\nCada compra trae kind, orderRef (en la factura: la OC que cubre) e invoiceRef (en la OC: la factura que la cerró). En una OC, status pending = abierta y completed = facturada.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -5500,6 +5546,14 @@
           },
           "limit": {
             "type": "number"
+          },
+          "kind": {
+            "description": "order = órdenes de compra; invoice = facturas de proveedor. Sin él, todo",
+            "type": "string",
+            "enum": [
+              "order",
+              "invoice"
+            ]
           },
           "status": {
             "type": "string",
@@ -8691,7 +8745,7 @@
     },
     {
       "name": "update_purchase",
-      "description": "Actualizar una orden de compra por ID (PUT /api/purchases/:id). Solo se tocan los campos enviados; enviar items los REEMPLAZA. supplierId vacío o null desvincula al proveedor. Requiere purchases:write.",
+      "description": "Actualizar una compra por ID (PUT /api/purchases/:id). Solo se tocan los campos enviados; enviar items los REEMPLAZA. supplierId vacío o null desvincula al proveedor. kind no se cambia después de crear (400 si difiere); orderNumber de una OC lo asigna el servidor (400 si difiere); cancelar una OC ya facturada responde 409. Requiere purchases:write.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",

@@ -13,6 +13,7 @@ const toc = [
   { id: "create", label: "Crear deal", depth: 3 },
   { id: "edit", label: "Editar deal", depth: 3 },
   { id: "stages", label: "Mover entre etapas" },
+  { id: "close-dates", label: "Fecha de cierre" },
   { id: "filters", label: "Filtros y búsqueda" },
   { id: "products", label: "Productos en deals" },
   { id: "activities", label: "Actividades y notas" },
@@ -44,7 +45,8 @@ export default function DealsPage() {
               { label: "Contacto asociado", desc: "Cliente o prospecto" },
               { label: "Etapa del pipeline", desc: "Fase actual del negocio" },
               { label: "Propietario", desc: "Vendedor responsable" },
-              { label: "Fecha de cierre", desc: "Fecha estimada de cierre" },
+              { label: "Fecha de cierre", desc: "Estimada mientras está abierto; real al ganar o perder" },
+              { label: "Ganado / Perdido el", desc: "Sello con la fecha y hora del cierre" },
               { label: "Probabilidad", desc: "% de éxito estimado" },
               { label: "Productos", desc: "Ítems del negocio" },
               { label: "Actividades", desc: "Llamadas, emails, reuniones" },
@@ -127,7 +129,7 @@ export default function DealsPage() {
                     ["Etapa", "Fase inicial del deal", "Sí"],
                     ["Contacto", "Cliente asociado", "No"],
                     ["Valor", "Monto estimado en COP/USD", "No"],
-                    ["Fecha de cierre", "Estimado de cierre", "No"],
+                    ["Fecha de cierre", "Estimada; al ganar o perder se guarda la real", "No"],
                     ["Propietario", "Vendedor asignado", "Auto"],
                     ["Probabilidad", "% estimado de ganar", "No"],
                     ["Descripción", "Notas adicionales", "No"],
@@ -179,6 +181,31 @@ export default function DealsPage() {
           </Callout>
         </section>
 
+        <section id="close-dates&ldquo; className=&rdquo;mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Fecha de cierre: estimada vs real</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Mientras un negocio está en una etapa abierta, su fecha de cierre es una <strong style={{ color: "var(--foreground)" }}>estimación</strong> del
+            vendedor (la previsión de ventas la usa para proyectar el mes). Al entrar a una etapa
+            ganada o perdida pasa a ser la <strong style={{ color: "var(--foreground)" }}>fecha real</strong> de cierre, y es la que cuentan los
+            informes de ventas.
+          </p>
+          <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Al mover desde el tablero</strong> a ganado o perdido, la fecha de cierre pasa a hoy (en la zona horaria de la organización).</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Desde el modal</strong>, al elegir una etapa cerrada el campo se precarga con hoy; si el negocio cerró otro día, cámbiala antes de guardar y esa fecha manda. Así se registran ventas atrasadas con su fecha real.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>La estimada no se pierde:</strong> queda como &ldquo;Estimada original&rdquo; en el detalle, para comparar proyección contra realidad.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Ganado el / Perdido el:</strong> el detalle y la página del negocio muestran el momento exacto del cierre. Reabrir un negocio limpia el sello y devuelve la estimada.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Informes personalizados:</strong> &ldquo;Fecha de venta (ganado el)&rdquo;, &ldquo;Fecha de pérdida&rdquo; y &ldquo;Cierre estimado original&rdquo; están disponibles como campos del negocio. Para agrupar por mes calendario usa &ldquo;Fecha de cierre&rdquo; con el filtro de ganados.</li>
+          </ul>
+          <div className="p-4 rounded-lg border mb-4" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
+            <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>
+              <strong style={{ color: "var(--foreground)" }}>API y MCP:</strong> cada negocio expone <code>closingDate</code>, <code>wonAt</code>, <code>lostAt</code> y <code>expectedCloseDate</code>.
+              <code>GET /api/deals</code> y la tool <code>list_deals</code> filtran por <code>closingFrom/closingTo</code> (fecha de cierre),
+              <code>wonFrom/wonTo</code> (instante en que se ganó) y <code>lostFrom/lostTo</code>. Si envías <code>closingDate</code> junto con un cambio de
+              etapa, esa es la fecha que queda. Ver la referencia en <a href="/docs/api" style={{ color: "#d1345b" }}>API</a> y <a href="/docs/mcp" style={{ color: "#d1345b" }}>MCP</a>.
+            </p>
+          </div>
+        </section>
+
         <section id="filters" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Filtros y búsqueda</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
@@ -187,7 +214,7 @@ export default function DealsPage() {
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
             <li>• <strong style={{ color: "var(--foreground)" }}>Por pipeline:</strong> Selector en la barra superior</li>
             <li>• <strong style={{ color: "var(--foreground)" }}>Por propietario:</strong> Filtra los deals de un vendedor específico</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Por fecha de cierre:</strong> Rango de fechas estimadas</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Por fecha de cierre:</strong> Rango de fechas (estimadas en abiertos, reales en cerrados)</li>
             <li>• <strong style={{ color: "var(--foreground)" }}>Por valor:</strong> Rango de monto mínimo y máximo</li>
             <li>• <strong style={{ color: "var(--foreground)" }}>Búsqueda por nombre:</strong> Texto libre en el campo de búsqueda</li>
           </ul>
