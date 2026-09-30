@@ -9,6 +9,7 @@
     "src/mcp/tools/automations.ts",
     "src/mcp/tools/calendar-events.ts",
     "src/mcp/tools/campaigns.ts",
+    "src/mcp/tools/catalogs.ts",
     "src/mcp/tools/company-properties.ts",
     "src/mcp/tools/contact-properties.ts",
     "src/mcp/tools/conversation-pipelines.ts",
@@ -29,9 +30,10 @@
     "src/mcp/tools/product-variants.ts",
     "src/mcp/tools/products.ts",
     "src/mcp/tools/scoring-rules.ts",
+    "src/mcp/tools/shipments.ts",
     "src/mcp/tools/users.ts"
   ],
-  "toolCount": 213,
+  "toolCount": 219,
   "tools": [
     {
       "name": "add_contacts_to_list",
@@ -804,7 +806,7 @@
     },
     {
       "name": "create_company",
-      "description": "Crear una empresa (o actualizarla si ya existe: upsert por idNumber/NIT primero y por name después). Body plano → properties: name, industry, website, email, phone, address, city, country, idType, idNumber, size, notes y cualquier propiedad custom. Requiere name o idNumber. Permiso companies:write.",
+      "description": "Crear una empresa (o actualizarla si ya existe: upsert por idNumber/NIT primero y por name después). Body plano → properties: name, industry, website, email, phone, address, city, cityCode, country, idType, idNumber, size, notes y cualquier propiedad custom. Requiere name o idNumber. Permiso companies:write. CIUDAD (catálogo DANE, modo estricto): cityCode (5 dígitos, ej. 05001 = Medellín) o city inequívoco; ambiguo/desconocido → 422 CITY_UNRESOLVED con candidates (reintenta con cityCode; si candidates viene vacío, búscalo con search_municipalities); cityCode inexistente → 400 INVALID_CITY_CODE. state (departamento en texto) sirve de pista para homónimos; stateCode siempre se deriva del cityCode. Nunca elijas un candidato por el usuario.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -815,6 +817,20 @@
           },
           "idNumber": {
             "description": "NIT / número de documento (clave de upsert preferida)",
+            "type": "string"
+          },
+          "city": {
+            "description": "Ciudad (Colombia): nombre inequívoco del catálogo DANE",
+            "type": "string"
+          },
+          "cityCode": {
+            "description": "Código DANE del municipio, 5 dígitos. Deriva city, state y stateCode.",
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 5
+          },
+          "state": {
+            "description": "Departamento (texto). Solo sirve como pista para desambiguar city; se deriva de cityCode.",
             "type": "string"
           }
         },
@@ -874,7 +890,7 @@
     },
     {
       "name": "create_contact",
-      "description": "Create (or update if exists) a contact. At least one of email, mobile, or whatsapp_phone required. Buenas prácticas: llena SIEMPRE que se pueda source (de dónde salió el lead), companyType (Personal/Empresa/Proveedor/Cliente/Otro u opciones de la org) y city — un contacto sin segmentación no sirve para filtrar ni para campañas. Si no tienes esos datos, pregúntale al usuario.",
+      "description": "Create (or update if exists) a contact. At least one of email, mobile, or whatsapp_phone required. Buenas prácticas: llena SIEMPRE que se pueda source (de dónde salió el lead), companyType (Personal/Empresa/Proveedor/Cliente/Otro u opciones de la org) y city — un contacto sin segmentación no sirve para filtrar ni para campañas. Si no tienes esos datos, pregúntale al usuario. CIUDAD (catálogo DANE, modo estricto): manda cityCode (5 dígitos, ej. 05001 = Medellín) o un city inequívoco; si city es ambiguo (ej. 'Rionegro': Antioquia 05615 / Santander 68615), está mal escrito o no existe, la API responde 422 CITY_UNRESOLVED con `candidates` [{code, shortName, stateName}] y NO crea el contacto: pregunta el departamento y reintenta con cityCode. Con candidates: [] (mal escrita o desconocida) busca el código con search_municipalities. Un cityCode inexistente responde 400 INVALID_CITY_CODE. Nunca elijas un candidato por el usuario. Sin city/cityCode no se toca nada; con country distinto de Colombia, city es texto libre.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -909,6 +925,17 @@
             "type": "string"
           },
           "city": {
+            "description": "Ciudad (Colombia): nombre inequívoco del catálogo DANE. Se deriva de cityCode si lo mandas.",
+            "type": "string"
+          },
+          "cityCode": {
+            "description": "Código DANE del municipio, 5 dígitos (ej. 05001 = Medellín, 76001 = Cali). Fuente de verdad: deriva city, state y stateCode.",
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 5
+          },
+          "state": {
+            "description": "Departamento (texto). Solo sirve como pista para desambiguar city; se deriva de cityCode.",
             "type": "string"
           },
           "country": {
@@ -1438,7 +1465,7 @@
     },
     {
       "name": "create_dynamic_contact_list",
-      "description": "Crear una lista DINÁMICA de contactos.\nA diferencia de la estática, los contactos que pertenecen a la lista se recalculan en tiempo real\ncada vez que se consultan, aplicando los filtros almacenados contra la base de datos actual.\n\nSe REQUIERE al menos un filtro.\nEstructura de un filtro: { key: 'city', operator: 'contains', value: 'Bogotá' }\nOperadores: contains, equals, 'starts with', 'ends with', 'is empty', 'is not empty', greater_than, less_than.\nClaves de ejemplo: firstName, lastName, email, mobile, company, city, country, source, companyType, leadScore.\nFiltro especial: { key: 'hasDeals', operator: 'equals', value: true } para contactos con/sin negocios.",
+      "description": "Crear una lista DINÁMICA de contactos.\nA diferencia de la estática, los contactos que pertenecen a la lista se recalculan en tiempo real\ncada vez que se consultan, aplicando los filtros almacenados contra la base de datos actual.\n\nSe REQUIERE al menos un filtro.\nEstructura de un filtro: { key: 'city', operator: 'contains', value: 'Bogotá' }\nOperadores: contains, equals, 'starts with', 'ends with', 'is empty', 'is not empty', greater_than, less_than.\nClaves de ejemplo: firstName, lastName, email, mobile, company, city, cityCode, stateCode, country, source, companyType, leadScore.\nCiudades (catálogo DANE): { key: 'cityCode', operator: 'equals', value: '05001' } (05001 = Medellín); todo un departamento: { key: 'stateCode', operator: 'equals', value: '05' } o { key: 'cityCode', operator: 'starts with', value: '05' }. city es texto y puede estar sin confirmar (cityCode vacío).\nFiltro especial: { key: 'hasDeals', operator: 'equals', value: true } para contactos con/sin negocios.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -2375,6 +2402,243 @@
       "group": "settings"
     },
     {
+      "name": "create_shipment",
+      "description": "Generar un envío (guía) en Envia.com (POST /api/shipments). 🚨 COBRA SALDO REAL de la cuenta de Envia de la organización en esta misma llamada: confirma con el usuario la transportadora, el servicio y el precio antes de llamarla. Requiere shipments:write y el módulo envios.\nPrimero cotiza con quote_shipment y pasa aquí el carrier y el service de la tarifa elegida, con los MISMOS paquetes y destino.\nPasa SIEMPRE idempotencyKey, una por INTENTO de envío y no por pedido (ej. \"pedido-4521-1\"; 1-100 caracteres, única por organización). Si reintentas con la misma clave y el envío ya tiene guía, responde 200 con reused:true sin volver a cobrar: en ese caso el body se IGNORA (no se aplican cambios de destino, paquetes ni transportadora) y hay que revisar data.status, que puede ser cualquier estado, incluso canceled. Para generar otra guía del mismo pedido (p. ej. tras cancelar la anterior) usa una clave NUEVA (\"pedido-4521-2\"). Si el intento anterior falló (draft), la misma clave reintenta generar sobre el mismo envío (201 reused:false, o 422 si falla otra vez). Mientras el generate de esa clave sigue en curso (candado de hasta 120 s), la misma clave responde 409 SHIPMENT_IN_PROGRESS sin volver a cobrar: espera unos segundos y reintenta. La misma clave con OTRO contactId → 400 IDEMPOTENCY_KEY_REUSED. NO reintentes en bucle; consulta con list_contact_shipments.\n🚨 409 SHIPMENT_NEEDS_REVIEW (con shipmentId): Envia no respondió a tiempo, falló la red o respondió sin guía, así que NO sabemos si generó (y cobró) la guía. Ese envío NUNCA se regenera solo, ni con la misma clave. Dile al usuario que revise su panel de Envia; solo si allí no aparece la guía, reintenta con una clave NUEVA.\nEl destino sale del contacto y destination lo pisa (ciudad ambigua o desconocida → 422 INVALID_CITY con candidates; el cityCode se obtiene con search_municipalities). dealId/quotationId/invoiceId y presetId deben ser de la organización (400 VALIDATION_ERROR con field si no).\n201 = guía generada: data.status created con trackingNumber, trackUrl, labelUrl (etiqueta PDF/ZPL), pricing.total y balanceAfter. Si Envia la rechaza (saldo insuficiente, transportadora caída…) → 422 ENVIA_GENERATE_FAILED con error y shipmentId del borrador (queda en draft; se puede reintentar con la misma clave). Si error.code es CARRIER_ERROR, pide al usuario revisar su panel de Envia antes de reintentar: la transportadora pudo haber creado la guía.\nEstados posibles de un envío: draft (falló la generación o está en revisión si generateOutcome=unknown), created (guía generada; único cancelable — cancelar se hace desde la app: la API pública expone POST /api/shipments/{id}/cancel, pero este MCP no tiene tool de cancelar hasta verificar con una guía real cómo responde Envia y si devuelve el saldo), picked_up, in_transit, out_for_delivery, delivered, delivery_failed, returned, lost, address_error, at_office, canceled, exception. Terminales: delivered, returned, lost, canceled.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "contactId": {
+            "type": "string",
+            "description": "_id del contacto destinatario (obligatorio)"
+          },
+          "carrier": {
+            "type": "string",
+            "minLength": 1,
+            "description": "carrier de la tarifa elegida en quote_shipment (ej. serviEntrega)"
+          },
+          "service": {
+            "type": "string",
+            "minLength": 1,
+            "description": "service de la tarifa elegida en quote_shipment (ej. premier)"
+          },
+          "packages": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Descripción del contenido"
+                },
+                "amount": {
+                  "description": "Bultos iguales. Por defecto 1",
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "weight": {
+                  "type": "number",
+                  "minimum": 0.01,
+                  "description": "Peso en kg (mínimo 0.01)"
+                },
+                "dimensions": {
+                  "type": "object",
+                  "properties": {
+                    "length": {
+                      "type": "number",
+                      "minimum": 1
+                    },
+                    "width": {
+                      "type": "number",
+                      "minimum": 1
+                    },
+                    "height": {
+                      "type": "number",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "length",
+                    "width",
+                    "height"
+                  ],
+                  "description": "Largo, ancho y alto en cm (mínimo 1)"
+                },
+                "declaredValue": {
+                  "description": "Valor declarado en COP",
+                  "type": "number",
+                  "minimum": 0
+                },
+                "presetId": {
+                  "description": "Preset de paquete de la organización",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "content",
+                "weight",
+                "dimensions"
+              ]
+            },
+            "description": "Los mismos paquetes que se cotizaron"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "OBLIGATORIA. Clave por INTENTO de envío (ej. pedido-4521-1), única por organización: un reintento con la misma clave no genera (ni cobra) otra guía y devuelve el envío existente ignorando el body. Tras cancelar o ante SHIPMENT_NEEDS_REVIEW, usa una clave nueva"
+          },
+          "destination": {
+            "description": "Dirección confirmada; pisa la del contacto. Úsala igual que en quote_shipment",
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "company": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "street": {
+                "description": "Calle y número (\"Calle 5 # 3-20\")",
+                "type": "string"
+              },
+              "number": {
+                "type": "string"
+              },
+              "district": {
+                "description": "Barrio",
+                "type": "string"
+              },
+              "reference": {
+                "description": "Indicaciones para el mensajero",
+                "type": "string"
+              },
+              "identificationNumber": {
+                "description": "NIT o cédula del destinatario",
+                "type": "string"
+              },
+              "city": {
+                "description": "Ciudad en texto libre (\"Lérida\")",
+                "type": "string"
+              },
+              "cityCode": {
+                "description": "DANE de municipio, 5 dígitos (\"73408\"). Gana sobre city",
+                "type": "string"
+              },
+              "state": {
+                "description": "Departamento en texto libre (\"Tolima\")",
+                "type": "string"
+              },
+              "stateCode": {
+                "description": "DANE de departamento, 2 dígitos (\"73\")",
+                "type": "string"
+              },
+              "country": {
+                "description": "Por defecto CO (único soportado)",
+                "type": "string"
+              },
+              "postalCode": {
+                "type": "string"
+              }
+            }
+          },
+          "insurance": {
+            "description": "Seguro. true equivale a { enabled: true }",
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "amount": {
+                    "description": "Valor asegurado; si falta se usa el declarado",
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                },
+                "required": [
+                  "enabled"
+                ]
+              }
+            ]
+          },
+          "cod": {
+            "description": "Pago contra entrega (solo si el servicio lo soporta)",
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            },
+            "required": [
+              "amount"
+            ]
+          },
+          "pickup": {
+            "description": "Pedir recogida al generar la guía",
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string",
+                "description": "YYYY-MM-DD"
+              },
+              "timeFrom": {
+                "type": "string",
+                "description": "HH:MM, anterior a timeTo"
+              },
+              "timeTo": {
+                "type": "string",
+                "description": "HH:MM"
+              },
+              "instructions": {
+                "type": "string",
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "date",
+              "timeFrom",
+              "timeTo"
+            ]
+          },
+          "dealId": {
+            "description": "Negocio asociado (de la organización)",
+            "type": "string"
+          },
+          "quotationId": {
+            "description": "Cotización asociada (de la organización)",
+            "type": "string"
+          },
+          "invoiceId": {
+            "description": "Factura asociada (de la organización)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "contactId",
+          "carrier",
+          "service",
+          "packages",
+          "idempotencyKey"
+        ]
+      },
+      "group": "shipments"
+    },
+    {
       "name": "create_static_contact_list",
       "description": "Crear una lista ESTÁTICA de contactos. Existen tres modos:\n\n1. Lista vacía: pasar solo name (y opcionalmente description). Se puede poblar después con add_contacts_to_list.\n2. Por IDs directos: pasar contactIds (array de IDs de contacto). Máximo 2000 contactos.\n3. Por filtros de propiedades: pasar filters para buscar y capturar los contactos que coincidan en el momento de creación.\n   Los filtros son snapshots — el grupo no cambia automáticamente después (para eso usar create_dynamic_contact_list).\n\nEstructura de un filtro: { key: 'city', operator: 'contains', value: 'Bogotá' }\nOperadores soportados: contains, equals, 'starts with', 'ends with', 'is empty', 'is not empty', greater_than, less_than.\nClaves de ejemplo: firstName, lastName, email, mobile, company, city, country, source, companyType, leadScore.\nLímite: 5000 coincidencias al filtrar (usar filtros más específicos si se supera).",
       "inputSchema": {
@@ -2972,7 +3236,7 @@
     },
     {
       "name": "filter_contacts",
-      "description": "Filtro avanzado cruzado: combina condiciones sobre propiedades de contactos Y condiciones sobre sus deals para retornar una lista paginada.\n\nCondiciones para contactFilters: equals | not_equals | contains | not_contains | is_empty | is_not_empty\nCondiciones para dealFilters:    equals | not_equals | contains | not_contains | greater_than | less_than | between | last_deal_before | last_deal_after\n\nCampos especiales en dealFilters:\n  - field \"hasDeals\" (sin condition): filtra si el contacto tiene (true) o no (false) deals que cumplan los demás filtros\n  - field \"lastDeal\" con condition \"last_deal_before\"/\"last_deal_after\": filtra según la fecha del deal más reciente del contacto\n  - field \"amount\" con greater_than/less_than/between: filtra por monto del deal (between requiere también \"valueTo\")\n  - cualquier campo real del deal: title, closingDate, createdAt, etc.\n\nEjemplos de uso:\n  - Hoteles sin pedidos en 60 días: contactFilters=[{field:\"companyType\",condition:\"equals\",value:\"Hoteles y Piscinas\"}], dealFilters=[{field:\"hasDeals\",value:true},{field:\"lastDeal\",condition:\"last_deal_before\",value:\"2026-02-09\"}]\n  - Clientes de Bogotá con deals > $500k: contactFilters=[{field:\"lifeCycle\",condition:\"equals\",value:\"Cliente\"},{field:\"city\",condition:\"equals\",value:\"Bogota\"}], dealFilters=[{field:\"amount\",condition:\"greater_than\",value:\"500000\"}]\n  - Contactos sin categoría: contactFilters=[{field:\"companyType\",condition:\"is_empty\"}]",
+      "description": "Filtro avanzado cruzado: combina condiciones sobre propiedades de contactos Y condiciones sobre sus deals para retornar una lista paginada.\n\nCondiciones para contactFilters: equals | not_equals | contains | not_contains | is_empty | is_not_empty\nCondiciones para dealFilters:    equals | not_equals | contains | not_contains | greater_than | less_than | between | last_deal_before | last_deal_after\n\nCampos especiales en dealFilters:\n  - field \"hasDeals\" (sin condition): filtra si el contacto tiene (true) o no (false) deals que cumplan los demás filtros\n  - field \"lastDeal\" con condition \"last_deal_before\"/\"last_deal_after\": filtra según la fecha del deal más reciente del contacto\n  - field \"amount\" con greater_than/less_than/between: filtra por monto del deal (between requiere también \"valueTo\")\n  - cualquier campo real del deal: title, closingDate, createdAt, etc.\n\nEjemplos de uso:\n  - Hoteles sin pedidos en 60 días: contactFilters=[{field:\"companyType\",condition:\"equals\",value:\"Hoteles y Piscinas\"}], dealFilters=[{field:\"hasDeals\",value:true},{field:\"lastDeal\",condition:\"last_deal_before\",value:\"2026-02-09\"}]\n  - Clientes de Bogotá con deals > $500k: contactFilters=[{field:\"lifeCycle\",condition:\"equals\",value:\"Cliente\"},{field:\"city\",condition:\"equals\",value:\"Bogota\"}], dealFilters=[{field:\"amount\",condition:\"greater_than\",value:\"500000\"}]\n  - Contactos sin categoría: contactFilters=[{field:\"companyType\",condition:\"is_empty\"}]\n  - Ciudad por código DANE (Épica Y): contactFilters=[{field:\"cityCode\",condition:\"equals\",value:\"05001\"}] (05001 = Medellín); todo un departamento: {field:\"stateCode\",condition:\"equals\",value:\"05\"} (05 = Antioquia). No filtres cityCode por prefijo: contains escapa el texto (un \"^05\" se busca literal y nunca casa) y aquí no existe starts_with. Códigos con search_municipalities / list_states. Contactos con ciudad sin confirmar: [{field:\"cityCode\",condition:\"is_empty\"},{field:\"city\",condition:\"is_not_empty\"}]",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -2984,7 +3248,7 @@
               "properties": {
                 "field": {
                   "type": "string",
-                  "description": "Clave de propiedad del contacto: companyType, city, lifeCycle, source, country, etc."
+                  "description": "Clave de propiedad del contacto: companyType, city, cityCode (código DANE de 5 dígitos), stateCode (departamento, 2 dígitos), lifeCycle, source, country, etc."
                 },
                 "condition": {
                   "type": "string",
@@ -3389,7 +3653,7 @@
     },
     {
       "name": "get_conversation",
-      "description": "Get a conversation by ID with messages, lastMessage populated, and contact data.",
+      "description": "Get a conversation by ID with messages, lastMessage populated, and contact data. Returns the most recent `messagesLimit` messages. To read older history, pass `messagesBefore` = `messagesPagination.nextBefore` from the previous response (or the timestamp/_id of the oldest message you already have) and repeat while `messagesPagination.hasMore` is true.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -3400,6 +3664,10 @@
           "messagesLimit": {
             "description": "Messages to include (default 50, max 200)",
             "type": "number"
+          },
+          "messagesBefore": {
+            "description": "Cursor: ISO 8601 timestamp or message _id. Returns messages strictly older than it.",
+            "type": "string"
           }
         },
         "required": [
@@ -3801,7 +4069,7 @@
     },
     {
       "name": "get_organization_settings",
-      "description": "Devuelve los datos de la EMPRESA dueña de la cuenta y sus ajustes generales: nombre, tipo y número de identificación (NIT), correo, teléfono, WhatsApp, dirección, logo e icono; y en settings la zona horaria, idioma/región (locale BCP-47), moneda (ISO-4217), la ventana de envío de automatizaciones (automationSendWindow: días 0=domingo..6=sábado y franja HH:mm en que SÍ se escribe a clientes; null = sin restricción), si se exige 2FA, los textos por defecto de cotizaciones (condiciones de pago y envío, notas, pie, días de validez, prefijo del número, rótulo del impuesto) y de órdenes de compra, y el campo de negocios que alimenta el KPI de productos vendidos. NO incluye usuarios (list_users), plan, configuración de facturación electrónica, integraciones ni credenciales (tienen sus propias tools). Requiere settings:read.",
+      "description": "Devuelve los datos de la EMPRESA dueña de la cuenta y sus ajustes generales: nombre, tipo y número de identificación (NIT), correo, teléfono, WhatsApp, dirección (con cityCode = código DANE del municipio, vacío si la ciudad no está confirmada), logo e icono; y en settings la zona horaria, idioma/región (locale BCP-47), moneda (ISO-4217), la ventana de envío de automatizaciones (automationSendWindow: días 0=domingo..6=sábado y franja HH:mm en que SÍ se escribe a clientes; null = sin restricción), si se exige 2FA, los textos por defecto de cotizaciones (condiciones de pago y envío, notas, pie, días de validez, prefijo del número, rótulo del impuesto) y de órdenes de compra, y el campo de negocios que alimenta el KPI de productos vendidos. NO incluye usuarios (list_users), plan, configuración de facturación electrónica, integraciones ni credenciales (tienen sus propias tools). Requiere settings:read.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -4041,7 +4309,7 @@
     },
     {
       "name": "import_contacts",
-      "description": "Importa contactos EN LOTE (hasta 500 filas por llamada) con el mismo motor que el importador de Excel de la app. Cada fila es un objeto { clave: valor } con las claves de las propiedades de contacto de la organización (firstName, lastName, email, mobile, phone, company, city… — consulta las claves reales con la configuración de propiedades de contacto) más 'owner' (correo del asesor dueño). DEDUPE: busca cada fila contra los contactos existentes por email (sin distinguir mayúsculas), luego mobile y luego phone (comparando los últimos 10 dígitos, con o sin indicativo), y también fusiona filas repetidas dentro del mismo lote. Si el contacto YA EXISTE lo ACTUALIZA: escribe los valores no vacíos de la fila (una celda vacía nunca borra un dato existente) y conserva lo demás; si no existe lo crea. Una clave que no es propiedad de contacto de la organización RECHAZA esa fila (sale en rejectedRows, no se inventan propiedades). 'company' enlaza la empresa por nombre; con createMissingCompanies=true crea las que falten. Respeta el límite de contactos del plan (los que no caben salen en skippedByPlan). NO dispara automatizaciones ni eventos de 'contacto creado', NO envía mensajes ni correos. RECOMENDADO: llama primero con dryRun=true para ver cuántos crearía, actualizaría y rechazaría sin escribir nada, y confirma con el usuario antes de importar de verdad. La importación real queda en el historial (list_imports) y se puede deshacer con import_rollback.",
+      "description": "Importa contactos EN LOTE (hasta 500 filas por llamada) con el mismo motor que el importador de Excel de la app. Cada fila es un objeto { clave: valor } con las claves de las propiedades de contacto de la organización (firstName, lastName, email, mobile, phone, company, city… — consulta las claves reales con la configuración de propiedades de contacto) más 'owner' (correo del asesor dueño). DEDUPE: busca cada fila contra los contactos existentes por email (sin distinguir mayúsculas), luego mobile y luego phone (comparando los últimos 10 dígitos, con o sin indicativo), y también fusiona filas repetidas dentro del mismo lote. Si el contacto YA EXISTE lo ACTUALIZA: escribe los valores no vacíos de la fila (una celda vacía nunca borra un dato existente) y conserva lo demás; si no existe lo crea. Una clave que no es propiedad de contacto de la organización RECHAZA esa fila (sale en rejectedRows, no se inventan propiedades). CIUDADES (catálogo DANE, modo estricto): 'cityCode' (código DANE de 5 dígitos, ej. 05001 = Medellín) es la fuente de verdad y deriva city/state/stateCode; si solo mandas 'city' debe ser un nombre inequívoco del catálogo (opcionalmente con 'state' para desambiguar). Una fila con ciudad ambigua (ej. 'Rionegro': Antioquia 05615 o Santander 68615), mal escrita o desconocida se RECHAZA y sale en rejectedRows con los candidatos (sin candidatos = mal escrita o desconocida: busca el código con search_municipalities): corrige con cityCode y reimporta. stateCode siempre se deriva del cityCode. Nunca se asigna un 'mejor candidato'. Un contacto de otro país (country distinto de Colombia) guarda city como texto libre. 'company' enlaza la empresa por nombre; con createMissingCompanies=true crea las que falten. Respeta el límite de contactos del plan (los que no caben salen en skippedByPlan). NO dispara automatizaciones ni eventos de 'contacto creado', NO envía mensajes ni correos. RECOMENDADO: llama primero con dryRun=true para ver cuántos crearía, actualizaría y rechazaría sin escribir nada, y confirma con el usuario antes de importar de verdad. La importación real queda en el historial (list_imports) y se puede deshacer con import_rollback.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -4394,7 +4662,7 @@
     },
     {
       "name": "list_companies",
-      "description": "Listar empresas (companies) con búsqueda, rango de fechas y filtros por propiedades (permiso companies:read).\n\nFiltros de propiedades (se combinan con AND, case-insensitive por defecto):\n- Campos canónicos: name, industry, city, country, idNumber (NIT).\n- extraFilters: objeto libre { key: value } para filtrar por CUALQUIER propiedad custom no listada (ej. { size: '50-100' }).\n- matchMode: 'contains' (default, regex case-insensitive con escape) o 'exact' (igualdad exacta).\n\nsearch: texto libre sobre name, industry, email, phone, website, city, idNumber.\nRango de fechas (createdAt) vía createdFrom/createdTo en ISO (YYYY-MM-DD).\nOrdenable por createdAt/updatedAt asc|desc. Paginación con page/limit.",
+      "description": "Listar empresas (companies) con búsqueda, rango de fechas y filtros por propiedades (permiso companies:read).\n\nFiltros de propiedades (se combinan con AND, case-insensitive por defecto):\n- Campos canónicos: name, industry, city, cityCode (código DANE de 5 dígitos, usar matchMode exact), stateCode (departamento, 2 dígitos), country, idNumber (NIT).\n- extraFilters: objeto libre { key: value } para filtrar por CUALQUIER propiedad custom no listada (ej. { size: '50-100' }).\n- matchMode: 'contains' (default, regex case-insensitive con escape) o 'exact' (igualdad exacta).\n\nsearch: texto libre sobre name, industry, email, phone, website, city, idNumber.\nRango de fechas (createdAt) vía createdFrom/createdTo en ISO (YYYY-MM-DD).\nOrdenable por createdAt/updatedAt asc|desc. Paginación con page/limit.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -4425,6 +4693,14 @@
             "type": "string"
           },
           "city": {
+            "type": "string"
+          },
+          "cityCode": {
+            "description": "Código DANE del municipio (5 dígitos, ej. 05001 = Medellín)",
+            "type": "string"
+          },
+          "stateCode": {
+            "description": "Código DANE del departamento (2 dígitos, ej. 05 = Antioquia)",
             "type": "string"
           },
           "country": {
@@ -4490,7 +4766,7 @@
     },
     {
       "name": "list_company_properties",
-      "description": "Lista las propiedades (campos) de las empresas de la organización con sus grupos: key, label, type, isVisible, options, groupId y reserved (true = propiedad núcleo del CRM como name, idNumber, email o phone). Las keys son las que usan create_company/update_company. NO devuelve empresas. Requiere fields:read.",
+      "description": "Lista las propiedades (campos) de las empresas de la organización con sus grupos: key, label, type, isVisible, options, groupId y reserved (true = propiedad núcleo del CRM como name, idNumber, email o phone). type: catalog (con catalog: co_municipalities | co_states) = cityCode y stateCode, códigos DANE del catálogo nacional: cityCode se escribe con un código de search_municipalities y stateCode se deriva solo; no se pueden crear propiedades catalog. Las keys son las que usan create_company/update_company. NO devuelve empresas. Requiere fields:read.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -4521,7 +4797,7 @@
     },
     {
       "name": "list_contact_properties",
-      "description": "Lista las propiedades (campos) de los contactos de la organización con sus grupos: key, label, type, isVisible, options, groupId y reserved (true = propiedad núcleo del CRM como email, mobile, firstName o companyType). Las keys son las que usan create_contact/update_contact y los filtros de list_contacts. NO devuelve contactos. Requiere fields:read.",
+      "description": "Lista las propiedades (campos) de los contactos de la organización con sus grupos: key, label, type, isVisible, options, groupId y reserved (true = propiedad núcleo del CRM como email, mobile, firstName o companyType). type: catalog (con catalog: co_municipalities | co_states) = cityCode y stateCode, códigos DANE del catálogo nacional: cityCode se escribe con un código de search_municipalities y stateCode se deriva solo; no se pueden crear propiedades catalog. Las keys son las que usan create_contact/update_contact y los filtros de list_contacts. NO devuelve contactos. Requiere fields:read.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -4541,8 +4817,56 @@
       "group": "fields"
     },
     {
+      "name": "list_contact_shipments",
+      "description": "Listar los envíos de UN contacto (GET /api/shipments?contactId=…), más recientes primero, con el último estado guardado (no consulta a Envia; para refrescar usa track_shipment). Requiere shipments:read y el módulo envios.\nCada envío trae id, carrier, service, trackingNumber, trackUrl, labelUrl, status, events, destination, packages y pricing. Paginación: limit 20 por defecto y máximo 100 (un valor mayor da error de validación); la respuesta trae pagination { total, page, limit, pages }.\nstatus filtra por estado: draft, created, picked_up, in_transit, out_for_delivery, delivered, delivery_failed, returned, lost, address_error, at_office, canceled, exception.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "contactId": {
+            "type": "string",
+            "description": "_id del contacto (obligatorio)"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "created",
+              "picked_up",
+              "in_transit",
+              "out_for_delivery",
+              "delivered",
+              "delivery_failed",
+              "returned",
+              "lost",
+              "address_error",
+              "at_office",
+              "canceled",
+              "exception"
+            ]
+          },
+          "page": {
+            "description": "Por defecto 1",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "limit": {
+            "description": "Por defecto 20, máximo 100 (un valor mayor da error de validación)",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "contactId"
+        ]
+      },
+      "group": "shipments"
+    },
+    {
       "name": "list_contacts",
-      "description": "Listar contactos con búsqueda, rango de fechas y filtros por propiedades.\n\nFiltros de propiedades (se combinan con AND, case-insensitive por defecto):\n- Campos canónicos: firstName, lastName, email, mobile, phone, company, position, city, country, source, idNumber, companyType.\n- extraFilters: objeto libre { key: value } para filtrar por CUALQUIER propiedad custom no listada (ej. { industry: 'retail' }).\n- matchMode: 'contains' (default, regex case-insensitive con escape) o 'exact' (igualdad exacta).\n\nFiltros de presencia (ideales para auditar calidad de datos y organizar contactos):\n- missing: lista separada por comas de claves que DEBEN estar ausentes o vacías. Ej: 'companyType,city' trae contactos sin companyType o con companyType=''.\n- exists: lista separada por comas de claves que DEBEN existir con valor no vacío. Ej: 'email,mobile' trae contactos con ambos campos.\n\nRango de fechas (createdAt) vía createdFrom/createdTo en ISO (YYYY-MM-DD).\nOrdenable por createdAt/updatedAt asc|desc. Paginación con page/limit.",
+      "description": "Listar contactos con búsqueda, rango de fechas y filtros por propiedades.\n\nFiltros de propiedades (se combinan con AND, case-insensitive por defecto):\n- Campos canónicos: firstName, lastName, email, mobile, phone, company, position, city, cityCode, stateCode, country, source, idNumber, companyType.\n- Ciudades (catálogo DANE, Épica Y): cityCode = código DANE del municipio (5 dígitos, ej. 05001 = Medellín; usar matchMode exact); stateCode = código del departamento (2 dígitos, ej. 05 = Antioquia). Para todo un departamento filtra por stateCode (matchMode exact; en filter_contacts: stateCode equals '05'). No filtres cityCode por prefijo: contains escapa el texto ('^05' nunca casa) y filter_contacts no tiene starts_with. city sigue siendo texto (puede estar sin confirmar: cityCode vacío). ¿No sabes el código? search_municipalities.\n- extraFilters: objeto libre { key: value } para filtrar por CUALQUIER propiedad custom no listada (ej. { industry: 'retail' }).\n- matchMode: 'contains' (default, regex case-insensitive con escape) o 'exact' (igualdad exacta).\n\nFiltros de presencia (ideales para auditar calidad de datos y organizar contactos):\n- missing: lista separada por comas de claves que DEBEN estar ausentes o vacías. Ej: 'companyType,city' trae contactos sin companyType o con companyType=''.\n- exists: lista separada por comas de claves que DEBEN existir con valor no vacío. Ej: 'email,mobile' trae contactos con ambos campos.\n\nRango de fechas (createdAt) vía createdFrom/createdTo en ISO (YYYY-MM-DD).\nOrdenable por createdAt/updatedAt asc|desc. Paginación con page/limit.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -4592,6 +4916,14 @@
             "type": "string"
           },
           "city": {
+            "type": "string"
+          },
+          "cityCode": {
+            "description": "Código DANE del municipio (5 dígitos, ej. 05001 = Medellín). Combinar con matchMode 'exact'.",
+            "type": "string"
+          },
+          "stateCode": {
+            "description": "Código DANE del departamento (2 dígitos, ej. 05 = Antioquia). Trae todos los municipios del departamento.",
             "type": "string"
           },
           "country": {
@@ -5675,6 +6007,16 @@
       "group": "settings"
     },
     {
+      "name": "list_states",
+      "description": "Listar los 33 departamentos de Colombia (GET /api/catalogs/states; Bogotá D.C. cuenta como uno, código 11) con su código DANE de 2 dígitos (el stateCode de contactos y empresas y el state de search_municipalities), nombre oficial, nombre corto e ISO 3166-2. Solo lectura; cualquier token, sin permiso especial.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {}
+      },
+      "group": "contacts"
+    },
+    {
       "name": "list_tasks",
       "description": "Listar tareas (opcional projectId en query para filtrar).",
       "inputSchema": {
@@ -5845,6 +6187,191 @@
         ]
       },
       "group": "landings"
+    },
+    {
+      "name": "quote_shipment",
+      "description": "Cotizar un envío con Envia.com (POST /api/shipments/rates). Es una CONSULTA: no crea nada ni cobra saldo. Requiere shipments:read y el módulo envios en el plan.\nDestino: manda contactId (se usa la dirección del contacto) o destination; con ambos, lo que venga en destination pisa lo del contacto. Sin ninguno → 400. La ciudad se resuelve contra el catálogo DANE: usa cityCode (DANE de 5 dígitos) o city + state inequívocos; si es ambigua o no se reconoce → 422 INVALID_CITY con candidates (pregúntale al usuario cuál es y reintenta con su cityCode; si no hay candidatos, búscalo con search_municipalities). Ojo: este código es INVALID_CITY, no el CITY_UNRESOLVED de contactos. Solo Colombia.\nEl origen es el de Ajustes → Envíos de la app (no se manda; 422 ORIGIN_NOT_CONFIGURED si falta). Sin la API key de Envia → 422 ENVIA_NOT_CONFIGURED.\nRespuesta: data.rates ordenadas por totalPrice ascendente (COP), cada una con carrier + service (lo que pide create_shipment), deliveryEstimate y desglose; data.failed = transportadoras que no respondieron (no tumban la cotización). Consulta cada transportadora con timeout de 12 s: puede tardar.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "contactId": {
+            "description": "_id del contacto destinatario; su dirección es el destino",
+            "type": "string"
+          },
+          "destination": {
+            "description": "Dirección de destino. Todo opcional: lo enviado pisa lo del contacto",
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "company": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "street": {
+                "description": "Calle y número (\"Calle 5 # 3-20\")",
+                "type": "string"
+              },
+              "number": {
+                "type": "string"
+              },
+              "district": {
+                "description": "Barrio",
+                "type": "string"
+              },
+              "reference": {
+                "description": "Indicaciones para el mensajero",
+                "type": "string"
+              },
+              "identificationNumber": {
+                "description": "NIT o cédula del destinatario",
+                "type": "string"
+              },
+              "city": {
+                "description": "Ciudad en texto libre (\"Lérida\")",
+                "type": "string"
+              },
+              "cityCode": {
+                "description": "DANE de municipio, 5 dígitos (\"73408\"). Gana sobre city",
+                "type": "string"
+              },
+              "state": {
+                "description": "Departamento en texto libre (\"Tolima\")",
+                "type": "string"
+              },
+              "stateCode": {
+                "description": "DANE de departamento, 2 dígitos (\"73\")",
+                "type": "string"
+              },
+              "country": {
+                "description": "Por defecto CO (único soportado)",
+                "type": "string"
+              },
+              "postalCode": {
+                "type": "string"
+              }
+            }
+          },
+          "packages": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Descripción del contenido"
+                },
+                "amount": {
+                  "description": "Bultos iguales. Por defecto 1",
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "weight": {
+                  "type": "number",
+                  "minimum": 0.01,
+                  "description": "Peso en kg (mínimo 0.01)"
+                },
+                "dimensions": {
+                  "type": "object",
+                  "properties": {
+                    "length": {
+                      "type": "number",
+                      "minimum": 1
+                    },
+                    "width": {
+                      "type": "number",
+                      "minimum": 1
+                    },
+                    "height": {
+                      "type": "number",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "length",
+                    "width",
+                    "height"
+                  ],
+                  "description": "Largo, ancho y alto en cm (mínimo 1)"
+                },
+                "declaredValue": {
+                  "description": "Valor declarado en COP",
+                  "type": "number",
+                  "minimum": 0
+                },
+                "presetId": {
+                  "description": "Preset de paquete de la organización",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "content",
+                "weight",
+                "dimensions"
+              ]
+            },
+            "description": "Al menos un paquete"
+          },
+          "insurance": {
+            "description": "Seguro. true equivale a { enabled: true }",
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "amount": {
+                    "description": "Valor asegurado; si falta se usa el declarado",
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                },
+                "required": [
+                  "enabled"
+                ]
+              }
+            ]
+          },
+          "cod": {
+            "description": "Pago contra entrega (solo si la transportadora lo soporta)",
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            },
+            "required": [
+              "amount"
+            ]
+          },
+          "carriers": {
+            "description": "Códigos de transportadora a cotizar (ej. serviEntrega, coordinadora). Sin él, todas las de la cuenta",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "packages"
+        ]
+      },
+      "group": "shipments"
     },
     {
       "name": "recalculate_scoring_rules",
@@ -6028,6 +6555,34 @@
         ]
       },
       "group": "knowledge-base"
+    },
+    {
+      "name": "search_municipalities",
+      "description": "Buscar municipios de Colombia en el catálogo DANE/DIVIPOLA (GET /api/catalogs/municipalities) para obtener su cityCode (código DANE de 5 dígitos). Solo lectura; cualquier token, sin permiso especial.\nÚsala cuando create_contact, update_contact, create_company, update_company, import_contacts o submit_form respondan CITY_UNRESOLVED (sobre todo con candidates: [] = ciudad mal escrita o desconocida), y antes de quote_shipment/create_shipment si la ciudad del destino no es inequívoca. Luego reintenta con cityCode.\nq busca por prefijo o inclusión sobre el nombre oficial y el corto, sin tildes ni mayúsculas, capitales primero (20 resultados por defecto). state acota a un departamento (código DANE de 2 dígitos, ver list_states); un state desconocido → 400 STATE_UNKNOWN. Sin q devuelve el departamento entero (o el catálogo completo de 1.122 municipios: evítalo, manda q).\nCada fila trae code (el cityCode), name (oficial), shortName (lo que el CRM guarda en city), stateCode, stateName, stateIso2 y dane8. Hay 66 nombres repetidos entre departamentos (Rionegro, La Unión, Armenia…): mira stateName y, si hay más de un resultado plausible, pregúntale al usuario cuál es. Nunca elijas por él.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "q": {
+            "description": "Texto a buscar (\"medel\", \"rionegro\", \"santa rosa\")",
+            "type": "string",
+            "minLength": 1
+          },
+          "state": {
+            "description": "Código DANE del departamento para acotar (\"05\" Antioquia, \"76\" Valle del Cauca)",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2
+          },
+          "limit": {
+            "description": "Máximo de filas (1-1200). Por defecto 20 con q",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1200
+          }
+        }
+      },
+      "group": "contacts"
     },
     {
       "name": "send_email",
@@ -6242,7 +6797,7 @@
     },
     {
       "name": "submit_form",
-      "description": "Enviar un formulario en nombre de un contacto (server-to-server). Pasa por el mismo camino que la página pública: busca el contacto por email/celular y lo crea o actualiza sin duplicar, registra el origen, crea el negocio si el form lo tiene configurado y avisa al dueño. `values` = { claveDeCampo: valor }; opcionales utm_source/utm_medium/utm_campaign/page_url.",
+      "description": "Enviar un formulario en nombre de un contacto (server-to-server). Pasa por el mismo camino que la página pública: busca el contacto por email/celular y lo crea o actualiza sin duplicar, registra el origen, crea el negocio si el form lo tiene configurado y avisa al dueño. `values` = { claveDeCampo: valor }; opcionales utm_source/utm_medium/utm_campaign/page_url. Solo cuentan las claves que son campos del formulario (get_form). CIUDAD (catálogo DANE, modo estricto): si el envío trae ciudad y no resuelve sin ambigüedad, responde 400 con code CITY_UNRESOLVED (ambigua, mal escrita o desconocida) o INVALID_CITY_CODE (cityCode inexistente), más input y candidates [{code, shortName, stateName, stateCode}], y NO guarda nada. Reintenta con cityCode (si el formulario tiene ese campo) o con la ciudad + el departamento (campo state/departamento/depto/dpto) para homónimos como Rionegro; con candidates vacío, búscala con search_municipalities. Nunca elijas un candidato por el usuario.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -6266,6 +6821,24 @@
         ]
       },
       "group": "forms"
+    },
+    {
+      "name": "track_shipment",
+      "description": "Refrescar el rastreo de un envío consultando a Envia.com (POST /api/shipments/:id/track): agrega los eventos nuevos sin duplicar y actualiza status/statusRaw. Devuelve el envío actualizado (events con at, status, raw, description, location). No cobra. Requiere shipments:write y el módulo envios.\nUn envío sin guía (draft) → 409 SHIPMENT_NOT_TRACKABLE; inexistente o de otra organización → 404; Envia caído → 502 ENVIA_TRACK_FAILED. Para ver el último estado guardado sin consultar a Envia usa list_contact_shipments.\nEstados: draft, created, picked_up, in_transit, out_for_delivery, delivered, delivery_failed, returned, lost, address_error, at_office, canceled, exception. Terminales: delivered, returned, lost, canceled.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "id del envío (campo id de create_shipment o list_contact_shipments)"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "shipments"
     },
     {
       "name": "unpublish_landing_page",
@@ -6958,7 +7531,7 @@
     },
     {
       "name": "update_company",
-      "description": "Actualizar una empresa por ID (merge de properties por key: los campos enviados se actualizan o agregan, el resto se conserva). Si cambia el name se sincroniza en los contactos vinculados. Permiso companies:write.",
+      "description": "Actualizar una empresa por ID (merge de properties por key: los campos enviados se actualizan o agregan, el resto se conserva). Si cambia el name se sincroniza en los contactos vinculados. Permiso companies:write. CIUDAD (catálogo DANE, modo estricto): cityCode (5 dígitos) o city inequívoco; ambiguo/desconocido → 422 CITY_UNRESOLVED con candidates (reintenta con cityCode; si candidates viene vacío, búscalo con search_municipalities); cityCode inexistente → 400 INVALID_CITY_CODE. state (texto) es pista para homónimos; stateCode siempre se deriva.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -6993,6 +7566,17 @@
             "type": "string"
           },
           "city": {
+            "description": "Ciudad (Colombia): nombre inequívoco del catálogo DANE",
+            "type": "string"
+          },
+          "cityCode": {
+            "description": "Código DANE del municipio, 5 dígitos (ej. 05001 = Medellín). Deriva city, state y stateCode.",
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 5
+          },
+          "state": {
+            "description": "Departamento (texto); solo pista para desambiguar city",
             "type": "string"
           },
           "country": {
@@ -7059,7 +7643,7 @@
     },
     {
       "name": "update_contact",
-      "description": "Actualizar un contacto por ID (PUT /contacts/:id): merge de properties por key, los campos que no se envían se conservan. companyId null o '' desvincula la empresa.",
+      "description": "Actualizar un contacto por ID (PUT /contacts/:id): merge de properties por key, los campos que no se envían se conservan. companyId null o '' desvincula la empresa. CIUDAD (catálogo DANE, modo estricto): cityCode (5 dígitos) o city inequívoco; ambiguo/desconocido → 422 CITY_UNRESOLVED con candidates (reintenta con cityCode; si candidates viene vacío, búscalo con search_municipalities); cityCode inexistente → 400 INVALID_CITY_CODE. stateCode siempre se deriva del cityCode (el del body se ignora). Sin city/cityCode no se toca la ubicación.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -7110,6 +7694,17 @@
             "type": "string"
           },
           "city": {
+            "description": "Ciudad (Colombia): nombre inequívoco del catálogo DANE",
+            "type": "string"
+          },
+          "cityCode": {
+            "description": "Código DANE del municipio, 5 dígitos (ej. 05001 = Medellín). Deriva city, state y stateCode.",
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 5
+          },
+          "state": {
+            "description": "Departamento (texto); solo pista para desambiguar city",
             "type": "string"
           },
           "country": {
@@ -8306,11 +8901,23 @@
                 ]
               },
               "city": {
-                "description": "Ciudad",
+                "description": "Ciudad en texto. En Colombia se resuelve contra el catálogo DANE: si coincide asigna cityCode; si no, queda sin confirmar (cityCode vacío)",
                 "anyOf": [
                   {
                     "type": "string",
                     "maxLength": 200
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "cityCode": {
+                "description": "Código DANE del municipio (5 dígitos, ej. '05001' Medellín; búscalo con GET /catalogs/municipalities?q=). Si cambia, MANDA: city y state se derivan del catálogo. Código inexistente → 400",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 5
                   },
                   {
                     "type": "null"

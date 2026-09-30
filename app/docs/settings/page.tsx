@@ -179,7 +179,7 @@ export default function SettingsPage() {
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
             En <strong style={{ color: "var(--foreground)" }}>Configuración → Desarrollador → Conectores MCP</strong> (solo
             propietarios) creas las credenciales con las que Claude, ChatGPT o Cursor se conectan al
-            servidor MCP de FusionCRM y operan el CRM con más de 90 herramientas.
+            servidor MCP de FusionCRM y operan el CRM con más de 200 herramientas.
           </p>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
             <li>1. <em>Crear conector MCP</em> y ponle un nombre que diga desde dónde se conecta (ej. «Claude Desktop - Producción»).</li>

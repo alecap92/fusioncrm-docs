@@ -36,7 +36,7 @@ export default function IntegrationsPage() {
               { name: "N8N / Make / Zapier", status: "API", color: "#EA5B0C", desc: "Por la API REST y peticiones HTTP" },
               { name: "Facebook Messenger", status: "OAuth", color: "#1877F2", desc: "Mensajes de la página" },
               { name: "Instagram", status: "OAuth", color: "#E4405F", desc: "Mensajes directos" },
-              { name: "API REST", status: "Nativo", color: "#6b7280", desc: "98 operaciones con tokens por permiso" },
+              { name: "API REST", status: "Nativo", color: "#6b7280", desc: "Más de 200 operaciones con tokens por permiso" },
               { name: "MCP (IA)", status: "Nativo", color: "#1f2a48", desc: "Claude, ChatGPT, Cursor" },
               { name: "Formularios web", status: "Nativo", color: "#0f766e", desc: "Link, embed o webhook" },
             ].map((i) => (

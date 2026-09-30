@@ -24,6 +24,8 @@ const labels: Record<string, string> = {
   settings: "Configuración",
   api: "API REST",
   mcp: "MCP",
+  ciudades: "Ciudades (DANE)",
+  envios: "Envíos",
   integrations: "Integraciones",
   companies: "Empresas",
   forms: "Formularios web",
