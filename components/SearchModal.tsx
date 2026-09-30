@@ -41,6 +41,8 @@ const searchIndex = [
   { title: "Tokens de API", href: "/docs/api#auth", section: "API", keywords: ["api", "token", "autenticacion", "keys", "bearer"] },
   { title: "Permisos de la API", href: "/docs/api#permissions", section: "API", keywords: ["api", "permisos", "scopes", "contacts:read"] },
   { title: "Referencia de endpoints (OpenAPI)", href: "/docs/api#reference", section: "API", keywords: ["api", "endpoints", "rest", "openapi", "swagger", "contactos", "deals"] },
+  { title: "Ciudades: catálogo DANE y cityCode", href: "/docs/ciudades", section: "API", keywords: ["ciudad", "ciudades", "municipio", "municipios", "dane", "divipola", "citycode", "departamento", "statecode", "catalogo"] },
+  { title: "Envíos con Envia.com", href: "/docs/envios", section: "API", keywords: ["envios", "envio", "guia", "guias", "transportadora", "envia", "shipments", "rastreo", "cotizar"] },
   { title: "Webhooks salientes", href: "/docs/api#webhooks", section: "API", keywords: ["webhook", "evento", "etapa", "http", "automatizacion"] },
   { title: "MCP: el CRM desde tu IA", href: "/docs/mcp", section: "MCP", keywords: ["mcp", "claude", "chatgpt", "cursor", "ia", "inteligencia artificial", "tools"] },
   { title: "Agentes IA de WhatsApp", href: "/docs/agentes-ia", section: "Agentes IA", keywords: ["agente", "ia", "bot", "whatsapp", "openai", "prompt", "asistente"] },

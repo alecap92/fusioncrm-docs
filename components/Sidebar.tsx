@@ -32,6 +32,7 @@ const navigation: NavItem[] = [
     children: [
       { title: "Directorio de contactos", href: "/docs/contacts" },
       { title: "Crear y editar contactos", href: "/docs/contacts#crud" },
+      { title: "Ciudad y departamento", href: "/docs/contacts#city" },
       { title: "Campos personalizados", href: "/docs/contacts#custom-fields" },
       { title: "Listas y segmentos", href: "/docs/contacts#lists" },
       { title: "Importar contactos", href: "/docs/contacts#import" },
@@ -239,6 +240,8 @@ const navigation: NavItem[] = [
       { title: "Referencia de endpoints", href: "/docs/api#reference" },
       { title: "Webhooks salientes", href: "/docs/api#webhooks" },
       { title: "Errores y límites", href: "/docs/api#errors" },
+      { title: "Ciudades (catálogo DANE)", href: "/docs/ciudades" },
+      { title: "Envíos (Envia.com)", href: "/docs/envios" },
     ],
   },
   {

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Callout from "@/components/Callout";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
@@ -12,6 +13,7 @@ const toc = [
   { id: "create", label: "Crear contacto", depth: 3 },
   { id: "edit", label: "Editar contacto", depth: 3 },
   { id: "delete", label: "Eliminar contacto", depth: 3 },
+  { id: "city", label: "Ciudad y departamento" },
   { id: "custom-fields", label: "Campos personalizados" },
   { id: "lists", label: "Listas y segmentos" },
   { id: "import", label: "Importar contactos" },
@@ -97,7 +99,8 @@ export default function ContactsPage() {
                     ["Teléfono", "Teléfono", "No"],
                     ["Empresa", "Texto", "No"],
                     ["Cargo", "Texto", "No"],
-                    ["Ciudad", "Texto", "No"],
+                    ["Ciudad", "Municipio del catálogo DANE", "No"],
+                    ["Departamento", "Se completa solo con la ciudad", "No"],
                     ["País", "Selección", "No"],
                     ["Notas", "Texto largo", "No"],
                     ["Propietario", "Usuario", "Auto-asignado"],
@@ -151,6 +154,53 @@ export default function ContactsPage() {
               facturas asociadas <strong>no</strong> se eliminan.
             </Callout>
           </div>
+        </section>
+
+        <section id="city" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Ciudad y departamento</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            La ciudad se elige de la lista oficial de municipios de Colombia (DANE). Al escribir
+            aparecen sugerencias como &quot;Medellín — Antioquia&quot;; al elegir una, el departamento se
+            completa solo. Así no hay &quot;BOGOTA&quot; y &quot;Bogotá D.C.&quot; como si fueran dos ciudades,
+            y los filtros por ciudad o por departamento traen a todos.
+          </p>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• Si escribes una ciudad sin elegirla de la lista, se guarda igual y el contacto la muestra como <strong style={{ color: "var(--foreground)" }}>&quot;sin confirmar&quot;</strong> (por ejemplo, &quot;Rionegro · sin confirmar&quot;, porque hay un Rionegro en Antioquia y otro en Santander).</li>
+            <li>• La lista dinámica <strong style={{ color: "var(--foreground)" }}>&quot;Ciudades sin confirmar&quot;</strong> reúne esos contactos para corregirlos cuando quieras.</li>
+            <li>• Para contactos de otro país la ciudad es texto libre.</li>
+          </ul>
+          <div className="rounded-lg overflow-hidden border mb-4" style={{ borderColor: "var(--border)" }}>
+            <div className="px-4 py-2 text-xs font-semibold" style={{ backgroundColor: "#1f2a48", color: "white" }}>
+              Por API: city, cityCode, state y stateCode
+            </div>
+            <table className="w-full text-sm">
+              <tbody>
+                {[
+                  ["cityCode", "Código DANE del municipio, 5 dígitos (05001 = Medellín). Es la fuente de verdad: si lo envías, se derivan los otros tres."],
+                  ["city", "Nombre de la ciudad. Enviado solo, debe corresponder sin ambigüedad a un municipio."],
+                  ["state", "Departamento en texto. Lo deriva el servidor; enviado sirve de pista para desambiguar city."],
+                  ["stateCode", "Código DANE del departamento (05 = Antioquia). Siempre lo calcula el servidor; el valor enviado se ignora."],
+                ].map(([field, desc]) => (
+                  <tr key={field}>
+                    <td className="p-3 border-b font-mono text-xs" style={{ borderColor: "var(--border)", color: "#d1345b" }}>{field}</td>
+                    <td className="p-3 border-b" style={{ borderColor: "var(--border)", color: "var(--muted-foreground)" }}>{desc}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            En la API la ciudad es estricta: si <code>city</code> es ambigua, está mal escrita o no
+            existe, la respuesta es <strong style={{ color: "var(--foreground)" }}>422 CITY_UNRESOLVED</strong>{" "}
+            con los <code>candidates</code> posibles y no se guarda nada; reenvía con el{" "}
+            <code>cityCode</code> que corresponda. Un <code>cityCode</code> inexistente responde 400{" "}
+            <code>INVALID_CITY_CODE</code>. Busca el código con{" "}
+            <code>GET /api/catalogs/municipalities?q=medellin</code>.
+          </p>
+          <Callout type="tip">
+            Ejemplos, caché del catálogo y el comportamiento de formularios e importación en{" "}
+            <Link href="/docs/ciudades" style={{ color: "#d1345b" }}>Ciudades: catálogo DANE</Link>.
+          </Callout>
         </section>
 
         <section id="custom-fields" className="mb-10">

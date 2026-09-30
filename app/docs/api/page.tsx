@@ -22,6 +22,7 @@ const toc = [
 ];
 
 const modules = [
+  { path: "/catalogs", name: "Catálogos DANE: municipios y departamentos (cityCode)", perms: "cualquier token" },
   { path: "/contacts", name: "Contactos", perms: "contacts:*" },
   { path: "/companies", name: "Empresas (B2B)", perms: "companies:*" },
   { path: "/deals", name: "Negocios", perms: "deals:*" },
@@ -31,6 +32,7 @@ const modules = [
   { path: "/quotations", name: "Cotizaciones y su PDF", perms: "quotations:*" },
   { path: "/products", name: "Productos y variantes", perms: "products:*" },
   { path: "/invoices", name: "Facturación electrónica (DIAN)", perms: "invoices:*" },
+  { path: "/shipments", name: "Envíos con Envia.com (módulo Envíos)", perms: "shipments:read / shipments:write" },
   { path: "/projects", name: "Proyectos", perms: "projects:*" },
   { path: "/tasks", name: "Tareas", perms: "tasks:*" },
   { path: "/lists", name: "Listas de contactos", perms: "contacts:*" },
@@ -51,6 +53,7 @@ const permissions = [
   ["quotations:read · quotations:write · quotations:delete", "Cotizaciones"],
   ["products:read · products:write", "Productos"],
   ["invoices:read · invoices:write", "Facturas (requiere el módulo de facturación)"],
+  ["shipments:read · shipments:write", "Envíos: read lista, consulta y cotiza (no cobra); write genera guías (cobra saldo de Envia), rastrea y cancela. Requiere el módulo Envíos"],
   ["projects:read · projects:write · tasks:read · tasks:write", "Proyectos y tareas"],
   ["fragments:read · fragments:write · fragments:delete", "Respuestas rápidas"],
   ["library:read · library:write", "Biblioteca (solo metadatos; la subida vive en la app)"],
@@ -67,6 +70,8 @@ const errors = [
   ["403", "PLAN_MODULE_REQUIRED", "El plan de la organización no incluye el módulo API (o el de facturación, en /invoices)."],
   ["403", "PLAN_LIMIT_REACHED", "Se alcanzó un límite del plan al crear (contactos, cotizaciones, facturas, listas, documentos RAG)."],
   ["400", "—", "Datos inválidos: el cuerpo lleva success:false y error con el motivo."],
+  ["400", "INVALID_CITY_CODE", "El cityCode enviado no existe en el catálogo DANE. Ver Ciudades."],
+  ["422", "CITY_UNRESOLVED", "La ciudad (texto) es ambigua, está mal escrita o no existe; la respuesta trae candidates para reenviar con cityCode. Ver Ciudades."],
   ["404", "—", "El recurso no existe o pertenece a otra organización (nunca se distingue entre ambos)."],
   ["409", "—", "Conflicto: por ejemplo un atajo de respuesta rápida repetido."],
   ["503", "RAG_QUEUE_UNAVAILABLE", "La cola de indexación no aceptó un documento; reintente."],
@@ -90,7 +95,7 @@ export default function ApiPage() {
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Qué incluye</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
             {[
-              { title: "17 módulos, 98 operaciones", desc: "Cada endpoint documentado con parámetros, cuerpo, respuestas y ejemplos validados." },
+              { title: "Más de 40 módulos y 200 operaciones", desc: "Cada endpoint documentado con parámetros, cuerpo, respuestas y ejemplos validados. El conteo exacto está en la referencia de abajo." },
               { title: "Tokens por permiso", desc: "Cada token lleva solo los permisos que le des; nada de llaves maestras en tus integraciones." },
               { title: "Mismo motor que la app", desc: "Crear un negocio por API dispara las mismas automatizaciones y reglas que crearlo a mano." },
             ].map((c) => (
@@ -206,7 +211,7 @@ export default function ApiPage() {
             <li>• Cambios aditivos: nunca se renombran ni se quitan campos de una respuesta publicada; lo que sobra se marca <em>deprecated</em>.</li>
           </ul>
           <div className="rounded-lg overflow-hidden border" style={{ borderColor: "var(--border)" }}>
-            <div className="px-4 py-2 text-xs font-semibold" style={{ backgroundColor: "#1f2a48", color: "white" }}>Módulos disponibles</div>
+            <div className="px-4 py-2 text-xs font-semibold" style={{ backgroundColor: "#1f2a48", color: "white" }}>Módulos principales (la lista completa está en la referencia)</div>
             <table className="w-full text-sm">
               <tbody>
                 {modules.map((m) => (
@@ -221,7 +226,15 @@ export default function ApiPage() {
           </div>
         </section>
 
-        <section id="reference" className="mb-10">
+        <Callout type="tip">
+          Dos guías aparte para módulos con reglas propias:{" "}
+          <Link href="/docs/ciudades" style={{ color: "#d1345b" }}>Ciudades (catálogo DANE)</Link>, que explica{" "}
+          <code>cityCode</code> y el 422 <code>CITY_UNRESOLVED</code> de contactos y empresas, y{" "}
+          <Link href="/docs/envios" style={{ color: "#d1345b" }}>Envíos</Link>, con la idempotencia de{" "}
+          <code>POST /shipments</code> (generar una guía cobra saldo).
+        </Callout>
+
+        <section id="reference" className="mb-10 mt-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Referencia de endpoints</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
             La referencia se genera en cada despliegue desde el spec OpenAPI 3.1 del backend, así
@@ -310,7 +323,7 @@ export default function ApiPage() {
 
         <DocNav
           prev={{ href: "/docs/settings", title: "Configuración" }}
-          next={{ href: "/docs/mcp", title: "MCP: el CRM desde tu IA" }}
+          next={{ href: "/docs/ciudades", title: "Ciudades: catálogo DANE" }}
         />
       </article>
 
