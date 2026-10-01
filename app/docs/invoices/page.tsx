@@ -172,10 +172,19 @@ export default function InvoicesPage() {
         <section id="purchases" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Compras</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            El módulo de Compras gestiona las órdenes de compra a proveedores:
+            El módulo de Compras gestiona las facturas de tus proveedores y las órdenes de compra:
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
             <li>• Crea órdenes de compra para tus proveedores</li>
+            <li>
+              • Revisa las facturas mes a mes: la lista arranca en el mes actual, se cambia con las
+              flechas y el botón &quot;Ver todos&quot; muestra el histórico completo
+            </li>
+            <li>
+              • Ve el Bruto, las Retenciones y el Neto del mes (total menos retenciones, sin las
+              facturas anuladas). El Neto no descuenta lo que ya pagaste: es lo comprado, no lo
+              que debes
+            </li>
             <li>• Importa compras masivamente desde Excel/CSV</li>
             <li>• Asocia compras a proyectos o centros de costo</li>
             <li>• Genera reportes de compras por proveedor y período</li>
