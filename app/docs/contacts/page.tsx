@@ -38,7 +38,7 @@ export default function ContactsPage() {
             El directorio de contactos muestra una tabla paginada con todos tus contactos. Puedes:
           </p>
           <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Buscar contactos por nombre, email, teléfono o empresa</li>
+            <li>• Buscar contactos por nombre, email, teléfono o empresa (mínimo 3 caracteres; los espacios de más no afectan: &quot;Juan Acosta&quot; encuentra &quot;Juan  Acosta&quot;)</li>
             <li>• Ordenar columnas haciendo clic en los encabezados</li>
             <li>• Filtrar por campos estándar y personalizados</li>
             <li>• Ver el puntaje de lead scoring de cada contacto</li>
@@ -48,6 +48,10 @@ export default function ContactsPage() {
           <Callout type="note">
             Los contactos son visibles por todos los usuarios de la organización por defecto.
             El administrador puede configurar permisos granulares desde Configuración → Usuarios.
+          </Callout>
+          <Callout type="note">
+            Al guardar un contacto (a mano, por importación, formulario o API) los valores se
+            guardan sin espacios al inicio ni al final.
           </Callout>
         </section>
 
