@@ -11,6 +11,8 @@ const toc = [
   { id: "organization", label: "Organización" },
   { id: "users", label: "Usuarios y permisos" },
   { id: "fields", label: "Campos personalizados" },
+  { id: "whatsapp", label: "WhatsApp (líneas)" },
+  { id: "conversations", label: "Conversaciones (pipelines)" },
   { id: "integrations", label: "Integraciones" },
   { id: "email-settings", label: "Configuración de email" },
   { id: "lead-scoring", label: "Lead Scoring" },
@@ -47,7 +49,8 @@ export default function SettingsPage() {
               { section: "Email", desc: "Cuentas de correo, firma, auto-responder" },
               { section: "Facturas", desc: "Config DIAN, plantilla de factura" },
               { section: "Cotizaciones", desc: "Plantilla, numeración" },
-              { section: "Conversaciones", desc: "WhatsApp, canales de chat" },
+              { section: "WhatsApp", desc: "Líneas (números) conectadas, línea por defecto, pipeline de cada línea" },
+              { section: "Conversaciones", desc: "Pipelines de conversación y sus columnas, números bloqueados" },
               { section: "Lead Scoring", desc: "Reglas de puntuación" },
               { section: "Automatizaciones", desc: "Lista de workflows activos" },
               { section: "Integraciones", desc: "Conectores externos" },
@@ -139,6 +142,26 @@ export default function SettingsPage() {
             más allá de los campos estándar. Consulta la documentación de{" "}
             <a href="/docs/contacts#custom-fields" style={{ color: "#d1345b" }}>Contactos → Campos personalizados</a>{" "}
             para más detalles.
+          </p>
+        </section>
+
+        <section id="whatsapp" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>WhatsApp (líneas)</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Ajustes → WhatsApp lista los números conectados (líneas). Por cada uno: nombre, color,
+            quién atiende los chats nuevos, el pipeline en el que nacen y si es la línea por defecto.
+            Aquí también se conectan números nuevos y vive el switch de confirmaciones de lectura.
+            Guía completa en <a href="/docs/whatsapp-lines" style={{ color: "#d1345b" }}>Líneas de WhatsApp</a>.
+          </p>
+        </section>
+
+        <section id="conversations" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Conversaciones (pipelines)</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Ajustes → Conversaciones administra los pipelines de conversación (crear, renombrar, marcar
+            predeterminado, eliminar moviendo sus chats) y las columnas de cada uno, con asignación
+            automática, reapertura y webhook por columna. También los números bloqueados.
+            Guía completa en <a href="/docs/conversation-pipelines" style={{ color: "#d1345b" }}>Pipelines de conversación</a>.
           </p>
         </section>
 

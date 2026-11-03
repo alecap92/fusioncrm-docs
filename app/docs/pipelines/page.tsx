@@ -26,7 +26,13 @@ export default function PipelinesPage() {
           personalizables que representan las fases por las que pasa una oportunidad de venta.
         </p>
 
-        <section id="overview" className="mb-10">
+        <Callout type="note">
+          Esta página es sobre los pipelines de <strong>negocios</strong> (deals). Las conversaciones
+          tienen sus propios tableros: ver{" "}
+          <a href="/docs/conversation-pipelines" style={{ color: "#d1345b" }}>Pipelines de conversación</a>.
+        </Callout>
+
+        <section id="overview" className="mb-10 mt-8">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>¿Qué es un pipeline?</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
             Un <strong style={{ color: "var(--foreground)" }}>pipeline</strong> es un proceso de ventas

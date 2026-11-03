@@ -16,6 +16,7 @@
     "src/mcp/tools/deal-checklists.ts",
     "src/mcp/tools/deal-fields.ts",
     "src/mcp/tools/deal-pipelines.ts",
+    "src/mcp/tools/deals.ts",
     "src/mcp/tools/document-templates.ts",
     "src/mcp/tools/email-templates.ts",
     "src/mcp/tools/exports.ts",
@@ -31,9 +32,11 @@
     "src/mcp/tools/products.ts",
     "src/mcp/tools/scoring-rules.ts",
     "src/mcp/tools/shipments.ts",
-    "src/mcp/tools/users.ts"
+    "src/mcp/tools/stage-transitions.ts",
+    "src/mcp/tools/users.ts",
+    "src/mcp/tools/whatsapp-templates.ts"
   ],
-  "toolCount": 219,
+  "toolCount": 234,
   "tools": [
     {
       "name": "add_contacts_to_list",
@@ -91,7 +94,7 @@
     },
     {
       "name": "apply_invoice_withholdings",
-      "description": "Registrar las retenciones que el cliente practicó al pagar una factura de venta (PUT /api/invoices/:id/withholdings o, con prefix+number, PUT /api/invoices/withholdings). Requiere invoices:write. No emite nada ante la DIAN.\nEs lo mismo que el modal 'Aplicar retenciones' de la app: queda pegado a la factura, netea la cartera (saldo = total − retenciones − abonos) y sale en el Excel del contador y en el informe mensual.\nCada ítem lleva key (concepto) y amount O pct. Con pct el servidor calcula sobre la base sin IVA (tax_exclusive_amount); para reteIva calcula sobre el IVA de la factura. Si no mandas ni amount ni pct usa el porcentaje sugerido del concepto. El monto que manda es el que el cliente retuvo de verdad (el comprobante): si difiere del cálculo, manda amount.\nConceptos y % sugerido: compras25 (2.5), compras35 (3.5), serviciosGeneral4 (4), serviciosGeneral6 (6), honorarios10 (10), honorarios11 (11), arrendamientoBienesMuebles (4), arrendamientoBienesRaices (3.5), serviciosAseoVigilancia (2), serviciosHotelesRestaurantes (3.5), transporteCarga (1), reteIva (15, sobre el IVA), reteIca (sin % sugerido: manda amount).\nREEMPLAZA el set completo de la factura (idempotente): para editar, manda todos los ítems otra vez. Con dryRun: true devuelve el cálculo sin guardar; úsalo para mostrarle a la persona el total y el neto antes de aplicar.\nSolo facturas de venta (direction outgoing, tipo factura): notas crédito/débito y facturas de proveedor responden 422 NOT_A_SALES_INVOICE.",
+      "description": "Registrar las retenciones que el cliente practicó al pagar una factura de venta (PUT /api/invoices/:id/withholdings o, con prefix+number, PUT /api/invoices/withholdings). Requiere invoices:write. No emite nada ante la DIAN.\nEs lo mismo que el modal 'Aplicar retenciones' de la app: queda pegado a la factura, netea la cartera (saldo = total − retenciones − abonos) y sale en el Excel del contador y en el informe mensual.\nCada ítem lleva key (concepto) y amount O pct. Con pct el servidor calcula sobre la base sin IVA (tax_exclusive_amount); para reteIva calcula sobre el IVA de la factura. Si no mandas ni amount ni pct usa el porcentaje sugerido del concepto. El monto que manda es el que el cliente retuvo de verdad (el comprobante): si difiere del cálculo, manda amount.\nConceptos y % sugerido: compras25 (2.5), compras35 (3.5), serviciosGeneral4 (4), serviciosGeneral6 (6), honorarios10 (10), honorarios11 (11), arrendamientoBienesMuebles (4), arrendamientoBienesRaices (3.5), serviciosAseoVigilancia (2), serviciosHotelesRestaurantes (3.5), transporteCarga (1), reteIva (15, sobre el IVA), reteIca (sin % sugerido: manda amount). Estampillas y tasas (kind otros, cada departamento cobra distinto: manda el amount del comprobante): estampillaProDesarrollo (2), estampillaProCultura (2), estampillaProUniversidad (0.5), tasaProDeporte (2), estampillaProUnivalle (2), estampillaProHospitalUniversitario (1), estampillaUceva (0.5), estampillaProUnivPacifico (0.5), estampillaProElectrificacion (0.2), estampillaOtra (sin %).\nREEMPLAZA el set completo de la factura (idempotente): para editar, manda todos los ítems otra vez. Con dryRun: true devuelve el cálculo sin guardar; úsalo para mostrarle a la persona el total y el neto antes de aplicar.\nSolo facturas de venta (direction outgoing, tipo factura): notas crédito/débito y facturas de proveedor responden 422 NOT_A_SALES_INVOICE.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -129,7 +132,17 @@
                     "serviciosHotelesRestaurantes",
                     "transporteCarga",
                     "reteIva",
-                    "reteIca"
+                    "reteIca",
+                    "estampillaProDesarrollo",
+                    "estampillaProCultura",
+                    "estampillaProUniversidad",
+                    "tasaProDeporte",
+                    "estampillaProUnivalle",
+                    "estampillaProHospitalUniversitario",
+                    "estampillaUceva",
+                    "estampillaProUnivPacifico",
+                    "estampillaProElectrificacion",
+                    "estampillaOtra"
                   ],
                   "description": "Concepto de la retención"
                 },
@@ -188,7 +201,7 @@
     },
     {
       "name": "conversations_summary",
-      "description": "Summary of conversations in a date range: counts and by source (sample up to 1000 per page).",
+      "description": "Summary of conversations in a date range: counts, by source and by WhatsApp line (byLine, keyed by lineId with its lineName; sample up to 1000 per page). lineId restricts the sample to one line.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -213,6 +226,10 @@
           "timezone": {
             "description": "UTC offset, default -5 (Colombia)",
             "type": "number"
+          },
+          "lineId": {
+            "description": "ObjectId de una línea de WhatsApp de la organización (ver list_whatsapp_lines): solo conversaciones de esa línea. Una línea de otra org o inexistente responde 400.",
+            "type": "string"
           }
         },
         "required": [
@@ -718,7 +735,7 @@
     },
     {
       "name": "create_campaign_draft",
-      "description": "Crea el BORRADOR de una campaña masiva de WhatsApp (la de /mass-whatsapp): nombre, lista de contactos de la organización y plantilla aprobada en Meta (nombre, idioma, de dónde sale cada variable {{n}} y la imagen/video de cabecera si la plantilla la lleva). Queda en estado 'planeacion' y SIN fecha de envío: NO envía ningún mensaje, NO la programa y NO la ejecuta — eso lo hace una persona desde la app con 'Enviar ahora'. No verifica que la plantilla exista en Meta (un nombre mal escrito falla recién al ejecutar): toma el nombre de list_whatsapp_templates. Después usa get_campaign_preflight para ver a cuántos les llegaría. Requiere automations:write.",
+      "description": "Crea el BORRADOR de una campaña masiva de WhatsApp (la de /mass-whatsapp): nombre, lista de contactos de la organización, plantilla aprobada en Meta (nombre, idioma, de dónde sale cada variable {{n}} y la imagen/video de cabecera si la plantilla la lleva) y, opcionalmente, la LÍNEA (número) por la que sale. Sin lineId la campaña sale por la línea por defecto de la organización; si la org tiene varias líneas, elige el id con list_whatsapp_lines (la plantilla tiene que existir en la WABA de ESA línea: list_whatsapp_templates con el mismo lineId). Queda en estado 'planeacion' y SIN fecha de envío: NO envía ningún mensaje, NO la programa y NO la ejecuta — eso lo hace una persona desde la app con 'Enviar ahora'. No verifica la plantilla al crear: get_campaign_preflight dice si existe y está aprobada en la línea, y a cuántos les llegaría. Requiere automations:write.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -737,6 +754,10 @@
           "contactListId": {
             "type": "string",
             "description": "Id de la lista de contactos (de list_contact_lists); tiene que ser de esta organización"
+          },
+          "lineId": {
+            "description": "Línea de WhatsApp por la que sale la campaña (id de list_whatsapp_lines; tiene que ser de esta organización, si no 400 LINE_NOT_FOUND). Omitido = la línea por defecto",
+            "type": "string"
           },
           "template": {
             "type": "object",
@@ -806,7 +827,7 @@
     },
     {
       "name": "create_company",
-      "description": "Crear una empresa (o actualizarla si ya existe: upsert por idNumber/NIT primero y por name después). Body plano → properties: name, industry, website, email, phone, address, city, cityCode, country, idType, idNumber, size, notes y cualquier propiedad custom. Requiere name o idNumber. Permiso companies:write. CIUDAD (catálogo DANE, modo estricto): cityCode (5 dígitos, ej. 05001 = Medellín) o city inequívoco; ambiguo/desconocido → 422 CITY_UNRESOLVED con candidates (reintenta con cityCode; si candidates viene vacío, búscalo con search_municipalities); cityCode inexistente → 400 INVALID_CITY_CODE. state (departamento en texto) sirve de pista para homónimos; stateCode siempre se deriva del cityCode. Nunca elijas un candidato por el usuario.",
+      "description": "Crear una empresa (o actualizarla si ya existe: upsert por idNumber/NIT primero y por name después). Body plano → properties: name, industry, website, email, phone, address, city, cityCode, country, idType, idNumber, size, notes y cualquier propiedad custom. Requiere name o idNumber. Permiso companies:write. CIUDAD (catálogo DANE, modo estricto): cityCode (5 dígitos, ej. 05001 = Medellín) o city inequívoco; ambiguo/desconocido → 422 CITY_UNRESOLVED con candidates (reintenta con cityCode; si candidates viene vacío, búscalo con search_municipalities); cityCode inexistente → 400 INVALID_CITY_CODE. state (departamento en texto) sirve de pista para homónimos; stateCode siempre se deriva del cityCode. Nunca elijas un candidato por el usuario. IDENTIFICACIÓN (modo estricto): idType = código DIAN (13 cédula, 31 NIT, 22 CE, 41 pasaporte, 42 doc. extranjero, 50 NIT de otro país…) o un texto inequívoco ('CC', 'NIT'); idNumber sin puntos (para NIT el DV va en dv; si lo mandas pegado o con guion se separa solo; si falta se calcula). idType ambiguo o desconocido ('1', '11', 'Documento') → 422 ID_TYPE_UNRESOLVED con candidates: pregunta al usuario y reintenta con el código; idNumber inválido para el tipo → 400 INVALID_ID_NUMBER. Nunca elijas un candidato por el usuario. ",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -815,8 +836,16 @@
             "description": "Nombre de la empresa (requerido si no hay idNumber)",
             "type": "string"
           },
+          "idType": {
+            "description": "Código DIAN (31 NIT, 13 cédula, 50 NIT de otro país…) o texto inequívoco",
+            "type": "string"
+          },
           "idNumber": {
-            "description": "NIT / número de documento (clave de upsert preferida)",
+            "description": "NIT / número de documento sin puntos ni DV (clave de upsert preferida)",
+            "type": "string"
+          },
+          "dv": {
+            "description": "DV del NIT (idType 31); si falta se calcula",
             "type": "string"
           },
           "city": {
@@ -873,7 +902,11 @@
             }
           },
           "isVisible": {
-            "description": "Default true",
+            "description": "Default true. Deprecado: NO significa obligatorio",
+            "type": "boolean"
+          },
+          "required": {
+            "description": "Default false. Obligatorio al crear/editar desde la web y la app",
             "type": "boolean"
           },
           "groupId": {
@@ -890,7 +923,7 @@
     },
     {
       "name": "create_contact",
-      "description": "Create (or update if exists) a contact. At least one of email, mobile, or whatsapp_phone required. Buenas prácticas: llena SIEMPRE que se pueda source (de dónde salió el lead), companyType (Personal/Empresa/Proveedor/Cliente/Otro u opciones de la org) y city — un contacto sin segmentación no sirve para filtrar ni para campañas. Si no tienes esos datos, pregúntale al usuario. CIUDAD (catálogo DANE, modo estricto): manda cityCode (5 dígitos, ej. 05001 = Medellín) o un city inequívoco; si city es ambiguo (ej. 'Rionegro': Antioquia 05615 / Santander 68615), está mal escrito o no existe, la API responde 422 CITY_UNRESOLVED con `candidates` [{code, shortName, stateName}] y NO crea el contacto: pregunta el departamento y reintenta con cityCode. Con candidates: [] (mal escrita o desconocida) busca el código con search_municipalities. Un cityCode inexistente responde 400 INVALID_CITY_CODE. Nunca elijas un candidato por el usuario. Sin city/cityCode no se toca nada; con country distinto de Colombia, city es texto libre.",
+      "description": "Create (or update if exists) a contact. At least one of email, mobile, whatsapp_phone, whatsappUserId or linkedConversationId required. CLIENTE SIN NÚMERO (BSUID): desde 2026 un cliente de WhatsApp puede escribir sin teléfono, identificado por un BSUID tipo 'CO.2983224498705179' (sale en contact.whatsappUserId de las conversaciones). Ese valor va en whatsappUserId, NUNCA en mobile/whatsapp_phone (si llega ahí se mueve solo). Si el cliente ya existe por número, se reutiliza. CONVERSACIÓN ENLAZADA: linkedConversationId (_id de una conversación de la org) cuenta como medio — un lead de Instagram/Messenger sin teléfono se crea con first_name + linkedConversationId — y enlaza la conversación al contacto; de otra org o inexistente → 404 CONVERSATION_NOT_FOUND, con otro contacto ya enlazado → 409 CONVERSATION_ALREADY_LINKED (trae contactId). Sin first_name, al crear se usa el nombre del perfil de la conversación, luego el número. Buenas prácticas: llena SIEMPRE que se pueda source (de dónde salió el lead), companyType (Personal/Empresa/Proveedor/Cliente/Otro u opciones de la org) y city — un contacto sin segmentación no sirve para filtrar ni para campañas. Si no tienes esos datos, pregúntale al usuario. CIUDAD (catálogo DANE, modo estricto): manda cityCode (5 dígitos, ej. 05001 = Medellín) o un city inequívoco; si city es ambiguo (ej. 'Rionegro': Antioquia 05615 / Santander 68615), está mal escrito o no existe, la API responde 422 CITY_UNRESOLVED con `candidates` [{code, shortName, stateName}] y NO crea el contacto: pregunta el departamento y reintenta con cityCode. Con candidates: [] (mal escrita o desconocida) busca el código con search_municipalities. Un cityCode inexistente responde 400 INVALID_CITY_CODE. Nunca elijas un candidato por el usuario. Sin city/cityCode no se toca nada; con country distinto de Colombia, city es texto libre. IDENTIFICACIÓN (modo estricto): idType = código DIAN (13 cédula, 31 NIT, 22 CE, 41 pasaporte, 42 doc. extranjero, 50 NIT de otro país…) o un texto inequívoco ('CC', 'NIT'); idNumber sin puntos (para NIT el DV va en dv; si lo mandas pegado o con guion se separa solo; si falta se calcula). idType ambiguo o desconocido ('1', '11', 'Documento') → 422 ID_TYPE_UNRESOLVED con candidates: pregunta al usuario y reintenta con el código; idNumber inválido para el tipo → 400 INVALID_ID_NUMBER. Nunca elijas un candidato por el usuario. ",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -945,8 +978,16 @@
             "description": "Cargo del contacto",
             "type": "string"
           },
+          "idType": {
+            "description": "Tipo de documento: código DIAN (13 cédula, 31 NIT, 41 pasaporte…) o texto inequívoco ('CC', 'NIT')",
+            "type": "string"
+          },
           "idNumber": {
-            "description": "NIT / documento",
+            "description": "Número de documento sin puntos (NIT sin DV: el DV va en dv)",
+            "type": "string"
+          },
+          "dv": {
+            "description": "Dígito de verificación, solo para NIT (idType 31); si falta se calcula",
             "type": "string"
           },
           "phone": {
@@ -954,6 +995,18 @@
             "type": "string"
           },
           "address": {
+            "type": "string"
+          },
+          "linkedConversationId": {
+            "description": "_id de la conversación de la org a enlazar con el contacto; cuenta como medio de contacto",
+            "type": "string"
+          },
+          "whatsappUserId": {
+            "description": "BSUID de WhatsApp ('CO.298…') de un cliente sin número; otro valor → 400",
+            "type": "string"
+          },
+          "whatsappUsername": {
+            "description": "Alias de WhatsApp del cliente ('@claudiahoyos'); se guarda sin @ y en minúsculas. Solo se guarda: NO enlaza conversaciones ni asigna BSUID (eso lo hace un asesor en la web). Si el contacto ya tenía alias no se pisa. Inválido → 400 INVALID_WHATSAPP_USERNAME",
             "type": "string"
           }
         }
@@ -995,7 +1048,11 @@
             }
           },
           "isVisible": {
-            "description": "Default true",
+            "description": "Default true. Deprecado: NO significa obligatorio",
+            "type": "boolean"
+          },
+          "required": {
+            "description": "Default false. Obligatorio al crear/editar desde la web y la app",
             "type": "boolean"
           },
           "groupId": {
@@ -1017,6 +1074,10 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
+          "lineId": {
+            "description": "Línea (número) de WhatsApp del hilo (épica WL; ver list_whatsapp_lines). Sin él, la por defecto.",
+            "type": "string"
+          },
           "title": {
             "type": "string",
             "description": "Título de la conversación (requerido)"
@@ -1083,7 +1144,7 @@
     },
     {
       "name": "create_conversation_pipeline",
-      "description": "Crea el pipeline de conversaciones de la organización con sus etapas. La app trabaja con UN solo pipeline de conversaciones por organización: si ya existe uno, NO crea otro y devuelve el existente con alreadyExists: true (status 200). Para cambiar las etapas de un pipeline existente usa create_conversation_stage / update_conversation_stage / delete_conversation_stage. webhookUrl debe ser https. Requiere pipelines:write.",
+      "description": "Crea un pipeline de conversaciones NUEVO con sus etapas (201). Una organización puede tener varios (p. ej. uno por línea de WhatsApp): el primero nace como predeterminado y isDefault: true desmarca al anterior. Para cambiar las etapas de un pipeline existente usa create_conversation_stage / update_conversation_stage / delete_conversation_stage. webhookUrl debe ser https. Requiere pipelines:write.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -1232,7 +1293,7 @@
     },
     {
       "name": "create_deal",
-      "description": "Create a deal (cuerpo igual que POST /api/deals). Acepta companyId opcional para asociar una empresa (debe pertenecer a la organización); si no se envía y el contacto principal tiene empresa vinculada, el deal la HEREDA automáticamente.",
+      "description": "Create a deal (cuerpo igual que POST /api/deals). Acepta companyId opcional para asociar una empresa (debe pertenecer a la organización); si no se envía y el contacto principal tiene empresa vinculada, el deal la HEREDA automáticamente. customFields acepta el id, la key o el nombre de cada campo. La respuesta trae customFields[].fieldId y .key (reenviables) e ignoredFields si mandaste claves que no se aplican.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -1242,7 +1303,7 @@
             "type": "string"
           },
           "customFields": {
-            "description": "Campos personalizados: [{ \"field\": \"<_id del campo>\", \"value\": \"...\" }]. El `field` es el _id de la definición del campo (el que vive en dealsfields), NO su nombre ni su key: un nombre no se resuelve y la escritura se pierde.",
+            "description": "Campos personalizados: [{ \"field\": \"<id, key o nombre del campo>\", \"value\": \"...\" }]. `field` acepta el _id de la definición (list_deal_fields), su key o su nombre (sin importar tildes ni mayúsculas), resuelto en el pipeline del negocio. Un select solo acepta sus opciones (se guarda el texto exacto de la opción); si no existe responde 400 FIELD_OPTION_INVALID con allowedOptions. Campo inexistente → 400 FIELD_NOT_FOUND con availableFields; nombre repetido → FIELD_AMBIGUOUS (manda la key o el id). number/date/checkbox con formato raro se guardan y avisan en fieldWarnings.",
             "anyOf": [
               {
                 "type": "array",
@@ -1276,6 +1337,17 @@
               },
               {
                 "type": "string"
+              }
+            ]
+          },
+          "assignedTo": {
+            "description": "userId del dueño del negocio (empleado de la organización; ver list_users); null lo deja sin dueño",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
               }
             ]
           }
@@ -1575,7 +1647,7 @@
     },
     {
       "name": "create_fragment",
-      "description": "Crear un fragment. El 'atajo' debe ser único globalmente (índice único en BD).",
+      "description": "Crear un fragment. El 'atajo' es único por organización y debe ser UNA palabra: minúsculas, números, _ o - (se normaliza: sin # inicial, sin tildes). Con espacios responde 400; usa guiones (\"saludo-ali\"). En el chat se inserta escribiendo #atajo + Tab.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -1590,7 +1662,7 @@
           },
           "atajo": {
             "type": "string",
-            "description": "Atajo/shortcut único"
+            "description": "Una palabra única en la organización: minúsculas, números, _ o - (ej. envio, saludo-ali)"
           },
           "format": {
             "description": "Formato del contenido: \"text\" (texto plano / WhatsApp) o \"html\" (correo con formato). Por defecto \"text\".",
@@ -1602,6 +1674,10 @@
           },
           "asunto": {
             "description": "Asunto del correo (solo aplica a fragmentos de formato \"html\").",
+            "type": "string"
+          },
+          "imageLibraryId": {
+            "description": "ID de una imagen de la biblioteca (list_library_files, fileType \"image\"). En el chat el fragmento sale como foto con el texto de pie. Solo formato \"text\" y texto de máximo 1.024 caracteres (límite de WhatsApp).",
             "type": "string"
           }
         },
@@ -1667,6 +1743,10 @@
             "type": "string"
           },
           "notes": {
+            "type": "string"
+          },
+          "quotationId": {
+            "description": "_id de la cotización de la que sale la factura (opcional). Debe ser de esta organización y no estar anulada ni rechazada (si no, 400 sin emitir). Con la factura válida ante la DIAN la cotización pasa a Facturada.",
             "type": "string"
           }
         },
@@ -2110,7 +2190,7 @@
             ]
           },
           "status": {
-            "description": "Por defecto pending",
+            "description": "Por defecto pending. En una factura es el estado de pago (completed = pagada); en una OC se ignora (nace abierta).",
             "type": "string",
             "enum": [
               "pending",
@@ -2159,7 +2239,7 @@
     },
     {
       "name": "create_quotation",
-      "description": "Crear cotización (POST /api/quotations). El número lo asigna el sistema. Si el contacto no existe por mobile, se crea.",
+      "description": "Crear cotización (POST /api/quotations). El número lo asigna el sistema, solo después de validar el body (un 400 no consume número). Si el contacto no existe por mobile, se crea; si existe, su nombre NO se cambia. Términos: paymentTerms y shippingTerms; si no los mandas se usan los primeros de Ajustes > Cotizaciones y, si la org no tiene, responde 400 MISSING_QUOTATION_TERMS (pregunta al usuario). expirationDate opcional (yyyy-MM-dd); sin ella, la vigencia de la org. Nace en estado ready (Lista: terminada, falta enviarla) salvo que pidas status draft (borrador a medias). Ningún otro estado se admite al crear.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -2173,7 +2253,7 @@
               },
               "mobile": {
                 "type": "string",
-                "description": "Celular del cliente (busca/crea el contacto por este dato)"
+                "description": "Celular del cliente (busca/crea el contacto por este dato). Para un cliente de WhatsApp sin número, su BSUID ('CO.298…')"
               },
               "email": {
                 "type": "string"
@@ -2252,12 +2332,28 @@
             "description": "Título de la cotización",
             "type": "string"
           },
+          "paymentTerms": {
+            "description": "Forma de pago (p. ej. 100% Anticipado); default: la primera de la org",
+            "type": "string"
+          },
+          "shippingTerms": {
+            "description": "Tiempo de entrega (p. ej. 25 días hábiles); default: el primero de la org",
+            "type": "string"
+          },
           "expirationDate": {
-            "description": "Fecha de vencimiento (ISO)",
+            "description": "Fecha de vencimiento (yyyy-MM-dd o ISO)",
             "type": "string"
           },
           "observaciones": {
             "type": "string"
+          },
+          "status": {
+            "description": "ready (default) = terminada; draft = borrador a medias, no dispara automatizaciones",
+            "type": "string",
+            "enum": [
+              "draft",
+              "ready"
+            ]
           }
         },
         "required": [
@@ -2759,6 +2855,185 @@
       "group": "tasks"
     },
     {
+      "name": "create_whatsapp_template",
+      "description": "Crear una plantilla de WhatsApp en la cuenta de WhatsApp Business (WABA) de una línea: Meta la revisa y la aprueba o rechaza (consultar después con get_whatsapp_template; solo las APPROVED se envían con send_whatsapp_template). Requiere permiso whatsapp:send. VARIABLES: en header.text y body.text se escriben como {{1}}, {{2}}… (posicionales, consecutivas desde 1) O como {{nombre}}, {{numero_pedido}} (nombradas: minúsculas, dígitos y guion bajo; parameter_format NAMED de Meta). No se pueden mezclar ambas en una plantilla y el cuerpo no puede empezar ni terminar con una variable. Meta EXIGE un ejemplo realista por cada variable: body.examples como array en el orden de aparición (['Ana', '12345']) o como objeto por nombre ({ nombre: 'Ana' }); header.example como string ({{1}}) u objeto ({{nombre}}). CABECERA (opcional, una sola): TEXT (máx 60 caracteres, máx 1 variable), IMAGE (JPG/PNG ≤ 5 MB), VIDEO (MP4 ≤ 16 MB), DOCUMENT (PDF ≤ 100 MB) o LOCATION (sin más datos; la ubicación se manda al enviar). Para IMAGE/VIDEO/DOCUMENT pasa header.mediaUrl (https pública: el servidor la descarga y la sube a Meta como muestra) o header.handle (de upload_whatsapp_template_media). CUERPO: obligatorio, máx 1024 caracteres. PIE: opcional, máx 60 caracteres, sin variables. BOTONES (opcional, máx 10): QUICK_REPLY {text} · URL {text, url, urlExample} (máx 2; la url admite una sola variable {{1}} AL FINAL, ej. https://tienda.com/pedido/{{1}}, y entonces urlExample es obligatorio con la URL completa) · PHONE_NUMBER {text, phoneNumber en formato internacional +573001234567} (máx 1) · COPY_CODE {code de ejemplo, máx 15 caracteres} (máx 1, sin text). Texto de botón máx 25 caracteres. Las QUICK_REPLY van juntas (todas antes o todas después de los demás). CATEGORÍA: MARKETING (promociones), UTILITY (transaccional: confirmaciones, envíos) o AUTHENTICATION (códigos OTP; Meta exige botones especiales, crea esta categoría solo con la forma avanzada `components`). Con allowCategoryChange (default true) Meta puede recategorizar en vez de rechazar. NOMBRE: minúsculas, números y guion bajo (ej. confirmacion_pedido); language es el código de Meta (es, es_CO, en_US…). LÍNEA: lineId de list_whatsapp_lines; sin él, la línea por defecto. Responde el id, status (PENDING normalmente) y category que devolvió Meta.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre único en la WABA: minúsculas, números y guion bajo (ej. confirmacion_pedido)."
+          },
+          "language": {
+            "type": "string",
+            "description": "Código de idioma de Meta: es, es_CO, es_MX, en_US…"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "MARKETING",
+              "UTILITY",
+              "AUTHENTICATION"
+            ],
+            "description": "MARKETING, UTILITY o AUTHENTICATION."
+          },
+          "header": {
+            "description": "Cabecera de la plantilla (opcional, una sola).",
+            "type": "object",
+            "properties": {
+              "format": {
+                "type": "string",
+                "enum": [
+                  "TEXT",
+                  "IMAGE",
+                  "VIDEO",
+                  "DOCUMENT",
+                  "LOCATION"
+                ],
+                "description": "Tipo de cabecera."
+              },
+              "text": {
+                "description": "Solo TEXT: máx 60 caracteres, máx una variable {{1}} o {{nombre}}.",
+                "type": "string"
+              },
+              "example": {
+                "description": "Solo TEXT con variable: ejemplo de la variable (string para {{1}}; { nombre: 'ejemplo' } para {{nombre}}).",
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              },
+              "mediaUrl": {
+                "description": "IMAGE/VIDEO/DOCUMENT: URL https pública del archivo de muestra (JPG/PNG ≤ 5 MB, MP4 ≤ 16 MB, PDF ≤ 100 MB).",
+                "type": "string"
+              },
+              "handle": {
+                "description": "IMAGE/VIDEO/DOCUMENT: handle devuelto por upload_whatsapp_template_media (alternativa a mediaUrl).",
+                "type": "string"
+              }
+            },
+            "required": [
+              "format"
+            ]
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "Texto del mensaje (máx 1024). Variables {{1}}, {{2}}… o {{nombre}}; no puede empezar ni terminar con una variable."
+              },
+              "examples": {
+                "description": "OBLIGATORIO si hay variables: un ejemplo realista por variable. Array en orden ({{1}}, {{2}}…) u objeto por nombre ({ nombre: 'Ana' }).",
+                "anyOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              }
+            },
+            "required": [
+              "text"
+            ],
+            "description": "Cuerpo del mensaje (obligatorio)."
+          },
+          "footer": {
+            "description": "Pie de mensaje (opcional).",
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "Máx 60 caracteres, sin variables."
+              }
+            },
+            "required": [
+              "text"
+            ]
+          },
+          "buttons": {
+            "description": "Botones (máx 10; máx 2 URL, 1 PHONE_NUMBER, 1 COPY_CODE; QUICK_REPLY agrupadas).",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "QUICK_REPLY",
+                    "URL",
+                    "PHONE_NUMBER",
+                    "COPY_CODE"
+                  ],
+                  "description": "Tipo de botón."
+                },
+                "text": {
+                  "description": "Etiqueta (máx 25). Obligatoria salvo en COPY_CODE.",
+                  "type": "string"
+                },
+                "url": {
+                  "description": "Solo URL: http(s), máx una variable {{1}} al final.",
+                  "type": "string"
+                },
+                "urlExample": {
+                  "description": "Solo URL con {{1}}: URL completa de ejemplo (obligatoria).",
+                  "type": "string"
+                },
+                "phoneNumber": {
+                  "description": "Solo PHONE_NUMBER: formato internacional, ej. +573001234567.",
+                  "type": "string"
+                },
+                "code": {
+                  "description": "Solo COPY_CODE: código de ejemplo (máx 15 caracteres).",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            }
+          },
+          "allowCategoryChange": {
+            "description": "Default true: Meta puede cambiar la categoría en vez de rechazar la plantilla.",
+            "type": "boolean"
+          },
+          "lineId": {
+            "description": "Línea (número) cuya WABA recibe la plantilla; ver list_whatsapp_lines. Default: la línea por defecto.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "language",
+          "category",
+          "body"
+        ]
+      },
+      "group": "whatsapp"
+    },
+    {
       "name": "deals_summary",
       "description": "Sales summary for a date range filtered by closingDate (fecha de cierre real: al ganar o perder, closingDate pasa a ser el día en que se cerró; wonAt/lostAt llevan la hora). Total deals, won deals, total sold, avg ticket, top 5 by amount. Use this for monthly/period sales reports.",
       "inputSchema": {
@@ -2914,7 +3189,7 @@
     },
     {
       "name": "delete_conversation_pipeline",
-      "description": "BORRA un pipeline de conversaciones y TODAS sus etapas (incluida la configuración de webhooks y asignación). Es IRREVERSIBLE. Se niega (409) si es el único pipeline de la organización o si todavía tiene conversaciones: primero hay que moverlas con change_conversation_pipeline. Si era el predeterminado, otro pasa a serlo. No borra conversaciones. Confirma con el usuario antes de llamarlo. Requiere pipelines:write.",
+      "description": "BORRA un pipeline de conversaciones y TODAS sus etapas (incluida la configuración de webhooks y asignación). Es IRREVERSIBLE. Se niega (409) si es el único pipeline de la organización o si todavía tiene conversaciones: primero hay que moverlas con move_all_conversations_pipeline (todas) o change_conversation_pipeline (una). Si era el predeterminado, el más antiguo pasa a serlo. No borra conversaciones. Confirma con el usuario antes de llamarlo. Requiere pipelines:write.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -3069,6 +3344,29 @@
       "group": "fragments"
     },
     {
+      "name": "delete_invoice_payment",
+      "description": "Eliminar un abono mal registrado de una factura de venta (DELETE /api/invoices/:id/payments/:paymentId). Requiere invoices:write. El saldo se recalcula. El paymentId sale de get_invoice_payments. No toca las retenciones (para eso remove_invoice_withholdings).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "_id de la factura"
+          },
+          "paymentId": {
+            "type": "string",
+            "description": "_id del abono"
+          }
+        },
+        "required": [
+          "id",
+          "paymentId"
+        ]
+      },
+      "group": "invoices"
+    },
+    {
       "name": "delete_knowledge_base_document",
       "description": "Elimina un documento de la base de conocimiento (RAG) por ID, incluyendo sus chunks/embeddings. IRREVERSIBLE. Usa list_knowledge_base_documents para obtener el ID. Requiere permiso rag:delete.",
       "inputSchema": {
@@ -3088,7 +3386,7 @@
     },
     {
       "name": "delete_product",
-      "description": "Eliminar un producto del catálogo por su ID (DELETE /products/:id, permiso products:delete). BORRA el producto Y TODAS sus variantes (tallas, colores, SKUs de ProductVariant). Es IRREVERSIBLE: no hay papelera ni forma de recuperarlo. Si el producto aparece en una cotización abierta (borrador o enviada) responde 409 PRODUCT_IN_OPEN_QUOTATIONS y NO borra nada: cierra o edita esas cotizaciones primero. No toca cotizaciones ni facturas ya emitidas (guardan su propia copia del ítem). Confirma con el usuario el nombre del producto (get_product) antes de llamarla. Para solo cambiar precio o datos usa update_product.",
+      "description": "Eliminar un producto del catálogo por su ID (DELETE /products/:id, permiso products:delete). BORRA el producto Y TODAS sus variantes (tallas, colores, SKUs de ProductVariant). Es IRREVERSIBLE: no hay papelera ni forma de recuperarlo. Si el producto aparece en una cotización abierta (borrador, lista o enviada) responde 409 PRODUCT_IN_OPEN_QUOTATIONS y NO borra nada: cierra o edita esas cotizaciones primero. No toca cotizaciones ni facturas ya emitidas (guardan su propia copia del ítem). Confirma con el usuario el nombre del producto (get_product) antes de llamarla. Para solo cambiar precio o datos usa update_product.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -3141,7 +3439,7 @@
     },
     {
       "name": "delete_quotation",
-      "description": "Eliminar cotización por ID (permiso quotations:delete).",
+      "description": "Eliminar cotización por ID (permiso quotations:delete). Solo se borra lo que NUNCA se envió (draft o ready sin sentAt); lo demás responde 409 QUOTATION_NOT_DELETABLE: en ese caso anúlala con update_quotation status canceled.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -3190,6 +3488,28 @@
         ]
       },
       "group": "tasks"
+    },
+    {
+      "name": "delete_whatsapp_template",
+      "description": "Borrar una plantilla de WhatsApp de la WABA de la línea por nombre. IRREVERSIBLE: se eliminan TODOS los idiomas de ese nombre en Meta, las campañas o automatizaciones que la usen dejan de poder enviarla, y Meta no permite reutilizar el nombre durante 30 días. Confirma con el usuario (nombre exacto y línea) ANTES de llamar a esta tool; no la ejecutes por iniciativa propia. Requiere permiso whatsapp:send.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre exacto de la plantilla a borrar."
+          },
+          "lineId": {
+            "description": "Línea cuya WABA se modifica; ver list_whatsapp_lines. Default: la línea por defecto.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "group": "whatsapp"
     },
     {
       "name": "download_quotation_pdf",
@@ -3346,17 +3666,94 @@
     },
     {
       "name": "find_conversation_by_phone",
-      "description": "Find conversation by contact phone. Includes messages.",
+      "description": "Find conversation by contact phone or BSUID. Includes messages. CLIENTE SIN NÚMERO (BSUID): desde 2026 un cliente de WhatsApp puede escribir sin teléfono, identificado por un BSUID tipo 'CO.2983224498705179' (sale en contact.whatsappUserId de las conversaciones). Pásalo tal cual en phone (coincidencia exacta). Con un teléfono busca exacto (con o sin indicativo) y, si no hay, el número que termina en esos dígitos. Usa detail:'compact' para leer historial (≈4 veces menos tokens); pide messageInclude:['media'] solo si vas a abrir archivos. Con messagesBefore o cualquier parámetro de detalle/fechas responde también messagesPagination {limit, hasMore, nextBefore}: para leer más atrás repite con messagesBefore = nextBefore mientras hasMore sea true.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
           "phone": {
+            "type": "string",
+            "description": "Teléfono (ej. 573001234567) o BSUID ('CO.2983224498705179')"
+          },
+          "lineId": {
+            "description": "ObjectId de una línea de WhatsApp de la organización (ver list_whatsapp_lines): el hilo del contacto en esa línea (hay uno por contacto y línea). Una línea de otra org o inexistente responde 400.",
             "type": "string"
           },
           "messagesLimit": {
-            "description": "Messages to include (default 50, max 200)",
+            "description": "Messages to include, 0-200 (default 50)",
             "type": "number"
+          },
+          "messagesBefore": {
+            "description": "Cursor: ISO 8601 timestamp or message _id. Returns messages strictly older than it.",
+            "type": "string"
+          },
+          "timezone": {
+            "description": "Zona de messagesFrom/messagesTo: offset en horas (-5) o IANA. Default: la de la organización.",
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "detail": {
+            "description": "Nivel de detalle (default standard en el MCP; full = respuesta histórica completa). compact: {id,title,stage,pipeline,assignedTo,contact,source,unreadCount,lastMessageAt,tags,messages} y mensajes {id,at,dir,type,text,hasMedia}. standard agrega priority, updatedAt, lastMessage y en mensajes media, transcripción, reacciones, estado de entrega y cita.",
+            "type": "string",
+            "enum": [
+              "compact",
+              "standard",
+              "full"
+            ]
+          },
+          "include": {
+            "description": "Piezas extra de la conversación en compact/standard (lista cerrada).",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "metadata",
+                "contactData",
+                "participants",
+                "lastMessage",
+                "automation"
+              ]
+            }
+          },
+          "messageDetail": {
+            "description": "Nivel de detalle de cada mensaje (default = detail).",
+            "type": "string",
+            "enum": [
+              "compact",
+              "standard",
+              "full"
+            ]
+          },
+          "messageInclude": {
+            "description": "Piezas extra de cada mensaje. Pide 'media' solo si vas a abrir archivos (mediaUrl, mediaId…).",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "media",
+                "transcription",
+                "reactions",
+                "delivery",
+                "reply",
+                "interactive",
+                "ids",
+                "author"
+              ]
+            }
+          },
+          "messagesFrom": {
+            "description": "Solo mensajes desde este día (YYYY-MM-DD, dd/mm/yyyy o ISO), inicio del día en `timezone`.",
+            "type": "string"
+          },
+          "messagesTo": {
+            "description": "Solo mensajes hasta este día (fin del día en `timezone`).",
+            "type": "string"
           }
         },
         "required": [
@@ -3538,7 +3935,7 @@
     },
     {
       "name": "get_campaign_preflight",
-      "description": "Antes de enviar: calcula, con la lista TAL COMO ESTÁ HOY, a cuántos contactos les llegaría la campaña de WhatsApp y cuántos quedan fuera por motivo (no_mobile = sin celular, landline = número fijo, invalid_phone = formato inválido, opted_out = pidió no ser contactado, whatsapp_invalid = marcado sin WhatsApp), con hasta 10 ejemplos (teléfono enmascarado). Es la misma selección que usa el envío real. Solo lectura: NO envía nada ni modifica contactos. Responde 409 si la campaña no tiene lista o la lista ya no existe. Requiere contacts:read.",
+      "description": "Antes de enviar: calcula, con la lista TAL COMO ESTÁ HOY, a cuántos contactos les llegaría la campaña de WhatsApp y cuántos quedan fuera por motivo (no_mobile = sin celular, landline = número fijo, invalid_phone = formato inválido, opted_out = pidió no ser contactado, whatsapp_invalid = marcado sin WhatsApp), con hasta 10 ejemplos (teléfono enmascarado). Es la misma selección que usa el envío real. Además comprueba la plantilla en la WABA de la línea por la que saldría (lineId de la campaña o la por defecto): template.found, template.status (APPROVED es la única que envía; not_found = no existe en esa línea; unknown = no se pudo consultar, con template.error) y template.line. Solo lectura: NO envía nada ni modifica contactos. Responde 409 si la campaña no tiene lista o la lista ya no existe. Requiere contacts:read.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -3653,7 +4050,7 @@
     },
     {
       "name": "get_conversation",
-      "description": "Get a conversation by ID with messages, lastMessage populated, and contact data. Returns the most recent `messagesLimit` messages. To read older history, pass `messagesBefore` = `messagesPagination.nextBefore` from the previous response (or the timestamp/_id of the oldest message you already have) and repeat while `messagesPagination.hasMore` is true.",
+      "description": "Get a conversation by ID with messages, lastMessage populated, and contact data. Returns the most recent `messagesLimit` messages. To read older history, pass `messagesBefore` = `messagesPagination.nextBefore` from the previous response (or the timestamp/_id of the oldest message you already have) and repeat while `messagesPagination.hasMore` is true. Usa detail:'compact' para leer historial (≈4 veces menos tokens); pide messageInclude:['media'] solo si vas a abrir archivos. messagesFrom/messagesTo (con timezone; default la zona de la organización) traen solo los mensajes de esos días.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -3662,11 +4059,79 @@
             "type": "string"
           },
           "messagesLimit": {
-            "description": "Messages to include (default 50, max 200)",
+            "description": "Messages to include, 0-200 (default 50)",
             "type": "number"
           },
           "messagesBefore": {
             "description": "Cursor: ISO 8601 timestamp or message _id. Returns messages strictly older than it.",
+            "type": "string"
+          },
+          "timezone": {
+            "description": "Zona de messagesFrom/messagesTo: offset en horas (-5) o IANA. Default: la de la organización.",
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "detail": {
+            "description": "Nivel de detalle (default standard en el MCP; full = respuesta histórica completa). compact: {id,title,stage,pipeline,assignedTo,contact,source,unreadCount,lastMessageAt,tags,messages} y mensajes {id,at,dir,type,text,hasMedia}. standard agrega priority, updatedAt, lastMessage y en mensajes media, transcripción, reacciones, estado de entrega y cita.",
+            "type": "string",
+            "enum": [
+              "compact",
+              "standard",
+              "full"
+            ]
+          },
+          "include": {
+            "description": "Piezas extra de la conversación en compact/standard (lista cerrada).",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "metadata",
+                "contactData",
+                "participants",
+                "lastMessage",
+                "automation"
+              ]
+            }
+          },
+          "messageDetail": {
+            "description": "Nivel de detalle de cada mensaje (default = detail).",
+            "type": "string",
+            "enum": [
+              "compact",
+              "standard",
+              "full"
+            ]
+          },
+          "messageInclude": {
+            "description": "Piezas extra de cada mensaje. Pide 'media' solo si vas a abrir archivos (mediaUrl, mediaId…).",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "media",
+                "transcription",
+                "reactions",
+                "delivery",
+                "reply",
+                "interactive",
+                "ids",
+                "author"
+              ]
+            }
+          },
+          "messagesFrom": {
+            "description": "Solo mensajes desde este día (YYYY-MM-DD, dd/mm/yyyy o ISO), inicio del día en `timezone`.",
+            "type": "string"
+          },
+          "messagesTo": {
+            "description": "Solo mensajes hasta este día (fin del día en `timezone`).",
             "type": "string"
           }
         },
@@ -3989,8 +4454,26 @@
       "group": "settings"
     },
     {
+      "name": "get_invoice_payments",
+      "description": "Estado de cobro y abonos de UNA factura de venta (GET /api/invoices/:id/payments). Requiere invoices:read. Devuelve receivable (total, withheld, netTotal, paid, balance, status), collectible y payments[{_id, amount, paidAt, method, reference, note}]. El _id de cada abono es el que pide delete_invoice_payment.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "_id de la factura"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "invoices"
+    },
+    {
       "name": "get_invoice_withholdings",
-      "description": "Retenciones que el cliente le practicó a una factura de venta emitida (GET /api/invoices/:id/withholdings). Requiere invoices:read.\nDevuelve withholdings (null si no tiene): base, iva, items[{key, kind, label, pct, amount}], byKind{rteFuente, rteIva, rteIca}, total, netPayable, appliedAt, source; y netPayable (= total de la factura si no hay retenciones).\nÚsala antes de apply_invoice_withholdings para saber si la factura ya las tiene. El id se obtiene con list_invoices (search por prefijo/número).",
+      "description": "Retenciones que el cliente le practicó a una factura de venta emitida (GET /api/invoices/:id/withholdings). Requiere invoices:read.\nDevuelve withholdings (null si no tiene): base, iva, items[{key, kind, label, pct, amount}], byKind{rteFuente, rteIva, rteIca, otros}, total, netPayable, appliedAt, source; y netPayable (= total de la factura si no hay retenciones).\nÚsala antes de apply_invoice_withholdings para saber si la factura ya las tiene. El id se obtiene con list_invoices (search por prefijo/número).",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -4148,7 +4631,7 @@
     },
     {
       "name": "get_purchases_overview",
-      "description": "Resumen de compras de un período: total bruto, retenciones practicadas, neto pagado y desglose. Requiere el módulo de facturación electrónica del plan y el permiso purchases:read.",
+      "description": "Resumen de compras de un período: total bruto, retenciones practicadas, neto (bruto − retenciones, incluye facturas sin pagar) y desglose. Requiere el módulo de facturación electrónica del plan y el permiso purchases:read.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -4306,6 +4789,28 @@
         ]
       },
       "group": "users"
+    },
+    {
+      "name": "get_whatsapp_template",
+      "description": "Estado de UNA plantilla de WhatsApp por nombre en la WABA de la línea: status (APPROVED, PENDING, REJECTED, PAUSED, DISABLED), rejected_reason si Meta la rechazó, category, parameter_format y components (cabecera, cuerpo, pie y botones). Úsalo después de create_whatsapp_template para saber si ya se puede enviar. Si el nombre existe en varios idiomas, devuelve el primero y todos en `translations`. 404 si no existe. Requiere permiso whatsapp:send.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre exacto de la plantilla (el que se usó al crearla)."
+          },
+          "lineId": {
+            "description": "Línea cuya WABA se consulta; ver list_whatsapp_lines. Default: la línea por defecto.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "group": "whatsapp"
     },
     {
       "name": "import_contacts",
@@ -4501,6 +5006,7 @@
             "description": "Filtra por estado de la ejecución",
             "type": "string",
             "enum": [
+              "queued",
               "running",
               "success",
               "partial",
@@ -4565,7 +5071,7 @@
     },
     {
       "name": "list_automation_variables",
-      "description": "Catálogo para armar automatizaciones: las variables {{...}} disponibles según los tipos de disparador dados (con ejemplo), los tipos de disparador válidos y los tipos de acción que existen (send_whatsapp, send_whatsapp_template, send_email, create_task, http_request…). Úsalo antes de create_automation. Solo lectura.",
+      "description": "Catálogo para armar automatizaciones: las variables {{...}} disponibles según los tipos de disparador dados (con ejemplo y, en las de valores cerrados como trigger.quotation_status, sus `options` clave → etiqueta: se compara contra la clave), los tipos de disparador válidos y los tipos de acción que existen (send_whatsapp, send_whatsapp_template, send_email, create_task, http_request…). Úsalo antes de create_automation. Solo lectura.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -4766,7 +5272,7 @@
     },
     {
       "name": "list_company_properties",
-      "description": "Lista las propiedades (campos) de las empresas de la organización con sus grupos: key, label, type, isVisible, options, groupId y reserved (true = propiedad núcleo del CRM como name, idNumber, email o phone). type: catalog (con catalog: co_municipalities | co_states) = cityCode y stateCode, códigos DANE del catálogo nacional: cityCode se escribe con un código de search_municipalities y stateCode se deriva solo; no se pueden crear propiedades catalog. Las keys son las que usan create_company/update_company. NO devuelve empresas. Requiere fields:read.",
+      "description": "Lista las propiedades (campos) de las empresas de la organización con sus grupos: key, label, type, required (obligatorio en la web y la app), isVisible (deprecado: solo visibilidad), options, groupId y reserved (true = propiedad núcleo del CRM como name, idNumber, email o phone). type: catalog (con catalog: co_municipalities | co_states) = cityCode y stateCode, códigos DANE del catálogo nacional: cityCode se escribe con un código de search_municipalities y stateCode se deriva solo; no se pueden crear propiedades catalog. Las keys son las que usan create_company/update_company. NO devuelve empresas. Requiere fields:read.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -4797,7 +5303,7 @@
     },
     {
       "name": "list_contact_properties",
-      "description": "Lista las propiedades (campos) de los contactos de la organización con sus grupos: key, label, type, isVisible, options, groupId y reserved (true = propiedad núcleo del CRM como email, mobile, firstName o companyType). type: catalog (con catalog: co_municipalities | co_states) = cityCode y stateCode, códigos DANE del catálogo nacional: cityCode se escribe con un código de search_municipalities y stateCode se deriva solo; no se pueden crear propiedades catalog. Las keys son las que usan create_contact/update_contact y los filtros de list_contacts. NO devuelve contactos. Requiere fields:read.",
+      "description": "Lista las propiedades (campos) de los contactos de la organización con sus grupos: key, label, type, required (obligatorio en la web y la app), isVisible (deprecado: solo visibilidad), options, groupId y reserved (true = propiedad núcleo del CRM como email, mobile, firstName o companyType). type: catalog (con catalog: co_municipalities | co_states) = cityCode y stateCode, códigos DANE del catálogo nacional: cityCode se escribe con un código de search_municipalities y stateCode se deriva solo; no se pueden crear propiedades catalog. Las keys son las que usan create_contact/update_contact y los filtros de list_contacts. NO devuelve contactos. Requiere fields:read.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -4990,8 +5496,79 @@
       "group": "conversations"
     },
     {
+      "name": "list_conversation_stage_transitions",
+      "description": "Listar los cambios de etapa de las conversaciones de la organización en un rango de fechas (GET /api/conversations/stage-transitions, permiso conversations:read). Solo lectura.\nÚsala en vez de llamar get_conversation_stage_history por cada conversación: una sola llamada responde \"¿qué conversaciones entraron a la etapa X entre tal y tal fecha?\" o \"¿qué movió Fulano esta semana?\".\nRango: from/to (YYYY-MM-DD, dd/mm/yyyy o ISO) en la zona de timezone (offset \"-5\" o IANA \"America/Bogota\"; por defecto la de la organización). Sin fechas: últimos 7 días. Máximo 92 días (400 RANGE_TOO_LARGE: parte la consulta).\npipeline, stage, fromStage y toStage aceptan id o nombre (sin importar tildes ni mayúsculas). stage = la etapa en cualquiera de las dos puntas (entró o salió); toStage = solo las que ENTRARON. Un nombre repetido en varios pipelines → 400 STAGE_AMBIGUOUS con candidates: repite con el id o con pipeline.\ntriggeredBy filtra por origen: user (persona en la web), automation, system (API/MCP/agente IA o reapertura automática); varios separados por coma.\nCada ítem: {at, conversation:{id,title}, contact:{id,name,mobile}, pipeline:{id,name}, from:{id,name}, to:{id,name}, by:{type,via,userId,name}}. by.via = web | api | mcp | agent | automation | auto-reopen (null en registros viejos).\nOjo con coverageNote en la respuesta: antes del deploy de MC6 (oct-2026) los movimientos de automatizaciones, la reapertura automática y el PUT con currentStage no dejaban registro, así que el historial anterior tiene huecos.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "from": {
+            "description": "Inicio del rango (YYYY-MM-DD, dd/mm/yyyy o ISO). Default: to - 7 días",
+            "type": "string"
+          },
+          "to": {
+            "description": "Fin del rango (inclusive, día completo en la zona). Default: ahora",
+            "type": "string"
+          },
+          "timezone": {
+            "description": "Offset en horas (\"-5\") o zona IANA. Default: la de la organización",
+            "type": "string"
+          },
+          "pipeline": {
+            "description": "Pipeline de conversaciones por id o nombre",
+            "type": "string"
+          },
+          "stage": {
+            "description": "Etapa (id o nombre) en cualquiera de las dos puntas",
+            "type": "string"
+          },
+          "fromStage": {
+            "description": "Etapa de origen (id o nombre)",
+            "type": "string"
+          },
+          "toStage": {
+            "description": "Etapa destino (id o nombre)",
+            "type": "string"
+          },
+          "userId": {
+            "description": "ObjectId del usuario que movió (list_users)",
+            "type": "string"
+          },
+          "triggeredBy": {
+            "description": "user, automation y/o system, separados por coma",
+            "type": "string"
+          },
+          "conversationId": {
+            "description": "Solo los cambios de esta conversación",
+            "type": "string"
+          },
+          "page": {
+            "description": "Página (default 1)",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "limit": {
+            "description": "Ítems por página (default 100, máx 500)",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          },
+          "sort": {
+            "description": "Orden por fecha (default desc: más reciente primero)",
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "group": "conversations"
+    },
+    {
       "name": "list_conversations",
-      "description": "List conversations with filters, messages included. Dates dd/mm/yyyy; timezone = UTC offset (e.g. -5 Colombia). dateField controls which date column is filtered (createdAt, updatedAt, lastMessageTimestamp).",
+      "description": "List conversations with filters, messages included. Dates dd/mm/yyyy; timezone = UTC offset (e.g. -5 Colombia) or IANA zone. dateField controls which date column is filtered (createdAt, updatedAt, lastMessageTimestamp). Usa detail:'compact' para recorrer listas o leer historial (≈4 veces menos tokens; en compact las listas traen 0 mensajes salvo que pidas messagesLimit o messagesFrom/messagesTo); pide messageInclude:['media'] solo si vas a abrir archivos. messagesFrom/messagesTo filtran los mensajes de cada conversación por fecha.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -5002,6 +5579,10 @@
           },
           "stage": {
             "description": "ObjectId del stage (currentStage) para filtrar conversaciones",
+            "type": "string"
+          },
+          "lineId": {
+            "description": "ObjectId de una línea de WhatsApp de la organización (ver list_whatsapp_lines): solo conversaciones de esa línea. Una línea de otra org o inexistente responde 400.",
             "type": "string"
           },
           "assignedTo": {
@@ -5028,7 +5609,15 @@
             ]
           },
           "timezone": {
-            "type": "number"
+            "description": "Offset UTC en horas (-5) o zona IANA (America/Bogota). Para dateFrom/dateTo el default es 0; para messagesFrom/messagesTo, la zona de la organización.",
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ]
           },
           "source": {
             "type": "string",
@@ -5059,7 +5648,7 @@
             "type": "number"
           },
           "messagesLimit": {
-            "description": "Messages per conversation (default 50, max 200)",
+            "description": "Mensajes por conversación, 0-200 (default 50; con detail compact el default es 0 salvo que pidas messagesFrom/messagesTo)",
             "type": "number"
           },
           "sortBy": {
@@ -5076,6 +5665,63 @@
               "asc",
               "desc"
             ]
+          },
+          "detail": {
+            "description": "Nivel de detalle (default standard en el MCP; full = respuesta histórica completa). compact: {id,title,stage,pipeline,assignedTo,contact,source,unreadCount,lastMessageAt,tags,messages} y mensajes {id,at,dir,type,text,hasMedia}. standard agrega priority, updatedAt, lastMessage y en mensajes media, transcripción, reacciones, estado de entrega y cita.",
+            "type": "string",
+            "enum": [
+              "compact",
+              "standard",
+              "full"
+            ]
+          },
+          "include": {
+            "description": "Piezas extra de la conversación en compact/standard (lista cerrada).",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "metadata",
+                "contactData",
+                "participants",
+                "lastMessage",
+                "automation"
+              ]
+            }
+          },
+          "messageDetail": {
+            "description": "Nivel de detalle de cada mensaje (default = detail).",
+            "type": "string",
+            "enum": [
+              "compact",
+              "standard",
+              "full"
+            ]
+          },
+          "messageInclude": {
+            "description": "Piezas extra de cada mensaje. Pide 'media' solo si vas a abrir archivos (mediaUrl, mediaId…).",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "media",
+                "transcription",
+                "reactions",
+                "delivery",
+                "reply",
+                "interactive",
+                "ids",
+                "author"
+              ]
+            }
+          },
+          "messagesFrom": {
+            "description": "Solo mensajes desde este día (YYYY-MM-DD, dd/mm/yyyy o ISO), inicio del día en `timezone`.",
+            "type": "string"
+          },
+          "messagesTo": {
+            "description": "Solo mensajes hasta este día (fin del día en `timezone`).",
+            "type": "string"
           }
         }
       },
@@ -5163,8 +5809,79 @@
       "group": "pipelines"
     },
     {
+      "name": "list_deal_stage_transitions",
+      "description": "Listar los cambios de etapa de los negocios (deals) de la organización en un rango de fechas (GET /api/deals/stage-transitions, permiso deals:read). Solo lectura.\nResponde en una llamada \"¿qué negocios pasaron a Cerrado Ganado este mes?\" o \"¿qué negocios movió Fulano?\".\nIMPORTANTE: el historial completo empieza con el deploy de MC9 (oct-2026). Antes solo quedaban los movimientos hechos en la web desde el 08-sep-2026; los de la API pública, el MCP y n8n no se registraban. Lee coverageNote antes de sacar conclusiones de periodos viejos.\nRango: from/to (YYYY-MM-DD, dd/mm/yyyy o ISO) en la zona de timezone (default la de la organización). Sin fechas: últimos 7 días. Máximo 92 días (400 RANGE_TOO_LARGE).\npipeline, stage, fromStage y toStage aceptan id o nombre (sin tildes ni mayúsculas); stage = cualquiera de las dos puntas. Nombre repetido → 400 STAGE_AMBIGUOUS con candidates. triggeredBy: user (web), system (API/MCP/agente), separados por coma.\nCada ítem: {at, deal:{id,title,amount}, contact:{id}, pipeline:{id,name}, from:{id,name}, to:{id,name}, by:{type,via,userId,name}}. Para más datos del negocio usa get_deal con deal.id.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "from": {
+            "description": "Inicio del rango (YYYY-MM-DD, dd/mm/yyyy o ISO). Default: to - 7 días",
+            "type": "string"
+          },
+          "to": {
+            "description": "Fin del rango (inclusive, día completo en la zona). Default: ahora",
+            "type": "string"
+          },
+          "timezone": {
+            "description": "Offset en horas (\"-5\") o zona IANA. Default: la de la organización",
+            "type": "string"
+          },
+          "pipeline": {
+            "description": "Pipeline de negocios por id o nombre",
+            "type": "string"
+          },
+          "stage": {
+            "description": "Etapa (id o nombre) en cualquiera de las dos puntas",
+            "type": "string"
+          },
+          "fromStage": {
+            "description": "Etapa de origen (id o nombre)",
+            "type": "string"
+          },
+          "toStage": {
+            "description": "Etapa destino (id o nombre)",
+            "type": "string"
+          },
+          "userId": {
+            "description": "ObjectId del usuario que movió (list_users)",
+            "type": "string"
+          },
+          "triggeredBy": {
+            "description": "user y/o system, separados por coma",
+            "type": "string"
+          },
+          "dealId": {
+            "description": "Solo los cambios de este negocio",
+            "type": "string"
+          },
+          "page": {
+            "description": "Página (default 1)",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "limit": {
+            "description": "Ítems por página (default 100, máx 500)",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          },
+          "sort": {
+            "description": "Orden por fecha (default desc: más reciente primero)",
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "group": "deals"
+    },
+    {
       "name": "list_deals",
-      "description": "List deals with optional date range, search, and pagination. Dates YYYY-MM-DD. Use closingFrom/closingTo to filter by closing date (for sales reports: closingDate is the REAL close date once a deal is won/lost, the estimate while open). wonFrom/wonTo and lostFrom/lostTo filter by the exact won/lost timestamp (wonAt/lostAt). Use createdFrom/createdTo to filter by creation date. Each deal exposes wonAt, lostAt and expectedCloseDate (the original estimate).",
+      "description": "List deals with optional date range, search, and pagination. Dates YYYY-MM-DD. Use closingFrom/closingTo to filter by closing date (for sales reports: closingDate is the REAL close date once a deal is won/lost, the estimate while open). wonFrom/wonTo and lostFrom/lostTo filter by the exact won/lost timestamp (wonAt/lostAt). Use createdFrom/createdTo to filter by creation date. Each deal exposes wonAt, lostAt and expectedCloseDate (the original estimate).\n\nTAMAÑO DE LA RESPUESTA: por defecto el MCP pide detail=standard (liviano). detail=full trae el contacto completo (~2,5 KB por negocio). Si solo necesitas título, monto, etapa, contacto y campos personalizados pide detail=compact (≤350 B por negocio: {id,title,amount,stage:{id,name,outcome},pipeline,contact:{id,name,mobile},closingDate:'YYYY-MM-DD',customFields:{<key>:valor}}). detail=standard trae todos los campos de la lista `fields` en forma liviana; `fields` elige cuáles (implica compact si no mandas detail). Usa full solo si necesitas todas las properties del contacto.\n\nCampos personalizados: customFieldKeys limita cuáles se devuelven (id, key o nombre); customFieldFilters filtra por su valor (eq/in comparan contra el texto de la opción, sin importar tildes en un select; empty exige pipeline). Las respuestas traen customFields[].fieldId y .key, que sirven tal cual para update_deal / update_deals.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -5174,7 +5891,7 @@
             "type": "string"
           },
           "status": {
-            "description": "Estado del deal (ej. 'open', 'won', 'lost')",
+            "description": "'won', 'lost' u 'open' (abierto = ni ganado ni perdido), o el _id de una etapa",
             "type": "string"
           },
           "contactId": {
@@ -5245,6 +5962,92 @@
               "asc",
               "desc"
             ]
+          },
+          "detail": {
+            "description": "compact (recomendado para listar), standard (default en el MCP) o full (la forma histórica completa)",
+            "type": "string",
+            "enum": [
+              "compact",
+              "standard",
+              "full"
+            ]
+          },
+          "fields": {
+            "description": "Campos a devolver (el id va siempre). Con compact o standard; sin detail implica compact",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "title",
+                "amount",
+                "stage",
+                "pipeline",
+                "contact",
+                "company",
+                "closingDate",
+                "wonAt",
+                "lostAt",
+                "expectedCloseDate",
+                "assignedTo",
+                "customFields",
+                "createdAt",
+                "updatedAt"
+              ]
+            }
+          },
+          "customFieldKeys": {
+            "description": "Campos personalizados a devolver, por id, key o nombre (un nombre con coma: usa la key o el id)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "contactIds": {
+            "description": "Negocios de cualquiera de estos contactos (máx. 100 ids)",
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "customFieldFilters": {
+            "description": "Filtros AND por valor de campo personalizado",
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "description": "id, key o nombre del campo personalizado"
+                },
+                "op": {
+                  "type": "string",
+                  "enum": [
+                    "eq",
+                    "in",
+                    "empty",
+                    "notEmpty"
+                  ],
+                  "description": "empty exige el parámetro pipeline"
+                },
+                "value": {
+                  "description": "Para eq",
+                  "type": "string"
+                },
+                "values": {
+                  "description": "Para in (1 a 100)",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "field",
+                "op"
+              ]
+            }
           }
         }
       },
@@ -5868,7 +6671,7 @@
     },
     {
       "name": "list_purchases",
-      "description": "Listar compras a proveedores (GET /api/purchases): facturas de proveedor (kind=invoice) y órdenes de compra (kind=order). Sin `kind` devuelve ambas. Filtros por estado, proveedor, texto y rango de fechas de compra. Requiere purchases:read y el módulo de facturación en el plan.\nCada compra trae kind, orderRef (en la factura: la OC que cubre) e invoiceRef (en la OC: la factura que la cerró). En una OC, status pending = abierta y completed = facturada.",
+      "description": "Listar compras a proveedores (GET /api/purchases): facturas de proveedor (kind=invoice) y órdenes de compra (kind=order). Sin `kind` devuelve ambas. Filtros por estado, proveedor, texto y rango de fechas de compra. Requiere purchases:read y el módulo de facturación en el plan.\nCada compra trae kind, orderRef (en la factura: la OC que cubre) e invoiceRef (en la OC: la factura que la cerró). En una factura, status es el estado de PAGO: pending = sin pagar, completed = pagada, canceled = anulada (los informes excluyen solo canceled). En una OC, status pending = abierta y completed = facturada.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -5933,7 +6736,7 @@
     },
     {
       "name": "list_quotations",
-      "description": "Listar cotizaciones con filtros y paginación.",
+      "description": "Listar cotizaciones con filtros y paginación. status admite varios estados (OR); sent_unviewed = enviadas sin ver (sent con viewCount 0). Las viejas sin estado cuentan como draft. La respuesta trae statusCounts: cuántas hay en cada estado con los mismos filtros pero sin el de status.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -5945,7 +6748,40 @@
             "type": "number"
           },
           "status": {
-            "type": "string"
+            "description": "Estados a incluir, p. ej. [\"sent\", \"accepted\"] o [\"sent_unviewed\"]",
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "draft",
+                    "ready",
+                    "sent",
+                    "accepted",
+                    "rejected",
+                    "expired",
+                    "invoiced",
+                    "canceled",
+                    "sent_unviewed"
+                  ]
+                }
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "draft",
+                  "ready",
+                  "sent",
+                  "accepted",
+                  "rejected",
+                  "expired",
+                  "invoiced",
+                  "canceled",
+                  "sent_unviewed"
+                ]
+              }
+            ]
           },
           "contactId": {
             "type": "string"
@@ -5978,6 +6814,52 @@
         }
       },
       "group": "quotations"
+    },
+    {
+      "name": "list_receivables",
+      "description": "Cartera: facturas de venta cobrables con su saldo (GET /api/invoices/receivables). Requiere invoices:read. Una fila COMPACTA por factura (sin XML ni líneas): úsala para conciliar pagos en vez de list_invoices.\nCada fila: invoiceId, fullNumber (FS-702), date, customerName, customerNit, total, withheld (retenciones), credited y creditNotes (notas crédito que la anulan), netTotal (lo que el cliente consigna), paid, balance, status (pending|partial|overdue|paid|credited = anulada por NC, no es un cobro), dueDate, daysOverdue.\nstatus: open (default, con saldo) | pending | partial | overdue | paid | credited | all. Filtros: dateFrom/dateTo (emisión, YYYY-MM-DD), nit (exacto, sin DV), search (nombre del cliente), contactId. Devuelve además aging (tramos de antigüedad) y totals de todo lo filtrado.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "pending",
+              "partial",
+              "overdue",
+              "paid",
+              "credited",
+              "all"
+            ]
+          },
+          "dateFrom": {
+            "description": "Fecha de emisión desde (YYYY-MM-DD)",
+            "type": "string"
+          },
+          "dateTo": {
+            "description": "Fecha de emisión hasta (YYYY-MM-DD)",
+            "type": "string"
+          },
+          "nit": {
+            "description": "NIT o cédula del cliente, sin DV",
+            "type": "string"
+          },
+          "search": {
+            "description": "Texto en el nombre del cliente",
+            "type": "string"
+          },
+          "contactId": {
+            "type": "string"
+          },
+          "limit": {
+            "description": "Filas a devolver (default 500, máx 1000); los totales son de todo",
+            "type": "number"
+          }
+        }
+      },
+      "group": "invoices"
     },
     {
       "name": "list_scoring_rules",
@@ -6066,7 +6948,7 @@
     },
     {
       "name": "list_users",
-      "description": "Lista los usuarios (miembros del equipo) de la organización: id, nombre, correo, celular, rol (propietario, empleado o lector = solo lectura), avatar y lastSeenAt (última actividad en la app; null si no hay sesión reciente). Úsalo para obtener el id de un asesor antes de asignarle negocios, conversaciones o tareas. Solo lectura: NO crea, invita, edita ni borra usuarios (eso cambia asientos cobrados y se hace desde la app). No devuelve contraseñas ni credenciales. Requiere users:read.",
+      "description": "Lista los usuarios (miembros del equipo) de la organización: id, nombre, correo, celular, rol (propietario, empleado, lector = solo lectura, contador = solo contactos, empresas y facturación), avatar y lastSeenAt (última actividad en la app; null si no hay sesión reciente). Úsalo para obtener el id de un asesor antes de asignarle negocios, conversaciones o tareas. Solo lectura: NO crea, invita, edita ni borra usuarios (eso cambia asientos cobrados y se hace desde la app). No devuelve contraseñas ni credenciales. Requiere users:read.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -6077,7 +6959,8 @@
             "enum": [
               "propietario",
               "empleado",
-              "lector"
+              "lector",
+              "contador"
             ]
           },
           "page": {
@@ -6115,12 +6998,27 @@
       "group": "whatsapp"
     },
     {
-      "name": "list_whatsapp_templates",
-      "description": "Listar las plantillas de WhatsApp (Meta/Facebook Marketing) aprobadas para la organización. Devuelve nombre, idioma, categoría, estado y componentes (BODY/HEADER/FOOTER con su texto) para que la IA pueda elegir la plantilla adecuada antes de enviarla con send_whatsapp_template. Requiere permiso whatsapp:send en el token.",
+      "name": "list_whatsapp_lines",
+      "description": "Listar las líneas (números) de WhatsApp de la organización (épica WL): id, nombre, número, color, línea por defecto, a quién se asignan sus conversaciones nuevas y estado del token. El id es el lineId que aceptan send_whatsapp_message, send_whatsapp_template, list_whatsapp_templates y create_conversation; sin lineId todo sale por la línea por defecto. Nunca devuelve credenciales. Requiere permiso whatsapp:send.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {}
+      },
+      "group": "whatsapp"
+    },
+    {
+      "name": "list_whatsapp_templates",
+      "description": "Listar las plantillas de WhatsApp (Meta/Facebook Marketing) aprobadas para la organización. Devuelve nombre, idioma, categoría, estado y componentes (BODY/HEADER/FOOTER con su texto) para que la IA pueda elegir la plantilla adecuada antes de enviarla con send_whatsapp_template. Con varias líneas (ver list_whatsapp_lines) las plantillas son de la WABA de cada línea: pasa lineId; sin él, la línea por defecto. Requiere permiso whatsapp:send en el token.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "lineId": {
+            "description": "Línea cuyas plantillas se listan (épica WL). Default: la por defecto.",
+            "type": "string"
+          }
+        }
       },
       "group": "whatsapp"
     },
@@ -6146,6 +7044,34 @@
         }
       },
       "group": "notifications"
+    },
+    {
+      "name": "move_all_conversations_pipeline",
+      "description": "Mueve TODAS las conversaciones de un pipeline de conversaciones a una etapa de OTRO pipeline de la misma organización (paso previo a borrar el pipeline de origen). Deja un registro de cambio de pipeline por conversación. Devuelve { moved }. No borra el pipeline ni las conversaciones. Confirma con el usuario antes de llamarlo. Requiere pipelines:write.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "pipelineId": {
+            "type": "string",
+            "description": "ObjectId del pipeline de ORIGEN (del que salen todas las conversaciones)."
+          },
+          "targetPipelineId": {
+            "type": "string",
+            "description": "ObjectId del pipeline DESTINO (distinto al de origen)."
+          },
+          "targetStageId": {
+            "type": "string",
+            "description": "ObjectId de la etapa del pipeline destino donde caen las conversaciones."
+          }
+        },
+        "required": [
+          "pipelineId",
+          "targetPipelineId",
+          "targetStageId"
+        ]
+      },
+      "group": "conversations"
     },
     {
       "name": "move_conversation_stage",
@@ -6190,7 +7116,7 @@
     },
     {
       "name": "quote_shipment",
-      "description": "Cotizar un envío con Envia.com (POST /api/shipments/rates). Es una CONSULTA: no crea nada ni cobra saldo. Requiere shipments:read y el módulo envios en el plan.\nDestino: manda contactId (se usa la dirección del contacto) o destination; con ambos, lo que venga en destination pisa lo del contacto. Sin ninguno → 400. La ciudad se resuelve contra el catálogo DANE: usa cityCode (DANE de 5 dígitos) o city + state inequívocos; si es ambigua o no se reconoce → 422 INVALID_CITY con candidates (pregúntale al usuario cuál es y reintenta con su cityCode; si no hay candidatos, búscalo con search_municipalities). Ojo: este código es INVALID_CITY, no el CITY_UNRESOLVED de contactos. Solo Colombia.\nEl origen es el de Ajustes → Envíos de la app (no se manda; 422 ORIGIN_NOT_CONFIGURED si falta). Sin la API key de Envia → 422 ENVIA_NOT_CONFIGURED.\nRespuesta: data.rates ordenadas por totalPrice ascendente (COP), cada una con carrier + service (lo que pide create_shipment), deliveryEstimate y desglose; data.failed = transportadoras que no respondieron (no tumban la cotización). Consulta cada transportadora con timeout de 12 s: puede tardar.",
+      "description": "Cotizar un envío con Envia.com (POST /api/shipments/rates). Es una CONSULTA: no crea nada ni cobra saldo. Requiere shipments:read y el módulo envios en el plan.\nDestino: manda contactId (se usa la dirección del contacto) o destination; con ambos, lo que venga en destination pisa lo del contacto. Sin ninguno → 400. La ciudad se resuelve contra el catálogo DANE: usa cityCode (DANE de 5 dígitos) o city + state inequívocos; si es ambigua o no se reconoce → 422 INVALID_CITY con candidates (pregúntale al usuario cuál es y reintenta con su cityCode; si no hay candidatos, búscalo con search_municipalities). Ojo: este código es INVALID_CITY, no el CITY_UNRESOLVED de contactos. Solo Colombia.\nEl origen es el de Ajustes → Envíos de la app (no se manda; 422 ORIGIN_NOT_CONFIGURED si falta). Sin la API key de Envia → 422 ENVIA_NOT_CONFIGURED.\nRespuesta: data.rates ordenadas por totalPrice ascendente (COP), cada una con carrier + service (lo que pide create_shipment), deliveryEstimate y desglose; data.failed = transportadoras sin tarifa (no tumban la cotización): error.code NO_COVERAGE = no cubren la ruta, TIMEOUT/NETWORK = no respondieron. Consulta cada transportadora hasta 20 s (con un reintento): puede tardar.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -6384,6 +7310,123 @@
       "group": "settings"
     },
     {
+      "name": "register_invoice_payments",
+      "description": "Registrar abonos (pagos recibidos) a facturas de venta, en LOTE (POST /api/invoices/payments). Requiere invoices:write. Es lo mismo que 'Registrar pago' de la columna Cobro de /invoices: no emite nada ante la DIAN ni cambia el estado DIAN.\nFlujo recomendado: primero con dryRun: true y mostrarle a la persona la tabla (result por ítem y summary); aplicar sin dryRun solo con su aprobación.\nCada ítem identifica la factura con id (preferido) o prefix+number. amount = lo recibido (número, sin separadores de miles). Un abono NO puede pasar del saldo: si el cliente pagó unos pesos de más (redondeo), manda full: true + amount y se registra el saldo exacto (lo recibido queda en la nota). full se rechaza si amount se aleja del saldo más de $1.000 o 1 %: un pago parcial va sin full.\nSi el pago llegó corto por retenciones, manda withholdings en el mismo ítem (mismos conceptos y reglas que apply_invoice_withholdings: amount o pct; reteIva es sobre el IVA). Se aplican ANTES del abono y REEMPLAZAN las que tuviera la factura; así el neto baja y el abono la deja en cero. Ojo con facturas pagadas en cuotas: si cada cuota trae retención, manda en la última el set COMPLETO (las de todas las cuotas), o la segunda borra la primera.\npaidAt = fecha del pago (YYYY-MM-DD, se guarda en hora de Bogotá; no se aceptan fechas futuras ni inexistentes). reference = referencia o descripción del banco (queda en el abono). Antiduplicados por factura: mismo monto + mismo día => result 'skipped' aunque la referencia sea otra (el mismo pago registrado antes desde la web). Repetir la conciliación es seguro.\nCada ítem es independiente (no es atómico): uno con error (result 'error' + code: INVOICE_NOT_FOUND, NOT_COLLECTIBLE, ALREADY_PAID, PAYMENT_INVALID, CONFLICT, INTERNAL_ERROR…) no frena a los demás. En dryRun, varios ítems sobre la misma factura se simulan en orden (el segundo ve el saldo que dejó el primero). Máximo 100 ítems por llamada.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "items": {
+            "minItems": 1,
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "description": "_id de la factura (preferido)",
+                  "type": "string"
+                },
+                "prefix": {
+                  "description": "Prefijo, ej. FS (si no tienes el id)",
+                  "type": "string"
+                },
+                "number": {
+                  "description": "Número de la factura (si no tienes el id)",
+                  "type": "number"
+                },
+                "amount": {
+                  "description": "Monto recibido en COP",
+                  "type": "number"
+                },
+                "full": {
+                  "description": "true = abonar exactamente el saldo",
+                  "type": "boolean"
+                },
+                "paidAt": {
+                  "description": "Fecha del pago YYYY-MM-DD (default hoy)",
+                  "type": "string"
+                },
+                "method": {
+                  "description": "Ej. transferencia, wompi, efectivo",
+                  "type": "string"
+                },
+                "reference": {
+                  "description": "Referencia/descripción del movimiento bancario",
+                  "type": "string"
+                },
+                "note": {
+                  "type": "string"
+                },
+                "withholdings": {
+                  "description": "Retenciones que el cliente practicó en este pago; reemplazan las de la factura",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "key": {
+                        "type": "string",
+                        "enum": [
+                          "compras25",
+                          "compras35",
+                          "serviciosGeneral4",
+                          "serviciosGeneral6",
+                          "honorarios10",
+                          "honorarios11",
+                          "arrendamientoBienesMuebles",
+                          "arrendamientoBienesRaices",
+                          "serviciosAseoVigilancia",
+                          "serviciosHotelesRestaurantes",
+                          "transporteCarga",
+                          "reteIva",
+                          "reteIca",
+                          "estampillaProDesarrollo",
+                          "estampillaProCultura",
+                          "estampillaProUniversidad",
+                          "tasaProDeporte",
+                          "estampillaProUnivalle",
+                          "estampillaProHospitalUniversitario",
+                          "estampillaUceva",
+                          "estampillaProUnivPacifico",
+                          "estampillaProElectrificacion",
+                          "estampillaOtra"
+                        ],
+                        "description": "Concepto de la retención"
+                      },
+                      "amount": {
+                        "description": "Monto retenido en COP",
+                        "type": "number"
+                      },
+                      "pct": {
+                        "description": "Porcentaje (sobre el IVA si es reteIva)",
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "key"
+                    ]
+                  }
+                }
+              }
+            },
+            "description": "Abonos a registrar"
+          },
+          "dryRun": {
+            "description": "true = calcular sin guardar",
+            "type": "boolean"
+          },
+          "skipDuplicates": {
+            "description": "Default true. false solo si de verdad hubo dos pagos del mismo monto el mismo día a la misma factura",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "group": "invoices"
+    },
+    {
       "name": "remove_contacts_from_list",
       "description": "Quitar contactos de una lista ESTÁTICA existente por sus IDs (DELETE /lists/:id/contacts). No borra los contactos, solo su pertenencia a la lista. Los IDs que no estaban se cuentan en skipped.",
       "inputSchema": {
@@ -6483,14 +7526,14 @@
     },
     {
       "name": "search_contact_by_phone",
-      "description": "Search contact by phone number for this organization (coincidencia exacta por dígitos y luego parcial, en mobile o phone). Responde `contact` con properties aplanadas, `tags` y `attribution` first-touch (mismo formato que get_contact; null si no tiene).",
+      "description": "Search contact by phone number for this organization (coincidencia exacta por dígitos y luego parcial, en mobile o phone). También acepta un BSUID ('CO.298…', cliente de WhatsApp sin número): busca por whatsappUserId. Responde `contact` con properties aplanadas, `tags` y `attribution` first-touch (mismo formato que get_contact; null si no tiene).",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
           "phone": {
             "type": "string",
-            "description": "Teléfono a buscar; se normaliza a solo dígitos (mínimo 3). Ej: '573132925094' o '313 292 5094'."
+            "description": "Teléfono a buscar; se normaliza a solo dígitos (mínimo 3). Ej: '573132925094' o '313 292 5094'. O un BSUID tal cual: 'CO.2983224498705179'."
           }
         },
         "required": [
@@ -6501,12 +7544,16 @@
     },
     {
       "name": "search_conversations",
-      "description": "Buscar conversaciones por título, nombre/apellido del contacto o teléfono (query q, substring sin distinguir mayúsculas). NO busca dentro del contenido de los mensajes — para localizar una conversación por lo que se dijo en ella, usar list_conversations y revisar mensajes, o buscar por el contacto.",
+      "description": "Buscar conversaciones por título, nombre/apellido del contacto, teléfono, BSUID ('CO.298…') o @username de WhatsApp (query q, substring sin distinguir mayúsculas). NO busca dentro del contenido de los mensajes — para localizar una conversación por lo que se dijo en ella, usar list_conversations y revisar mensajes, o buscar por el contacto. Usa detail:'compact' para ubicar la conversación con pocos tokens (sin mensajes salvo que pidas messagesLimit) y luego get_conversation con detail:'compact'.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
           "q": {
+            "type": "string"
+          },
+          "lineId": {
+            "description": "ObjectId de una línea de WhatsApp de la organización (ver list_whatsapp_lines): solo conversaciones de esa línea. Una línea de otra org o inexistente responde 400.",
             "type": "string"
           },
           "page": {
@@ -6516,8 +7563,76 @@
             "type": "number"
           },
           "messagesLimit": {
-            "description": "Messages per conversation (default 50, max 200)",
+            "description": "Mensajes por conversación, 0-200 (default 50; con detail compact el default es 0 salvo que pidas messagesFrom/messagesTo)",
             "type": "number"
+          },
+          "timezone": {
+            "description": "Zona de messagesFrom/messagesTo: offset en horas (-5) o IANA. Default: la de la organización.",
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "detail": {
+            "description": "Nivel de detalle (default standard en el MCP; full = respuesta histórica completa). compact: {id,title,stage,pipeline,assignedTo,contact,source,unreadCount,lastMessageAt,tags,messages} y mensajes {id,at,dir,type,text,hasMedia}. standard agrega priority, updatedAt, lastMessage y en mensajes media, transcripción, reacciones, estado de entrega y cita.",
+            "type": "string",
+            "enum": [
+              "compact",
+              "standard",
+              "full"
+            ]
+          },
+          "include": {
+            "description": "Piezas extra de la conversación en compact/standard (lista cerrada).",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "metadata",
+                "contactData",
+                "participants",
+                "lastMessage",
+                "automation"
+              ]
+            }
+          },
+          "messageDetail": {
+            "description": "Nivel de detalle de cada mensaje (default = detail).",
+            "type": "string",
+            "enum": [
+              "compact",
+              "standard",
+              "full"
+            ]
+          },
+          "messageInclude": {
+            "description": "Piezas extra de cada mensaje. Pide 'media' solo si vas a abrir archivos (mediaUrl, mediaId…).",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "media",
+                "transcription",
+                "reactions",
+                "delivery",
+                "reply",
+                "interactive",
+                "ids",
+                "author"
+              ]
+            }
+          },
+          "messagesFrom": {
+            "description": "Solo mensajes desde este día (YYYY-MM-DD, dd/mm/yyyy o ISO), inicio del día en `timezone`.",
+            "type": "string"
+          },
+          "messagesTo": {
+            "description": "Solo mensajes hasta este día (fin del día en `timezone`).",
+            "type": "string"
           }
         },
         "required": [
@@ -6637,15 +7752,62 @@
       "group": "email"
     },
     {
+      "name": "send_quotation",
+      "description": "Enviar una cotización al cliente: el PDF + el link público de la cotización. channel=email: por la tubería de correo de la plataforma a `to` (obligatorio). channel=whatsapp: como documento por WhatsApp a la conversación `conversationId` o, sin ella, a la del contacto de la cotización; SOLO dentro de la ventana de 24 h de Meta (si el cliente no ha escrito en 24 h → 409 WHATSAPP_WINDOW_CLOSED y no se envía nada). Regla de envío: draft/ready/rejected → pasa a sent; sent/accepted/invoiced no cambian de estado (solo se registra el envío); canceled no se puede enviar (409 QUOTATION_CANCELED); expired solo con fecha de vencimiento futura (409 EXPIRATION_REQUIRED), y draft/ready/rejected con la fecha de vencimiento ya pasada en la zona de la organización tampoco salen (409 EXPIRATION_REQUIRED). 403 WHATSAPP_OPTED_OUT si el contacto pidió no ser contactado por WhatsApp. ⚠️ Es un envío REAL al cliente: confírmalo con el usuario antes.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID de la cotización"
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "email",
+              "whatsapp"
+            ],
+            "description": "Canal de envío"
+          },
+          "to": {
+            "description": "Email del destinatario (obligatorio con channel=email)",
+            "type": "string"
+          },
+          "subject": {
+            "description": "Asunto (email). Default: \"Cotización <número> — <empresa>\"",
+            "type": "string"
+          },
+          "message": {
+            "description": "Texto del correo o del pie del documento de WhatsApp (el link se agrega solo)",
+            "type": "string"
+          },
+          "conversationId": {
+            "description": "Conversación de WhatsApp (channel=whatsapp). Sin ella, la del contacto",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "channel"
+        ]
+      },
+      "group": "quotations"
+    },
+    {
       "name": "send_whatsapp_message",
       "description": "Enviar un mensaje de WhatsApp de sesión (texto o media) a un número. Solo llega si el cliente escribió en las últimas 24 h (ventana de Meta); fuera de la ventana usa send_whatsapp_template. organizationId se rellena automáticamente.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
+          "lineId": {
+            "description": "Línea (número) de WhatsApp por la que sale (épica WL; ver list_whatsapp_lines). Sin él: la línea de la conversación del contacto o la por defecto de la organización.",
+            "type": "string"
+          },
           "to": {
             "type": "string",
-            "description": "Número destino en formato internacional sin '+', ej. 573001234567"
+            "description": "Número destino en formato internacional sin '+', ej. 573001234567, o el BSUID ('CO.298…') de un cliente sin número"
           },
           "type": {
             "description": "Tipo de mensaje. Default: 'text'",
@@ -6688,6 +7850,10 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
+          "lineId": {
+            "description": "Línea (número) de WhatsApp por la que sale (épica WL; ver list_whatsapp_lines). Sin él: la línea de la conversación del contacto o la por defecto de la organización.",
+            "type": "string"
+          },
           "to": {
             "type": "string",
             "description": "Número destino en formato internacional sin '+', ej. 573001234567"
@@ -6794,6 +7960,67 @@
         ]
       },
       "group": "agents"
+    },
+    {
+      "name": "set_quotation_status",
+      "description": "Cambiar el estado de una cotización (PATCH /quotations/:id/status), validado contra la matriz y atómico. Destinos que puede pedir un asesor: draft↔ready; draft/ready→sent (\"marcar como enviada\" a mano: pasa channel); sent→accepted|rejected|canceled; accepted→sent (reabrir)|canceled; rejected→sent|canceled; expired→sent (exige una fecha de vencimiento futura, si no 409 EXPIRATION_REQUIRED)|canceled. Marcar sent desde draft/ready/rejected con la fecha de vencimiento ya pasada (en la zona de la organización) también responde 409 EXPIRATION_REQUIRED; marcar ready no. invoiced y expired los escribe solo el sistema. 409 INVALID_TRANSITION trae `allowed`; 409 STATUS_CONFLICT si cambió mientras tanto (o si expectedFrom no coincide). Para ENVIAR de verdad usa send_quotation: este tool no manda nada al cliente.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID de la cotización"
+          },
+          "to": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "ready",
+              "sent",
+              "accepted",
+              "rejected",
+              "canceled"
+            ],
+            "description": "Estado destino"
+          },
+          "reason": {
+            "description": "Motivo (texto libre), sobre todo al rechazar o anular",
+            "type": "string"
+          },
+          "reasonCode": {
+            "description": "Motivo de rechazo de lista corta (solo con to=rejected)",
+            "type": "string",
+            "enum": [
+              "price",
+              "timing",
+              "competitor",
+              "no_response",
+              "other"
+            ]
+          },
+          "channel": {
+            "description": "Por dónde salió, al marcarla como enviada a mano",
+            "type": "string",
+            "enum": [
+              "email",
+              "whatsapp",
+              "in_person",
+              "other",
+              "mcp"
+            ]
+          },
+          "expectedFrom": {
+            "description": "Estado que viste: si no coincide con el actual, 409 sin tocar nada",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "to"
+        ]
+      },
+      "group": "quotations"
     },
     {
       "name": "submit_form",
@@ -7428,7 +8655,7 @@
     },
     {
       "name": "update_campaign_draft",
-      "description": "Edita el borrador de una campaña masiva de WhatsApp: nombre, descripción, lista de contactos o la plantilla (nombre, idioma, variables, cabecera). Solo funciona si la campaña NUNCA se ha ejecutado y no se está ejecutando: si ya salió, está en cola o su fecha programada ya llegó responde 409 y no cambia nada (crea otra con create_campaign_draft). NO envía, NO programa y NO cambia el estado ni la fecha de la campaña. En template solo se cambian los campos enviados; variableMapping o headerMediaUrl en null los quitan. Requiere automations:write.",
+      "description": "Edita el borrador de una campaña masiva de WhatsApp: nombre, descripción, lista de contactos, línea de WhatsApp por la que sale (lineId de list_whatsapp_lines; null vuelve a la línea por defecto) o la plantilla (nombre, idioma, variables, cabecera). Solo funciona si la campaña NUNCA se ha ejecutado y no se está ejecutando: si ya salió, está en cola o su fecha programada ya llegó responde 409 y no cambia nada (crea otra con create_campaign_draft). NO envía, NO programa y NO cambia el estado ni la fecha de la campaña. En template solo se cambian los campos enviados; variableMapping o headerMediaUrl en null los quitan. Requiere automations:write.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -7458,6 +8685,17 @@
           "contactListId": {
             "description": "Otra lista de contactos de la organización",
             "type": "string"
+          },
+          "lineId": {
+            "description": "Otra línea de WhatsApp de la organización (id de list_whatsapp_lines); null la quita y la campaña vuelve a salir por la línea por defecto",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "template": {
             "description": "Cambios de la plantilla",
@@ -7531,7 +8769,7 @@
     },
     {
       "name": "update_company",
-      "description": "Actualizar una empresa por ID (merge de properties por key: los campos enviados se actualizan o agregan, el resto se conserva). Si cambia el name se sincroniza en los contactos vinculados. Permiso companies:write. CIUDAD (catálogo DANE, modo estricto): cityCode (5 dígitos) o city inequívoco; ambiguo/desconocido → 422 CITY_UNRESOLVED con candidates (reintenta con cityCode; si candidates viene vacío, búscalo con search_municipalities); cityCode inexistente → 400 INVALID_CITY_CODE. state (texto) es pista para homónimos; stateCode siempre se deriva.",
+      "description": "Actualizar una empresa por ID (merge de properties por key: los campos enviados se actualizan o agregan, el resto se conserva). Si cambia el name se sincroniza en los contactos vinculados. Permiso companies:write. CIUDAD (catálogo DANE, modo estricto): cityCode (5 dígitos) o city inequívoco; ambiguo/desconocido → 422 CITY_UNRESOLVED con candidates (reintenta con cityCode; si candidates viene vacío, búscalo con search_municipalities); cityCode inexistente → 400 INVALID_CITY_CODE. state (texto) es pista para homónimos; stateCode siempre se deriva. IDENTIFICACIÓN (modo estricto): idType = código DIAN (13 cédula, 31 NIT, 22 CE, 41 pasaporte, 42 doc. extranjero, 50 NIT de otro país…) o un texto inequívoco ('CC', 'NIT'); idNumber sin puntos (para NIT el DV va en dv; si lo mandas pegado o con guion se separa solo; si falta se calcula). idType ambiguo o desconocido ('1', '11', 'Documento') → 422 ID_TYPE_UNRESOLVED con candidates: pregunta al usuario y reintenta con el código; idNumber inválido para el tipo → 400 INVALID_ID_NUMBER. Nunca elijas un candidato por el usuario. ",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -7544,10 +8782,15 @@
             "type": "string"
           },
           "idType": {
+            "description": "Código DIAN (31 NIT, 13 cédula…) o texto inequívoco",
             "type": "string"
           },
           "idNumber": {
-            "description": "NIT / número de documento",
+            "description": "NIT / número de documento sin puntos ni DV",
+            "type": "string"
+          },
+          "dv": {
+            "description": "DV del NIT (idType 31); si falta se calcula",
             "type": "string"
           },
           "industry": {
@@ -7598,7 +8841,7 @@
     },
     {
       "name": "update_company_property",
-      "description": "Actualiza una propiedad de empresa por su key: label, isVisible (false = ocultarla, true = mostrarla), options, groupId y type. La key NUNCA cambia. En propiedades núcleo (reserved) el type no se puede cambiar, pero sí label, visibilidad y opciones. No existe borrado de propiedades: ocultar es la única forma de retirarla, y los valores guardados en las empresas se conservan. Requiere fields:write.",
+      "description": "Actualiza una propiedad de empresa por su key: label, isVisible (false = ocultarla, true = mostrarla), options, groupId y type. required = obligatorio al crear/editar desde la web y la app (isVisible ya NO significa obligatorio): required=false en firstName responde 400 SYSTEM_REQUIRED y required=true en dv o en una de catálogo (cityCode/stateCode) 400 REQUIRED_NOT_ALLOWED. La key NUNCA cambia. En propiedades núcleo (reserved) el type no se puede cambiar, pero sí label, visibilidad y opciones. No existe borrado de propiedades: ocultar es la única forma de retirarla, y los valores guardados en las empresas se conservan. Requiere fields:write.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -7611,6 +8854,11 @@
             "type": "string"
           },
           "isVisible": {
+            "description": "Deprecado: false = ocultar. NO significa obligatorio",
+            "type": "boolean"
+          },
+          "required": {
+            "description": "Obligatorio al crear/editar desde la web y la app",
             "type": "boolean"
           },
           "type": {
@@ -7643,7 +8891,7 @@
     },
     {
       "name": "update_contact",
-      "description": "Actualizar un contacto por ID (PUT /contacts/:id): merge de properties por key, los campos que no se envían se conservan. companyId null o '' desvincula la empresa. CIUDAD (catálogo DANE, modo estricto): cityCode (5 dígitos) o city inequívoco; ambiguo/desconocido → 422 CITY_UNRESOLVED con candidates (reintenta con cityCode; si candidates viene vacío, búscalo con search_municipalities); cityCode inexistente → 400 INVALID_CITY_CODE. stateCode siempre se deriva del cityCode (el del body se ignora). Sin city/cityCode no se toca la ubicación.",
+      "description": "Actualizar un contacto por ID (PUT /contacts/:id): merge de properties por key, los campos que no se envían se conservan. companyId null o '' desvincula la empresa. CIUDAD (catálogo DANE, modo estricto): cityCode (5 dígitos) o city inequívoco; ambiguo/desconocido → 422 CITY_UNRESOLVED con candidates (reintenta con cityCode; si candidates viene vacío, búscalo con search_municipalities); cityCode inexistente → 400 INVALID_CITY_CODE. stateCode siempre se deriva del cityCode (el del body se ignora). Sin city/cityCode no se toca la ubicación. IDENTIFICACIÓN (modo estricto): idType = código DIAN (13 cédula, 31 NIT, 22 CE, 41 pasaporte, 42 doc. extranjero, 50 NIT de otro país…) o un texto inequívoco ('CC', 'NIT'); idNumber sin puntos (para NIT el DV va en dv; si lo mandas pegado o con guion se separa solo; si falta se calcula). idType ambiguo o desconocido ('1', '11', 'Documento') → 422 ID_TYPE_UNRESOLVED con candidates: pregunta al usuario y reintenta con el código; idNumber inválido para el tipo → 400 INVALID_ID_NUMBER. Nunca elijas un candidato por el usuario. Sin idType/idNumber/dv no se toca la identificación.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -7713,7 +8961,16 @@
           "position": {
             "type": "string"
           },
+          "idType": {
+            "description": "Código DIAN (13 cédula, 31 NIT…) o texto inequívoco",
+            "type": "string"
+          },
           "idNumber": {
+            "description": "Sin puntos; para NIT sin DV",
+            "type": "string"
+          },
+          "dv": {
+            "description": "DV del NIT (idType 31)",
             "type": "string"
           },
           "phone": {
@@ -7721,6 +8978,28 @@
           },
           "address": {
             "type": "string"
+          },
+          "whatsappUserId": {
+            "description": "BSUID de WhatsApp ('CO.298…'); null o '' lo quita. Nunca lo pongas en mobile.",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "whatsappUsername": {
+            "description": "Alias de WhatsApp ('@claudiahoyos'); se guarda sin @ y en minúsculas; null o '' lo quita. Solo se guarda: NO enlaza conversaciones ni asigna BSUID.",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -7797,7 +9076,7 @@
     },
     {
       "name": "update_contact_property",
-      "description": "Actualiza una propiedad de contacto por su key: label, isVisible (false = ocultarla, true = mostrarla), options, groupId y type. La key NUNCA cambia. En propiedades núcleo (reserved) el type no se puede cambiar, pero sí label, visibilidad y opciones (ej. las de companyType). No existe borrado de propiedades: ocultar es la única forma de retirarla, y los valores guardados en los contactos se conservan. Requiere fields:write.",
+      "description": "Actualiza una propiedad de contacto por su key: label, isVisible (false = ocultarla, true = mostrarla), options, groupId y type. required = obligatorio al crear/editar desde la web y la app (isVisible ya NO significa obligatorio): required=false en firstName responde 400 SYSTEM_REQUIRED y required=true en dv o en una de catálogo (cityCode/stateCode) 400 REQUIRED_NOT_ALLOWED. La key NUNCA cambia. En propiedades núcleo (reserved) el type no se puede cambiar, pero sí label, visibilidad y opciones (ej. las de companyType). No existe borrado de propiedades: ocultar es la única forma de retirarla, y los valores guardados en los contactos se conservan. Requiere fields:write.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -7810,6 +9089,11 @@
             "type": "string"
           },
           "isVisible": {
+            "description": "Deprecado: false = ocultar. NO significa obligatorio",
+            "type": "boolean"
+          },
+          "required": {
+            "description": "Obligatorio al crear/editar desde la web y la app",
             "type": "boolean"
           },
           "type": {
@@ -7990,7 +9274,7 @@
     },
     {
       "name": "update_deal",
-      "description": "Update a deal by ID. Campos editables: title, amount, pipeline, status, closingDate, customFields, contact y companyId.\n\nPara asociar un contacto a un deal existente enviar `contact`:\n  - { \"id\": \"<contactId>\" } para usar un contacto ya existente de la organización\n  - { \"mobile\": \"573001234567\", \"name\": \"...\", \"company\": \"...\" } para buscarlo por teléfono y crearlo si no existe\n  - `null` para desasociar el contacto actual.\n\nPara asociar una empresa enviar `companyId` (debe pertenecer a la organización); `null` o \"\" desasocia la empresa actual.",
+      "description": "Update a deal by ID. Campos editables: title, amount, pipeline, status, closingDate, customFields, contact, companyId y assignedTo. Una clave que no se aplica sale en `ignoredFields` de la respuesta. Para varios negocios a la vez usa update_deals.\n\nPara asociar un contacto a un deal existente enviar `contact`:\n  - { \"id\": \"<contactId>\" } para usar un contacto ya existente de la organización\n  - { \"mobile\": \"573001234567\", \"name\": \"...\", \"company\": \"...\" } para buscarlo por teléfono y crearlo si no existe\n  - `null` para desasociar el contacto actual.\n\nPara asociar una empresa enviar `companyId` (debe pertenecer a la organización); `null` o \"\" desasocia la empresa actual.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -7999,7 +9283,7 @@
             "type": "string"
           },
           "contact": {
-            "description": "Contacto a asociar: { id } o { mobile, ... }; null desasocia",
+            "description": "Contacto a asociar: { id } o { mobile, ... } (mobile acepta el BSUID 'CO.298…' de un cliente sin número); null desasocia",
             "anyOf": [
               {
                 "type": "object",
@@ -8027,7 +9311,7 @@
             ]
           },
           "customFields": {
-            "description": "Campos personalizados: [{ \"field\": \"<_id del campo>\", \"value\": \"...\" }]. El `field` es el _id de la definición del campo (el que vive en dealsfields), NO su nombre ni su key: un nombre no se resuelve y la escritura se pierde.",
+            "description": "Campos personalizados: [{ \"field\": \"<id, key o nombre del campo>\", \"value\": \"...\" }]. `field` acepta el _id de la definición (list_deal_fields), su key o su nombre (sin importar tildes ni mayúsculas), resuelto en el pipeline del negocio. Un select solo acepta sus opciones (se guarda el texto exacto de la opción); si no existe responde 400 FIELD_OPTION_INVALID con allowedOptions. Campo inexistente → 400 FIELD_NOT_FOUND con availableFields; nombre repetido → FIELD_AMBIGUOUS (manda la key o el id). number/date/checkbox con formato raro se guardan y avisan en fieldWarnings.",
             "anyOf": [
               {
                 "type": "array",
@@ -8061,6 +9345,17 @@
               },
               {
                 "type": "string"
+              }
+            ]
+          },
+          "assignedTo": {
+            "description": "userId del dueño del negocio (empleado de la organización; ver list_users); null lo deja sin dueño",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
               }
             ]
           }
@@ -8332,6 +9627,145 @@
       "group": "pipelines"
     },
     {
+      "name": "update_deals",
+      "description": "Actualiza VARIOS negocios en una llamada (POST /api/deals/batch-update, permiso deals:write): 1 a 50 ítems { id, ...los mismos campos que update_deal }. Se procesan en orden y NO es atómico: cada ítem pasa por las mismas validaciones que update_deal (requisitos de etapa, etapa del pipeline, select con sus opciones) y uno que falla no frena a los demás. Respuesta: { summary: { updated, unchanged, failed }, results: [{ index, id?, result: updated|unchanged|failed, code?, error? }] } (un id que no existe en tu organización sale como NOT_FOUND sin repetir el id; ubícalo por index). Con dryRun: true valida todo y no escribe nada (result dice lo que pasaría). Úsalo para correcciones masivas (p. ej. poner el mismo campo personalizado en muchos negocios) en vez de llamar update_deal uno por uno.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "items": {
+            "minItems": 1,
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "_id del negocio"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "amount": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "pipeline": {
+                  "description": "_id del pipeline",
+                  "type": "string"
+                },
+                "status": {
+                  "description": "_id de la etapa (del pipeline del negocio); null la quita",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "closingDate": {
+                  "description": "YYYY-MM-DD; con un cambio a ganado/perdido es la fecha real de cierre",
+                  "type": "string"
+                },
+                "customFields": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "field": {
+                        "type": "string",
+                        "description": "id, key o nombre del campo"
+                      },
+                      "value": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "field"
+                    ]
+                  }
+                },
+                "contact": {
+                  "description": "{ id } o { mobile } (teléfono o BSUID 'CO.298…'); null desasocia",
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "mobile": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "companyId": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "assignedTo": {
+                  "description": "userId del dueño; null lo quita",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id"
+              ]
+            },
+            "description": "Negocios a actualizar (máx. 50)"
+          },
+          "dryRun": {
+            "description": "true = solo validar, no escribe nada",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "group": "deals"
+    },
+    {
       "name": "update_email_template",
       "description": "Edita una plantilla de correo existente. Solo cambia lo que mandes: name, saved, y el contenido con emailJson (preferido; regenera el HTML y emailHtml se ignora) o emailHtml (se sanitiza y deja emailJson vacío, así que el editor visual ya no podrá editarla por bloques). emailJson REEMPLAZA todos los bloques: lee primero la plantilla con get_email_template. No envía correos. Las campañas o automatizaciones que usan esta plantilla enviarán la versión nueva.",
       "inputSchema": {
@@ -8583,7 +10017,7 @@
     },
     {
       "name": "update_fragment",
-      "description": "Actualizar un fragment por ID. Campos editables: name, text, atajo, format, asunto.",
+      "description": "Actualizar un fragment por ID. Campos editables: name, text, atajo, format, asunto, imageLibraryId (null quita la imagen).",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -8598,6 +10032,7 @@
             "type": "string"
           },
           "atajo": {
+            "description": "Una palabra: minúsculas, números, _ o - (ej. envio, saludo-ali)",
             "type": "string"
           },
           "format": {
@@ -8611,6 +10046,17 @@
           "asunto": {
             "description": "Asunto del correo (solo aplica a fragmentos de formato \"html\").",
             "type": "string"
+          },
+          "imageLibraryId": {
+            "description": "ID de una imagen de la biblioteca para enviarla con el fragmento; null la quita. Solo formato \"text\" y texto de máximo 1.024 caracteres.",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -9026,6 +10472,21 @@
                     "required": [
                       "enabled"
                     ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "automationHttpAllowlist": {
+                "description": "Hosts o IPs privados que la acción http_request puede llamar con el bloqueo SSRF activo (p. ej. un n8n interno). Se reemplaza completa; null la quita",
+                "anyOf": [
+                  {
+                    "maxItems": 20,
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
                   },
                   {
                     "type": "null"
@@ -9457,7 +10918,7 @@
     },
     {
       "name": "update_quotation",
-      "description": "Actualizar cotización por ID (PUT /quotations/:id). El número de cotización no se puede cambiar.",
+      "description": "Actualizar cotización por ID (PUT /quotations/:id). El número de cotización no se puede cambiar. status NO es libre: sigue la matriz de estados (draft↔ready; draft/ready→sent; sent→accepted|rejected|canceled; accepted→sent|canceled; rejected→sent|canceled; expired→sent|canceled). Una transición inválida responde 409 INVALID_TRANSITION con `allowed`. Facturada (invoiced) y Vencida (expired) las escribe solo el sistema (un cron diario vence las Enviadas al terminar el día de expirationDate en la zona de la org). Ponerle a una Vencida una expirationDate futura la devuelve sola a Enviada. Una cotización invoiced o canceled no se puede editar (409 QUOTATION_LOCKED).",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -9470,14 +10931,41 @@
             "type": "string"
           },
           "status": {
+            "description": "Nuevo estado; debe ser una transición válida desde el actual",
             "type": "string",
             "enum": [
               "draft",
+              "ready",
               "sent",
               "accepted",
               "rejected",
-              "canceled",
-              "expired"
+              "canceled"
+            ]
+          },
+          "reason": {
+            "description": "Motivo (rechazo o anulación)",
+            "type": "string"
+          },
+          "reasonCode": {
+            "description": "Motivo de rechazo de lista corta (solo con status rejected)",
+            "type": "string",
+            "enum": [
+              "price",
+              "timing",
+              "competitor",
+              "no_response",
+              "other"
+            ]
+          },
+          "channel": {
+            "description": "Por dónde se envió (solo con status sent; marcarla enviada NO manda nada)",
+            "type": "string",
+            "enum": [
+              "email",
+              "whatsapp",
+              "in_person",
+              "other",
+              "mcp"
             ]
           },
           "expirationDate": {
@@ -9730,6 +11218,28 @@
         ]
       },
       "group": "knowledge-base"
+    },
+    {
+      "name": "upload_whatsapp_template_media",
+      "description": "Subir a Meta el archivo de MUESTRA para la cabecera multimedia de una plantilla (IMAGE JPG/PNG ≤ 5 MB, VIDEO MP4 ≤ 16 MB, DOCUMENT PDF ≤ 100 MB) desde una URL https pública. Devuelve `handle` (va en header.handle de create_whatsapp_template; también sirve la opción header.mediaUrl, que hace esto mismo en un paso), `url` (copia en S3 que se usa al enviar) y `format`. Requiere permiso whatsapp:send.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "mediaUrl": {
+            "type": "string",
+            "description": "URL https pública del archivo (no Google Drive ni enlaces que exijan login)."
+          },
+          "lineId": {
+            "description": "Línea cuyo token sube el archivo; ver list_whatsapp_lines. Default: la línea por defecto.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mediaUrl"
+        ]
+      },
+      "group": "whatsapp"
     },
     {
       "name": "validate_automation",
