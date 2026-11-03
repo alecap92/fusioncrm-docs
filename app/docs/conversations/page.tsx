@@ -15,6 +15,7 @@ const toc = [
   { id: "assignment", label: "Asignación de chats" },
   { id: "search", label: "Búsqueda en conversaciones" },
   { id: "status", label: "Estados de conversación" },
+  { id: "kanban", label: "Kanban, líneas y pipelines" },
 ];
 
 export default function ConversationsPage() {
@@ -24,19 +25,23 @@ export default function ConversationsPage() {
         <Breadcrumbs />
         <h1 className="text-3xl font-bold mb-2" style={{ color: "var(--foreground)" }}>Conversaciones</h1>
         <p className="text-lg mb-8" style={{ color: "var(--muted-foreground)" }}>
-          El módulo de Conversaciones centraliza todos los canales de comunicación — WhatsApp,
-          email y chat — en una sola bandeja unificada para que tu equipo no pierda ningún mensaje.
+          El módulo de Conversaciones centraliza todos los canales de chat — WhatsApp, Messenger e
+          Instagram — en un tablero kanban para que tu equipo no pierda ningún mensaje. Si tienes varios
+          números de WhatsApp o varios equipos, cada uno puede tener su{" "}
+          <a href="/docs/whatsapp-lines" style={{ color: "#d1345b" }}>línea</a> y su{" "}
+          <a href="/docs/conversation-pipelines" style={{ color: "#d1345b" }}>pipeline</a> propios.
         </p>
 
         <section id="overview" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Vista general</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            La bandeja de conversaciones es similar a una aplicación de mensajería empresarial.
-            A la izquierda ves la lista de conversaciones y a la derecha el hilo de mensajes.
+            El inbox es un tablero kanban: cada columna es una etapa (por ejemplo "Sin leer", "En
+            proceso", "Cerrado") y cada tarjeta es una conversación. Al abrir una tarjeta ves el hilo
+            completo de mensajes y, a la derecha, la información del contacto.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             {[
-              { title: "Lista de conversaciones", items: ["Ordenadas por último mensaje", "Indica canal (WA, Email)", "Muestra si está asignada", "Filtra por estado"] },
+              { title: "Tablero de conversaciones", items: ["Columnas = etapas del pipeline", "Tarjetas ordenadas por último mensaje", "Canal, línea de WhatsApp y asesor en cada tarjeta", "Arrastra para cambiar de etapa"] },
               { title: "Panel de mensajes", items: ["Historial completo del hilo", "Envío de mensajes y archivos", "Info del contacto a la derecha", "Acceso al perfil del contacto"] },
             ].map((p) => (
               <div key={p.title} className="p-4 rounded-lg border" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
@@ -201,9 +206,47 @@ export default function ConversationsPage() {
           </div>
         </section>
 
+        <section id="kanban" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Kanban, líneas y pipelines</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Con un solo número de WhatsApp y un solo pipeline el inbox se ve como siempre. Cuando la
+            organización crece, aparecen dos selectores en la barra superior del tablero:
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            {[
+              { title: "Línea:", href: "/docs/whatsapp-lines", items: ["Aparece con dos o más números de WhatsApp conectados", "Filtra el tablero a los chats de ese número", "Cada tarjeta lleva el punto de color y el nombre de su línea", "Un cliente que escribe a dos números tiene dos chats"] },
+              { title: "Pipeline:", href: "/docs/conversation-pipelines", items: ["Aparece con dos o más pipelines de conversación", "Cambia las columnas y los chats que ves", "Se administran en Ajustes → Conversaciones", "Cada línea de WhatsApp puede nacer en su propio pipeline"] },
+            ].map((p) => (
+              <div key={p.title} className="p-4 rounded-lg border" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
+                <p className="font-semibold mb-2" style={{ color: "var(--foreground)" }}>
+                  Selector <code style={{ color: "#d1345b" }}>{p.title}</code>{" "}
+                  <a href={p.href} className="text-xs font-normal" style={{ color: "#d1345b" }}>(guía completa →)</a>
+                </p>
+                <ul className="space-y-1">
+                  {p.items.map((i) => (
+                    <li key={i} className="text-sm flex gap-2" style={{ color: "var(--muted-foreground)" }}>
+                      <span style={{ color: "#d1345b" }}>•</span> {i}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Mover una conversación</h3>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Arrastrar la tarjeta</strong> a otra columna, o menú ⋯ → <strong style={{ color: "var(--foreground)" }}>Mover a columna</strong>.</li>
+            <li>• Menú ⋯ → <strong style={{ color: "var(--foreground)" }}>Mover a pipeline</strong>: eliges el pipeline destino y, sobre él, la columna donde quedará. Solo aparece con más de un pipeline.</li>
+            <li>• Desde el chat abierto, el chip <strong style={{ color: "var(--foreground)" }}>"Mover a otro pipeline"</strong> junto a la etapa.</li>
+          </ul>
+          <Callout type="note">
+            Todo chat nuevo nace en el pipeline de la línea de WhatsApp por la que entra o sale (entrante,
+            plantilla o campaña). Si la línea no tiene pipeline, nace en el predeterminado de la organización.
+          </Callout>
+        </section>
+
         <DocNav
-          prev={{ href: "/docs/pipelines", title: "Pipelines" }}
-          next={{ href: "/docs/whatsapp-templates", title: "Templates WhatsApp" }}
+          prev={{ href: "/docs/pipelines", title: "Pipelines de negocios" }}
+          next={{ href: "/docs/conversation-pipelines", title: "Pipelines de conversación" }}
         />
       </article>
 

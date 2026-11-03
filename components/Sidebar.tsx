@@ -86,7 +86,7 @@ const navigation: NavItem[] = [
     title: "Pipelines",
     icon: <GitBranch size={16} />,
     children: [
-      { title: "Gestión de pipelines", href: "/docs/pipelines" },
+      { title: "Pipelines de negocios", href: "/docs/pipelines" },
       { title: "Crear pipeline", href: "/docs/pipelines#create" },
       { title: "Configurar etapas", href: "/docs/pipelines#stages" },
     ],
@@ -100,6 +100,9 @@ const navigation: NavItem[] = [
       { title: "WhatsApp", href: "/docs/conversations#whatsapp" },
       { title: "Respuestas rápidas", href: "/docs/conversations#quick-replies" },
       { title: "Asignación de chats", href: "/docs/conversations#assignment" },
+      { title: "Kanban, líneas y pipelines", href: "/docs/conversations#kanban" },
+      { title: "Pipelines de conversación", href: "/docs/conversation-pipelines" },
+      { title: "Líneas de WhatsApp (varios números)", href: "/docs/whatsapp-lines" },
     ],
   },
   {
@@ -110,6 +113,8 @@ const navigation: NavItem[] = [
       { title: "Crear template", href: "/docs/whatsapp-templates#create" },
       { title: "Variables y parámetros", href: "/docs/whatsapp-templates#variables" },
       { title: "Envío masivo", href: "/docs/whatsapp-templates#mass-send" },
+      { title: "Plantillas por línea", href: "/docs/whatsapp-templates#lines" },
+      { title: "Crear por API o MCP", href: "/docs/whatsapp-templates#api" },
     ],
   },
   {
@@ -211,6 +216,8 @@ const navigation: NavItem[] = [
     children: [
       { title: "Organización", href: "/docs/settings" },
       { title: "Usuarios y permisos", href: "/docs/settings#users" },
+      { title: "WhatsApp (líneas)", href: "/docs/settings#whatsapp" },
+      { title: "Conversaciones (pipelines)", href: "/docs/settings#conversations" },
       { title: "Integraciones", href: "/docs/settings#integrations" },
       { title: "Campos personalizados", href: "/docs/settings#fields" },
       { title: "Lead Scoring config", href: "/docs/settings#lead-scoring" },

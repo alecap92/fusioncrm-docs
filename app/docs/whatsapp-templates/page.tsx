@@ -14,6 +14,8 @@ const toc = [
   { id: "approval", label: "Proceso de aprobación" },
   { id: "mass-send", label: "Envío masivo" },
   { id: "tips", label: "Consejos de redacción" },
+  { id: "lines", label: "Plantillas por línea" },
+  { id: "api", label: "Crear por API o MCP" },
 ];
 
 export default function WhatsAppTemplatesPage() {
@@ -214,8 +216,109 @@ export default function WhatsAppTemplatesPage() {
           </div>
         </section>
 
+        <section id="lines" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Plantillas por línea</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Las plantillas viven en la cuenta de WhatsApp Business (WABA) de cada número. Si tu
+            organización tiene varias <a href="/docs/whatsapp-lines" style={{ color: "#d1345b" }}>líneas de WhatsApp</a>,
+            cada una tiene sus propias plantillas: en el módulo de Templates aparece un selector de
+            línea junto al buscador, y al crear una plantilla la creas en la línea elegida.
+          </p>
+          <Callout type="warning">
+            Una plantilla aprobada en la línea "Ventas" no existe en la línea "Soporte". Si una
+            campaña o un envío va a salir por una línea, la plantilla tiene que estar aprobada en esa
+            misma línea. El preflight de las campañas te lo avisa antes de enviar.
+          </Callout>
+        </section>
+
+        <section id="api" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Crear por API o MCP</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Todo lo que haces en la pantalla de Templates también se puede hacer por la{" "}
+            <a href="/docs/api" style={{ color: "#d1345b" }}>API REST</a> (permiso{" "}
+            <code style={{ color: "#d1345b" }}>whatsapp:send</code>) o pidiéndoselo a tu IA por{" "}
+            <a href="/docs/mcp" style={{ color: "#d1345b" }}>MCP</a>:
+          </p>
+          <div className="rounded-lg overflow-hidden border mb-4" style={{ borderColor: "var(--border)" }}>
+            <table className="w-full text-sm">
+              <thead style={{ backgroundColor: "var(--muted)" }}>
+                <tr>
+                  <th className="text-left p-3 border-b font-semibold" style={{ borderColor: "var(--border)" }}>Qué</th>
+                  <th className="text-left p-3 border-b font-semibold" style={{ borderColor: "var(--border)" }}>API REST</th>
+                  <th className="text-left p-3 border-b font-semibold" style={{ borderColor: "var(--border)" }}>MCP</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ["Listar las plantillas de una línea", "GET /api/whatsapp/templates?lineId=", "list_whatsapp_templates"],
+                  ["Crear una plantilla en Meta", "POST /api/whatsapp/templates", "create_whatsapp_template"],
+                  ["Subir imagen, video o PDF de cabecera", "POST /api/whatsapp/templates/header-media (archivo o { mediaUrl })", "upload_whatsapp_template_media"],
+                  ["Consultar estado y motivo de rechazo", "GET /api/whatsapp/templates/{name}", "get_whatsapp_template"],
+                  ["Borrar (todos los idiomas, irreversible)", "DELETE /api/whatsapp/templates/{name}", "delete_whatsapp_template"],
+                ].map(([k, a, m]) => (
+                  <tr key={k}>
+                    <td className="p-3 border-b align-top" style={{ borderColor: "var(--border)", color: "var(--foreground)" }}>{k}</td>
+                    <td className="p-3 border-b align-top font-mono text-xs" style={{ borderColor: "var(--border)", color: "var(--muted-foreground)" }}>{a}</td>
+                    <td className="p-3 border-b align-top font-mono text-xs" style={{ borderColor: "var(--border)", color: "var(--muted-foreground)" }}>{m}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Qué opciones admite al crear</h3>
+          <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>
+            El cuerpo "simple" cubre todas las opciones de Meta sin armar el JSON de componentes a mano;
+            si prefieres, puedes mandar los <code style={{ color: "#d1345b" }}>components</code> de Meta tal cual.
+            Antes de llamar a Meta el CRM valida límites y devuelve un 400 con el detalle.
+          </p>
+          <div className="rounded-lg overflow-hidden border mb-4" style={{ borderColor: "var(--border)" }}>
+            <table className="w-full text-sm">
+              <tbody>
+                {[
+                  ["Nombre, idioma y categoría", "Nombre en minúsculas, dígitos y guion bajo. MARKETING o UTILITY (AUTHENTICATION solo con components de Meta)."],
+                  ["Variables posicionales", "{{1}}, {{2}}… consecutivas, con un ejemplo por variable. El texto no puede empezar ni terminar con una variable."],
+                  ["Variables con nombre", "{{nombre}}, {{pedido}}… con su ejemplo. No se mezclan con posicionales en la misma plantilla."],
+                  ["Cabecera", "Texto (máx. 60 caracteres, una variable), imagen (JPG/PNG ≤ 5 MB), video (MP4 ≤ 16 MB), documento (PDF ≤ 100 MB) o ubicación."],
+                  ["Cuerpo y pie", "Cuerpo obligatorio (≤ 1024). Pie opcional (≤ 60) sin variables."],
+                  ["Botones (hasta 10)", "Respuesta rápida (≤ 25 caracteres), URL (máx. 2, con una variable al final), llamada (máx. 1), copiar código (máx. 1)."],
+                ].map(([k, v]) => (
+                  <tr key={k}>
+                    <td className="p-3 border-b font-medium whitespace-nowrap align-top" style={{ borderColor: "var(--border)", color: "var(--foreground)" }}>{k}</td>
+                    <td className="p-3 border-b" style={{ borderColor: "var(--border)", color: "var(--muted-foreground)" }}>{v}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="rounded-lg p-4 border mb-4" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
+            <p className="text-sm font-semibold mb-2" style={{ color: "var(--foreground)" }}>Ejemplo (cuerpo simple):</p>
+            <pre className="p-3 rounded-lg text-xs overflow-x-auto" style={{ backgroundColor: "var(--code-bg)", color: "var(--foreground)" }}>{`POST /api/whatsapp/templates
+{
+  "lineId": "6900…",
+  "name": "pedido_despachado",
+  "language": "es",
+  "category": "UTILITY",
+  "header": { "format": "TEXT", "text": "Pedido {{numero}}", "example": "1234" },
+  "body": {
+    "text": "Hola {{nombre}}, tu pedido ya salió. Guía: {{guia}}.",
+    "examples": { "nombre": "Ana", "guia": "ABC123" }
+  },
+  "footer": { "text": "Manillas de Control" },
+  "buttons": [
+    { "type": "URL", "text": "Rastrear", "url": "https://rastreo.com/{{1}}", "urlExample": "ABC123" },
+    { "type": "QUICK_REPLY", "text": "Tengo una duda" }
+  ]
+}`}</pre>
+          </div>
+          <Callout type="tip">
+            Con el MCP basta con pedirlo: "crea en la línea Ventas una plantilla de utilidad que avise
+            que el pedido salió, con botón para rastrear". La IA usa create_whatsapp_template y luego
+            puedes preguntarle el estado de aprobación.
+          </Callout>
+        </section>
+
         <DocNav
-          prev={{ href: "/docs/conversations", title: "Conversaciones" }}
+          prev={{ href: "/docs/whatsapp-lines", title: "Líneas de WhatsApp" }}
           next={{ href: "/docs/email", title: "Correo" }}
         />
       </article>

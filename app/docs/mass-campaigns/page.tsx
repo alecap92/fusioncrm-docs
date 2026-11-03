@@ -96,7 +96,7 @@ export default function MassCampaignsPage() {
             {[
               { n: "1", t: "Ve a Campañas → WhatsApp masivo", d: "Desde la barra lateral." },
               { n: "2", t: "Crea nueva campaña", d: "Nombre interno para identificar la campaña." },
-              { n: "3", t: "Selecciona el template", d: "Solo templates con estado APPROVED están disponibles." },
+              { n: "3", t: "Elige \"Enviar desde\" y el template", d: "Si tienes varias líneas de WhatsApp, escoge por cuál número sale la campaña; se guarda con ella. Solo templates con estado APPROVED en esa línea están disponibles." },
               { n: "4", t: "Define las variables", d: "Para cada variable del template, indica si se tomará del campo del contacto o es un valor fijo." },
               { n: "5", t: "Selecciona los contactos", d: "Lista de contactos o filtros. Solo se envía a contactos con número de WhatsApp." },
               { n: "6", t: "Envía o programa", d: "Inicia el envío inmediatamente o en un horario específico." },
@@ -110,6 +110,14 @@ export default function MassCampaignsPage() {
               </li>
             ))}
           </ol>
+          <Callout type="note" title="Dónde caen las respuestas">
+            Cada contacto sin chat abierto en esa línea recibe una conversación nueva, que nace en el
+            pipeline de la línea (o en el predeterminado) en su primera columna. Si ya tenía un chat en
+            esa línea, el mensaje entra ahí y el chat se queda en su columna. Ver{" "}
+            <a href="/docs/conversation-pipelines" style={{ color: "#d1345b" }}>Pipelines de conversación</a>.
+            Por API o MCP, el borrador acepta <code style={{ color: "#d1345b" }}>lineId</code> y el preflight
+            dice si la plantilla existe y está aprobada en esa línea.
+          </Callout>
           <Callout type="warning">
             Los mensajes masivos de WhatsApp pueden afectar la calificación de calidad de tu número
             si los destinatarios los reportan como spam. Asegúrate de enviar solo a contactos que

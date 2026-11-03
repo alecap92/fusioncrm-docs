@@ -79,7 +79,7 @@ export default function IntegrationsPage() {
             {[
               { n: "1", t: "Configura Meta Business Manager", d: "Crea una cuenta en business.facebook.com si no tienes una. Verifica tu empresa." },
               { n: "2", t: "Crea una app en Meta Developers", d: "Agrega el producto WhatsApp Business a tu app." },
-              { n: "3", t: "Conecta en FusionCRM", d: "Ve a Configuración → WhatsApp → Conectar y sigue el proceso de autorización OAuth." },
+              { n: "3", t: "Conecta en FusionCRM", d: "Ve a Ajustes → WhatsApp → \"Conectar con Facebook\" y sigue el proceso de autorización. Repite el paso por cada número adicional: cada uno queda como una línea." },
               { n: "4", t: "Configura el webhook", d: "FusionCRM proporciona una URL de webhook. Agrégala en la configuración de tu app de Meta." },
               { n: "5", t: "Prueba la conexión", d: "Envía un mensaje de prueba desde FusionCRM para verificar que funciona." },
             ].map((s) => (
@@ -92,6 +92,11 @@ export default function IntegrationsPage() {
               </li>
             ))}
           </ol>
+          <Callout type="tip">
+            ¿Varios números? Una organización puede conectar varias líneas de WhatsApp, cada una con
+            su nombre, color, plantillas y pipeline. Ver{" "}
+            <a href="/docs/whatsapp-lines" style={{ color: "#d1345b" }}>Líneas de WhatsApp</a>.
+          </Callout>
           <Callout type="warning">
             El proceso de aprobación de WhatsApp Business API puede tomar entre 1 y 5 días
             hábiles dependiendo del estado de verificación de tu empresa en Meta.
