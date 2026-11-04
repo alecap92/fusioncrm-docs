@@ -103,6 +103,7 @@ const navigation: NavItem[] = [
       { title: "Kanban, líneas y pipelines", href: "/docs/conversations#kanban" },
       { title: "Pipelines de conversación", href: "/docs/conversation-pipelines" },
       { title: "Líneas de WhatsApp (varios números)", href: "/docs/whatsapp-lines" },
+      { title: "Perfil de negocio (foto y datos)", href: "/docs/whatsapp-lines#profile" },
     ],
   },
   {
