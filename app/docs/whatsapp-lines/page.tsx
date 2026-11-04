@@ -10,6 +10,7 @@ export const metadata: Metadata = { title: "Líneas de WhatsApp" };
 const toc = [
   { id: "overview", label: "Qué es una línea" },
   { id: "connect", label: "Conectar y administrar líneas" },
+  { id: "profile", label: "Perfil de negocio del número" },
   { id: "where", label: "Dónde se ve la línea" },
   { id: "routing", label: "Por cuál línea sale cada mensaje" },
   { id: "pipeline", label: "El pipeline de la línea" },
@@ -66,6 +67,7 @@ export default function WhatsappLinesPage() {
                   ["Asignación de conversaciones nuevas", "A qué asesor o agente IA llega cada conversación nueva que entra por esa línea."],
                   ["Pipeline de la línea", "En qué pipeline de conversaciones nacen sus chats nuevos (vacío = el pipeline por defecto de la organización)."],
                   ["Plantillas", "Las de la cuenta de WhatsApp Business (WABA) de ese número. Cada línea tiene las suyas."],
+                  ["Perfil de negocio", "Lo que el cliente ve al abrir el chat: foto, info, descripción, dirección, correo, sitios web y categoría. Se edita desde el CRM."],
                 ].map(([k, v]) => (
                   <tr key={k}>
                     <td className="p-3 border-b font-medium whitespace-nowrap" style={{ borderColor: "var(--border)", color: "var(--foreground)" }}>{k}</td>
@@ -95,6 +97,7 @@ export default function WhatsappLinesPage() {
           </ul>
           <H3>Editar, marcar por defecto y desconectar</H3>
           <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• <B>Perfil de WhatsApp (icono de persona):</B> la foto, la descripción y los datos que ven tus clientes. Ver <Link href="#profile" style={{ color: "#d1345b" }}>Perfil de negocio del número</Link>.</li>
             <li>• <B>Editar (lápiz):</B> nombre, color, a quién se asignan las conversaciones nuevas y el pipeline de la línea.</li>
             <li>• <B>Hacer por defecto (estrella):</B> cambia la línea de salida para los envíos que no eligen línea.</li>
             <li>• <B>Desconectar:</B> la línea por defecto no se puede desconectar mientras haya otras; primero marca otra como por defecto. Las conversaciones de una línea desconectada se conservan.</li>
@@ -103,6 +106,59 @@ export default function WhatsappLinesPage() {
           <Callout type="tip">
             Con una sola línea nada cambia: el CRM se ve igual que siempre. Los selectores de línea
             solo aparecen cuando hay dos o más líneas conectadas y activas.
+          </Callout>
+        </section>
+
+        <section id="profile" className="mb-10">
+          <H2>Perfil de negocio del número</H2>
+          <P>
+            Cuando un cliente abre tu chat en WhatsApp ve el <B>perfil de negocio</B> del número: la foto,
+            una frase corta ("info"), la descripción, la dirección, el correo, los sitios web y la
+            categoría. Antes había que configurarlo en el WhatsApp Manager de Meta; ahora se hace desde
+            el CRM, en <B>Ajustes → WhatsApp</B>, con el icono de persona de cada línea. Solo el
+            propietario puede editarlo.
+          </P>
+          <H3>Qué puedes cambiar</H3>
+          <div className="rounded-lg overflow-hidden border mb-4" style={{ borderColor: "var(--border)" }}>
+            <table className="w-full text-sm">
+              <thead style={{ backgroundColor: "var(--muted)" }}>
+                <tr>
+                  <th className="text-left p-3 border-b font-semibold" style={{ borderColor: "var(--border)" }}>Campo</th>
+                  <th className="text-left p-3 border-b font-semibold" style={{ borderColor: "var(--border)" }}>Detalle</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ["Foto de perfil", "JPG, PNG o WebP hasta 5 MB. El CRM la recorta al centro y la ajusta a 640×640, que es lo que pide WhatsApp. Se guarda en Meta apenas la eliges."],
+                  ["Info", "Una frase bajo el nombre, hasta 139 caracteres (\"Respondemos de lunes a viernes, 8 a 6\"). WhatsApp no la deja en blanco."],
+                  ["Descripción", "Qué vendes y para quién, hasta 512 caracteres. Junto con la foto, es lo primero que mira el cliente."],
+                  ["Dirección y correo", "Opcionales. El correo debe ser válido."],
+                  ["Sitios web", "Hasta 2, uno por línea. Si escribes \"www.tunegocio.com\" el CRM le agrega https://."],
+                  ["Categoría", "La lista de categorías de Meta (comercio, servicios profesionales, restaurante, salud…)."],
+                ].map(([k, v]) => (
+                  <tr key={k}>
+                    <td className="p-3 border-b font-medium whitespace-nowrap" style={{ borderColor: "var(--border)", color: "var(--foreground)" }}>{k}</td>
+                    <td className="p-3 border-b" style={{ borderColor: "var(--border)", color: "var(--muted-foreground)" }}>{v}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <P>
+            A la izquierda del formulario hay una <B>vista previa</B> de cómo se ve el perfil en un
+            teléfono; cambia mientras escribes. Los textos se guardan con "Guardar"; la foto, en el
+            momento en que la eliges. Meta suele reflejar los cambios en unos minutos.
+          </P>
+          <H3>Lo que no se cambia desde el CRM</H3>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• <B>El nombre visible:</B> lo aprueba Meta. El modal lo muestra en solo lectura con un enlace al WhatsApp Manager para pedir el cambio.</li>
+            <li>• <B>La verificación del negocio y el chulo verde:</B> se gestionan en el Business Manager de Meta.</li>
+          </ul>
+          <Callout type="tip" title="Completa tu perfil">
+            Apenas conectas una línea nueva, el CRM abre el perfil con el aviso "Completa tu perfil".
+            Puedes cerrarlo con "Lo hago después" y volver cuando quieras desde el icono de persona.
+            En la tabla de líneas, el chip <strong>Perfil incompleto</strong> te recuerda cuáles siguen
+            sin foto o sin descripción.
           </Callout>
         </section>
 
@@ -220,6 +276,8 @@ export default function WhatsappLinesPage() {
               { q: "Una respuesta salió por el número equivocado.", a: "La conversación pertenece a otra línea (mira el chip de la cabecera), o fue un envío suelto sin conversación y usó la línea por defecto. Elige \"Enviar desde\" o pasa lineId." },
               { q: "Las plantillas no cargan en una línea.", a: "La línea no tiene cuenta de WhatsApp Business asociada o su token venció. Revisa su estado en Ajustes → WhatsApp y reconéctala." },
               { q: "No puedo desconectar una línea.", a: "Es la línea por defecto y hay otras conectadas. Marca otra como por defecto primero." },
+              { q: "Cambié la foto o la descripción y el cliente sigue viendo la anterior.", a: "Meta tarda unos minutos en propagar el perfil. Si pasa más de una hora, abre el perfil desde el CRM: lo que muestra es lo que Meta tiene guardado." },
+              { q: "Quiero cambiar el nombre que ve el cliente.", a: "Ese es el nombre visible, que aprueba Meta. Usa el enlace al WhatsApp Manager que hay en el perfil de la línea." },
               { q: "Los chats nuevos de una línea caen en el pipeline equivocado.", a: "Edita la línea (lápiz) y cambia su pipeline. Los chats que ya existen no se mueven solos: muévelos desde el kanban o desde Ajustes → Conversaciones." },
             ].map((f) => (
               <div key={f.q} className="p-4 rounded-lg border" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
