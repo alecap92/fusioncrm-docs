@@ -26,6 +26,12 @@ export default function InvoicesPage() {
           FusionCRM incluye un módulo de facturación electrónica con integración directa a la DIAN
           (Colombia), permitiendo emitir facturas de venta, notas crédito y gestionar compras.
         </p>
+        <Callout type="note" title="Módulo adicional">
+          La facturación electrónica no viene incluida en los planes: es un módulo que se contrata aparte y se activa
+          para tu organización. Si no ves el menú de Facturas, pide su activación en{" "}
+          <strong style={{ color: "#d1345b" }}>ventas@fusioncol.com</strong>. Más detalle en{" "}
+          <a href="/docs/settings#plan" style={{ color: "#d1345b" }}>Plan, asientos y módulos</a>.
+        </Callout>
 
         <section id="overview" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Facturación electrónica</h2>

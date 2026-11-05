@@ -13,6 +13,7 @@ const toc = [
   { id: "categories", label: "Categorías de templates" },
   { id: "approval", label: "Proceso de aprobación" },
   { id: "mass-send", label: "Envío masivo" },
+  { id: "limits", label: "Límites de mensajes de Meta" },
   { id: "tips", label: "Consejos de redacción" },
   { id: "lines", label: "Plantillas por línea" },
   { id: "api", label: "Crear por API o MCP" },
@@ -191,9 +192,55 @@ export default function WhatsAppTemplatesPage() {
             <li>6. Programa la campaña o envía inmediatamente</li>
           </ol>
           <Callout type="warning">
-            WhatsApp tiene límites de envío según el nivel de calificación de tu número.
-            Comienza con volúmenes bajos (menos de 1,000 mensajes/día) y aumenta gradualmente
-            para mantener una buena calificación de calidad.
+            Meta limita cuántas personas distintas puedes contactar por plantilla cada día. Antes de
+            una campaña grande revisa tu nivel actual: mira <a href="#limits" style={{ color: "#d1345b" }}>Límites de mensajes de Meta</a>.
+          </Callout>
+        </section>
+
+        <section id="limits" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Límites de mensajes de Meta</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Cuando <strong style={{ color: "var(--foreground)" }}>tú inicias</strong> la conversación (enviando una plantilla),
+            Meta cuenta cuántos clientes <strong style={{ color: "var(--foreground)" }}>distintos</strong> contactas en un período
+            continuo de 24 horas. Ese tope es tu <strong style={{ color: "var(--foreground)" }}>límite de mensajes</strong> y
+            funciona por niveles: empiezas abajo y vas desbloqueando el siguiente a medida que demuestras que envías
+            mensajes que la gente sí quiere recibir.
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+            {[
+              { tier: "250", desc: "Punto de partida" },
+              { tier: "2.000", desc: "Primer nivel desbloqueado" },
+              { tier: "10.000", desc: "" },
+              { tier: "100.000", desc: "" },
+              { tier: "Ilimitado", desc: "Nivel máximo" },
+            ].map((n) => (
+              <div key={n.tier} className="p-3 rounded-lg border text-center" style={{ borderColor: "var(--border)" }}>
+                <p className="font-bold text-lg" style={{ color: "var(--foreground)" }}>{n.tier}</p>
+                <p className="text-xs mt-1" style={{ color: "var(--muted-foreground)" }}>{n.desc || "clientes / 24 h"}</p>
+              </div>
+            ))}
+          </div>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Qué cuenta y qué no</h3>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Cuenta:</strong> cada cliente distinto al que le envías una plantilla para abrir conversación. Si le escribes 3 veces al mismo cliente el mismo día, cuenta como 1.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>No cuenta:</strong> responder a un cliente que te escribió primero, mientras esté abierta la ventana de 24 horas desde su último mensaje.</li>
+            <li>• El límite es de tu cuenta de WhatsApp Business ante Meta: si tienes varias líneas, revisa en Meta cómo se reparte en tu caso.</li>
+          </ul>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Cómo subir de nivel</h3>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• Meta te pide iniciar <strong style={{ color: "var(--foreground)" }}>conversaciones de calidad</strong> con un número mínimo de clientes únicos en un período continuo de 7 días. Por ejemplo, estando en 2.000, el requisito para pasar a 10.000 es iniciar conversaciones con 1.000 clientes únicos en 7 días.</li>
+            <li>• Cuando cumples el requisito, el nuevo límite puede tardar hasta <strong style={{ color: "var(--foreground)" }}>24 horas</strong> en aplicarse.</li>
+            <li>• &quot;Calidad&quot; quiere decir que la gente no te bloquea ni te reporta. Si muchos lo hacen, la calificación de calidad de tu número baja y Meta puede frenar tu subida o bajarte de nivel.</li>
+          </ul>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Dónde ver tu nivel</h3>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            En el <strong style={{ color: "var(--foreground)" }}>Administrador de WhatsApp de Meta</strong> (business.facebook.com), sección
+            <strong style={{ color: "var(--foreground)" }}> Límites de mensajes</strong>, ves tu nivel actual, el requisito exacto para
+            el siguiente y cuántos clientes únicos llevas en los últimos 7 días. FusionCRM no muestra este dato: la fuente oficial es Meta.
+          </p>
+          <Callout type="tip">
+            Para crecer sin sustos: envía primero a los contactos que más probablemente respondan (clientes recientes, gente que ya te
+            escribió), divide las campañas grandes en varios días y deja que cada envío se haga dentro de tu límite actual.
           </Callout>
         </section>
 

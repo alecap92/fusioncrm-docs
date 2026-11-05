@@ -114,6 +114,7 @@ const navigation: NavItem[] = [
       { title: "Crear template", href: "/docs/whatsapp-templates#create" },
       { title: "Variables y parámetros", href: "/docs/whatsapp-templates#variables" },
       { title: "Envío masivo", href: "/docs/whatsapp-templates#mass-send" },
+      { title: "Límites de mensajes de Meta", href: "/docs/whatsapp-templates#limits" },
       { title: "Plantillas por línea", href: "/docs/whatsapp-templates#lines" },
       { title: "Crear por API o MCP", href: "/docs/whatsapp-templates#api" },
     ],
