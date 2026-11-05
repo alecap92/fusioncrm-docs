@@ -20,6 +20,7 @@ const toc = [
   { id: "mcp", label: "Conectores MCP" },
   { id: "api-keys", label: "Tokens de API" },
   { id: "security", label: "Seguridad" },
+  { id: "plantillas-pdf", label: "Plantillas PDF" },
   { id: "import-history", label: "Historial de importaciones" },
   { id: "plan", label: "Plan y facturación" },
 ];
@@ -290,6 +291,35 @@ export default function SettingsPage() {
             <li>• <strong style={{ color: "var(--foreground)" }}>Habeas Data:</strong> desde la ficha de un contacto, el propietario toca <em>Exportar datos</em> y descarga un Excel con todo lo que la plataforma tiene de esa persona (consentimientos, origen y respuestas de formularios), para atender una solicitud de la Ley 1581.</li>
             <li>• <strong style={{ color: "var(--foreground)" }}>Eliminar mi cuenta</strong> (solo el propietario): borra la cuenta y todos sus datos de forma permanente.</li>
           </ul>
+        </section>
+
+        <section id="plantillas-pdf" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Plantillas PDF</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Las plantillas PDF te permiten imprimir documentos rellenados automáticamente con los datos de un contacto:
+            rótulos de envío, contratos, formatos, autorizaciones… Se crean en{" "}
+            <strong style={{ color: "var(--foreground)" }}>Configuración → Documentos → Plantillas PDF</strong> y cualquier persona de tu organización
+            las usa desde la pestaña <strong style={{ color: "var(--foreground)" }}>Imprimir</strong> de la ficha del contacto.
+          </p>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Crear una plantilla</h3>
+          <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>1. <strong style={{ color: "var(--foreground)" }}>Prepara un PDF con campos rellenables.</strong> No sirve un PDF normal: necesita campos de formulario (los recuadros donde el sistema escribe). Los creas con Adobe Acrobat (opción &quot;Preparar formulario&quot;), LibreOffice o cualquier editor que permita agregar campos de texto.</li>
+            <li>2. <strong style={{ color: "var(--foreground)" }}>Nombra cada campo como <code style={{ color: "#d1345b" }}>etapa.campo</code>.</strong> La etapa agrupa campos relacionados y el campo dice qué dato va ahí. Por ejemplo: <code style={{ color: "#d1345b" }}>destinatario.firstName</code>, <code style={{ color: "#d1345b" }}>destinatario.address</code> o <code style={{ color: "#d1345b" }}>remitente.firstName</code>.</li>
+            <li>3. <strong style={{ color: "var(--foreground)" }}>Sube el PDF.</strong> Haz clic en <strong style={{ color: "var(--foreground)" }}>Nueva plantilla</strong>, ponle un nombre (por ejemplo &quot;Rótulo de envío&quot;) y una categoría, y selecciona el archivo. FusionCRM detecta solo los campos que trae.</li>
+            <li>4. <strong style={{ color: "var(--foreground)" }}>Revisa las etapas y los campos.</strong> Cada campo se conecta con un dato del contacto por su clave (por ejemplo <code style={{ color: "#d1345b" }}>firstName</code> o <code style={{ color: "#d1345b" }}>city</code>). Si quieres juntar varios datos en un solo recuadro, usa una combinación como <code style={{ color: "#d1345b" }}>{"{firstName} {lastName}"}</code>.</li>
+            <li>5. Guarda con <strong style={{ color: "var(--foreground)" }}>Crear plantilla</strong>. Después puedes previsualizar el PDF, editar la plantilla o cambiar el archivo base cuando quieras.</li>
+          </ol>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Imprimir desde un contacto</h3>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            En la ficha del contacto, abre la pestaña <strong style={{ color: "var(--foreground)" }}>Imprimir</strong>: verás todas las plantillas de tu
+            organización. En cada una puedes <strong style={{ color: "var(--foreground)" }}>imprimir</strong> (abre el cuadro de impresión del navegador)
+            o <strong style={{ color: "var(--foreground)" }}>abrirla en una pestaña nueva</strong> para verla o descargarla. Los recuadros cuyo dato no
+            exista en el contacto quedan vacíos.
+          </p>
+          <Callout type="tip">
+            Funciona muy bien para rótulos de envío: crea una etapa <code style={{ color: "#d1345b" }}>destinatario</code> con nombre, dirección,
+            ciudad y teléfono, y tendrás el rótulo listo con un clic desde cada cliente.
+          </Callout>
         </section>
 
         <section id="import-history" className="mb-10">

@@ -148,6 +148,12 @@ export default function ContactsPage() {
               Notas e Imprimir, y también Facturas y Envíos si tienes esos módulos activos. El botón de
               WhatsApp te lleva a su conversación.
             </p>
+            <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>
+              En la pestaña <strong style={{ color: "var(--foreground)" }}>Imprimir</strong> generas documentos en PDF
+              (rótulos de envío, contratos, formatos) rellenados con los datos del contacto. Las plantillas se crean en
+              Configuración → Documentos → Plantillas PDF; mira{" "}
+              <a href="/docs/settings#plantillas-pdf" style={{ color: "#d1345b" }}>cómo crear una plantilla</a>.
+            </p>
             <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
               <li>• <strong style={{ color: "var(--foreground)" }}>Origen:</strong> la tarjeta del contacto muestra de dónde llegó (por ejemplo, un formulario, una landing o un anuncio, con sus datos de campaña cuando existen).</li>
               <li>• <strong style={{ color: "var(--foreground)" }}>No contactar por WhatsApp:</strong> si el contacto lo pide, desactívalo en su ficha. Deja de recibir automatizaciones, campañas, plantillas y mensajes del agente IA; tú puedes seguir respondiéndole desde la bandeja.</li>

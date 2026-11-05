@@ -230,6 +230,7 @@ const navigation: NavItem[] = [
       { title: "Lead Scoring config", href: "/docs/settings#lead-scoring" },
       { title: "Seguridad y 2FA", href: "/docs/settings#security" },
       { title: "Notificaciones", href: "/docs/settings#notifications" },
+      { title: "Plantillas PDF", href: "/docs/settings#plantillas-pdf" },
       { title: "Historial de importaciones", href: "/docs/settings#import-history" },
       { title: "Conectores MCP", href: "/docs/settings#mcp" },
       { title: "Tokens de API", href: "/docs/settings#api-keys" },
