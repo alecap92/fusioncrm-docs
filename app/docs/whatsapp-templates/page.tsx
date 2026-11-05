@@ -66,13 +66,13 @@ export default function WhatsAppTemplatesPage() {
           </p>
           <ol className="space-y-3 mb-6">
             {[
-              { n: "1", t: "Ve a Templates WhatsApp", d: "En la barra lateral, haz clic en el módulo de Templates." },
-              { n: "2", t: "Clic en \"+ Nuevo template\"", d: "Botón en la esquina superior derecha." },
-              { n: "3", t: "Elige la categoría", d: "Selecciona entre Marketing, Utilidad o Autenticación." },
-              { n: "4", t: "Selecciona el idioma", d: "Español (es), Inglés (en) u otro. Puedes tener el mismo template en varios idiomas." },
-              { n: "5", t: "Escribe el contenido", d: "Redacta el cuerpo del mensaje. Usa {{1}}, {{2}} para variables dinámicas." },
-              { n: "6", t: "Agrega header y footer (opcional)", d: "El header puede ser texto, imagen o documento. El footer es texto pequeño." },
-              { n: "7", t: "Envía para aprobación", d: "Meta revisará el template en 24-72 horas." },
+              { n: "1", t: "Ve a Comunicación → Plantillas de WhatsApp", d: "En el menú superior." },
+              { n: "2", t: "Pulsa \"Nueva Plantilla\"", d: "También puedes crearla desde el formulario de una campaña de WhatsApp masivo, con el botón \"Nueva plantilla\"." },
+              { n: "3", t: "Elige la categoría", d: "Marketing o Utilidad. Las plantillas de autenticación (códigos de verificación) no se crean desde aquí." },
+              { n: "4", t: "Selecciona el idioma", d: "Español (es, España o México), inglés (en o EE. UU.) o portugués de Brasil. Puedes tener la misma plantilla en varios idiomas." },
+              { n: "5", t: "Escribe el contenido", d: "Redacta el cuerpo del mensaje. Usa {{1}}, {{2}} para las partes que cambian en cada envío." },
+              { n: "6", t: "Agrega cabecera, pie y botones (opcional)", d: "La cabecera puede ser texto, imagen (JPG o PNG hasta 5 MB), video (MP4 hasta 16 MB), documento PDF (hasta 25 MB desde aquí) o ubicación. Puedes sumar hasta 10 botones: respuesta rápida, enlace, llamada o copiar código." },
+              { n: "7", t: "Revisa la vista previa y envía para aprobación", d: "La vista previa cambia mientras escribes. Meta suele aprobar en unos minutos y hasta 24 horas." },
             ].map((s) => (
               <li key={s.n} className="flex gap-3">
                 <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "#d1345b" }}>{s.n}</span>
@@ -100,25 +100,23 @@ export default function WhatsAppTemplatesPage() {
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Variables y parámetros</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
             Las variables se definen con la notación <code style={{ color: "#d1345b" }}>{"{{número}}"}</code> y
-            se reemplazan con valores reales al enviar el mensaje.
+            se reemplazan con valores reales al enviar el mensaje. Ningún número tiene un valor fijo: de
+            dónde sale cada uno depende de cómo envíes la plantilla.
           </p>
           <div className="rounded-lg overflow-hidden border mb-4" style={{ borderColor: "var(--border)" }}>
-            <div className="px-4 py-2 text-xs font-semibold" style={{ backgroundColor: "#1f2a48", color: "white" }}>Variables disponibles en FusionCRM</div>
+            <div className="px-4 py-2 text-xs font-semibold" style={{ backgroundColor: "#1f2a48", color: "white" }}>Cómo se llenan las variables</div>
             <table className="w-full text-sm">
               <thead style={{ backgroundColor: "var(--muted)" }}>
                 <tr>
-                  <th className="text-left p-3 border-b font-semibold" style={{ borderColor: "var(--border)" }}>Variable template</th>
-                  <th className="text-left p-3 border-b font-semibold" style={{ borderColor: "var(--border)" }}>Valor automático</th>
+                  <th className="text-left p-3 border-b font-semibold" style={{ borderColor: "var(--border)" }}>Dónde envías</th>
+                  <th className="text-left p-3 border-b font-semibold" style={{ borderColor: "var(--border)" }}>Cómo se llenan</th>
                   <th className="text-left p-3 border-b font-semibold" style={{ borderColor: "var(--border)" }}>Ejemplo</th>
                 </tr>
               </thead>
               <tbody>
                 {[
-                  ["{{1}} – Nombre", "Nombre del contacto", "Juan"],
-                  ["{{2}} – Empresa", "Empresa del contacto", "Mi Empresa S.A."],
-                  ["{{3}} – Fecha", "Fecha actual o especificada", "15 de enero de 2025"],
-                  ["{{4}} – Hora", "Hora especificada", "2:00 PM"],
-                  ["{{n}} – Personalizado", "Valor ingresado manualmente", "cualquier texto"],
+                  ["Desde un chat", "{{1}} se llena con el nombre del contacto (puedes cambiarlo); las demás las escribes tú.", "Juan"],
+                  ["En una campaña", "Para cada variable eliges un campo del contacto (Nombre, Apellido, Empresa, Correo, Celular, Teléfono o Ciudad) o un texto fijo, y un valor por si el contacto no tiene ese dato.", "Empresa → \"Mi Empresa S.A.\""],
                 ].map(([v, a, e]) => (
                   <tr key={v}>
                     <td className="p-3 border-b font-mono text-xs" style={{ borderColor: "var(--border)", color: "#d1345b" }}>{v}</td>
@@ -137,7 +135,7 @@ export default function WhatsAppTemplatesPage() {
             {[
               { cat: "Marketing", color: "#f59e0b", desc: "Promociones, ofertas, anuncios de nuevos productos, contenido de valor.", examples: "\"¡Nueva colección disponible! Descuento del 20% hasta el viernes.\"" },
               { cat: "Utilidad", color: "#3b82f6", desc: "Confirmaciones, actualizaciones de estado, recordatorios, información transaccional.", examples: "\"Tu pedido #1234 ha sido despachado. Seguimiento: ...\"" },
-              { cat: "Autenticación", color: "#8b5cf6", desc: "Códigos de verificación, contraseñas temporales, confirmación de identidad.", examples: "\"Tu código de verificación es 847291. Válido por 10 minutos.\"" },
+              { cat: "Autenticación", color: "#8b5cf6", desc: "Códigos de verificación y confirmación de identidad. Meta arma estas plantillas con un formato fijo, así que no se crean desde la pantalla del CRM.", examples: "\"Tu código de verificación es 847291. Válido por 10 minutos.\"" },
             ].map((c) => (
               <div key={c.cat} className="p-4 rounded-lg border" style={{ borderColor: c.color, backgroundColor: `${c.color}10` }}>
                 <p className="font-bold mb-1" style={{ color: c.color }}>{c.cat}</p>
@@ -159,10 +157,12 @@ export default function WhatsAppTemplatesPage() {
           </p>
           <div className="space-y-2 mb-4">
             {[
-              { status: "PENDING", color: "#f59e0b", desc: "En revisión por Meta (24-72h normalmente)" },
-              { status: "APPROVED", color: "#22c55e", desc: "Aprobado y listo para usar" },
-              { status: "REJECTED", color: "#ef4444", desc: "Rechazado. Revisa el motivo y corrige el contenido." },
-              { status: "PAUSED", color: "#6b7280", desc: "Pausado temporalmente por Meta por baja calidad." },
+              { status: "Pendiente", color: "#f59e0b", desc: "En revisión por Meta (suele tardar de unos minutos a 24 horas)." },
+              { status: "Aprobada", color: "#22c55e", desc: "Lista para usar." },
+              { status: "Rechazada", color: "#ef4444", desc: "Meta no la aceptó. Crea una nueva con el texto corregido." },
+              { status: "Pausada", color: "#6b7280", desc: "Meta la frenó temporalmente por baja calidad." },
+              { status: "Deshabilitada", color: "#6b7280", desc: "Meta la desactivó y ya no se puede enviar." },
+              { status: "En apelación", color: "#f97316", desc: "Pediste a Meta revisar de nuevo un rechazo." },
             ].map((s) => (
               <div key={s.status} className="flex items-center gap-3 p-3 rounded border" style={{ borderColor: "var(--border)" }}>
                 <span className="text-xs font-bold px-2 py-1 rounded font-mono" style={{ backgroundColor: s.color, color: "white" }}>{s.status}</span>
@@ -171,26 +171,30 @@ export default function WhatsAppTemplatesPage() {
             ))}
           </div>
           <Callout type="tip">
-            Si tu template es rechazado, puedes editarlo y volver a enviarlo para aprobación.
-            Lee cuidadosamente el motivo del rechazo — generalmente indica qué parte del texto
-            no cumple las políticas de Meta.
+            Las plantillas no se editan desde el CRM: en la lista solo tienes Vista previa y Eliminar.
+            Si Meta rechaza una, crea otra con el texto corregido. El motivo del rechazo no aparece en la
+            pantalla de plantillas: pídeselo a tu IA por <a href="/docs/mcp" style={{ color: "#d1345b" }}>MCP</a> o
+            míralo en el WhatsApp Manager de Meta.
           </Callout>
         </section>
 
         <section id="mass-send" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Envío masivo</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Para enviar un template a múltiples contactos simultáneamente, usa el módulo de
-            <strong style={{ color: "var(--foreground)" }}> Campañas → WhatsApp masivo</strong>.
+            Para enviar una plantilla a muchos contactos a la vez, usa
+            <strong style={{ color: "var(--foreground)" }}> Comunicación → WhatsApp Masivo</strong>.
           </p>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. Ve a Campañas → WhatsApp masivo</li>
-            <li>2. Crea una nueva campaña y asigna un nombre</li>
-            <li>3. Selecciona el template aprobado a enviar</li>
-            <li>4. Escoge el segmento o lista de contactos destinatarios</li>
-            <li>5. Completa las variables del template para los contactos</li>
-            <li>6. Programa la campaña o envía inmediatamente</li>
+            <li>1. Pulsa "Nueva Campaña" y ponle nombre</li>
+            <li>2. Elige la plantilla aprobada</li>
+            <li>3. Define de dónde sale cada variable</li>
+            <li>4. Elige una lista de contactos (estática o dinámica)</li>
+            <li>5. Guárdala con "Guardar como borrador" o "Programar envío"</li>
+            <li>6. Para enviarla ya, usa "Enviar ahora" en la lista de campañas</li>
           </ol>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            El paso a paso completo está en <a href="/docs/mass-campaigns#whatsapp" style={{ color: "#d1345b" }}>Campañas masivas</a>.
+          </p>
           <Callout type="warning">
             Meta limita cuántas personas distintas puedes contactar por plantilla cada día. Antes de
             una campaña grande revisa tu nivel actual: mira <a href="#limits" style={{ color: "#d1345b" }}>Límites de mensajes de Meta</a>.
@@ -284,7 +288,7 @@ export default function WhatsAppTemplatesPage() {
             Todo lo que haces en la pantalla de Templates también se puede hacer por la{" "}
             <a href="/docs/api" style={{ color: "#d1345b" }}>API REST</a> (permiso{" "}
             <code style={{ color: "#d1345b" }}>whatsapp:send</code>) o pidiéndoselo a tu IA por{" "}
-            <a href="/docs/mcp" style={{ color: "#d1345b" }}>MCP</a>:
+            <a href="/docs/mcp" style={{ color: "#d1345b" }}>MCP</a> (planes Pro y Unlimited):
           </p>
           <div className="rounded-lg overflow-hidden border mb-4" style={{ borderColor: "var(--border)" }}>
             <table className="w-full text-sm">
@@ -325,7 +329,7 @@ export default function WhatsAppTemplatesPage() {
                   ["Nombre, idioma y categoría", "Nombre en minúsculas, dígitos y guion bajo. MARKETING o UTILITY (AUTHENTICATION solo con components de Meta)."],
                   ["Variables posicionales", "{{1}}, {{2}}… consecutivas, con un ejemplo por variable. El texto no puede empezar ni terminar con una variable."],
                   ["Variables con nombre", "{{nombre}}, {{pedido}}… con su ejemplo. No se mezclan con posicionales en la misma plantilla."],
-                  ["Cabecera", "Texto (máx. 60 caracteres, una variable), imagen (JPG/PNG ≤ 5 MB), video (MP4 ≤ 16 MB), documento (PDF ≤ 100 MB) o ubicación."],
+                  ["Cabecera", "Texto (máx. 60 caracteres, una variable), imagen (JPG/PNG ≤ 5 MB), video (MP4 ≤ 16 MB), documento (PDF ≤ 25 MB si subes el archivo, ≤ 100 MB si pasas mediaUrl) o ubicación."],
                   ["Cuerpo y pie", "Cuerpo obligatorio (≤ 1024). Pie opcional (≤ 60) sin variables."],
                   ["Botones (hasta 10)", "Respuesta rápida (≤ 25 caracteres), URL (máx. 2, con una variable al final), llamada (máx. 1), copiar código (máx. 1)."],
                 ].map(([k, v]) => (

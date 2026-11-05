@@ -35,14 +35,20 @@ export default function ConversationsPage() {
         <section id="overview" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Vista general</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            El inbox es un tablero kanban: cada columna es una etapa (por ejemplo "Sin leer", "En
-            proceso", "Cerrado") y cada tarjeta es una conversación. Al abrir una tarjeta ves el hilo
-            completo de mensajes y, a la derecha, la información del contacto.
+            Lo encuentras en el menú <strong style={{ color: "var(--foreground)" }}>Comunicación → WhatsApp</strong>.
+            El inbox es un tablero kanban: cada columna es una etapa y cada tarjeta es una conversación.
+            Tu tablero arranca con una sola columna, "Nuevas"; agrega las que necesites (por ejemplo
+            "En proceso" o "Cerrado") en <strong style={{ color: "var(--foreground)" }}>Ajustes → Conversaciones</strong>.
+            Al abrir una tarjeta ves el hilo completo de mensajes y, a la derecha, la información del contacto.
+          </p>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            El menú <strong style={{ color: "var(--foreground)" }}>⋯</strong> de cada tarjeta permite fijarla
+            arriba de su columna, marcarla como leída o no leída, moverla y eliminarla.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             {[
               { title: "Tablero de conversaciones", items: ["Columnas = etapas del pipeline", "Tarjetas ordenadas por último mensaje", "Canal, línea de WhatsApp y asesor en cada tarjeta", "Arrastra para cambiar de etapa"] },
-              { title: "Panel de mensajes", items: ["Historial completo del hilo", "Envío de mensajes y archivos", "Info del contacto a la derecha", "Acceso al perfil del contacto"] },
+              { title: "Chat abierto", items: ["Historial completo del hilo, con respuestas citadas y reacciones", "Barra superior: Prioridad, Puntuación, Asignado a, Etapa y Etiquetas", "Panel lateral: empresa, negocios, cotizaciones y, con el módulo de Facturación, facturas", "Marcar \"No contactar por WhatsApp\" o bloquear el número"] },
             ].map((p) => (
               <div key={p.title} className="p-4 rounded-lg border" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
                 <p className="font-semibold mb-2" style={{ color: "var(--foreground)" }}>{p.title}</p>
@@ -61,19 +67,18 @@ export default function ConversationsPage() {
         <section id="inbox" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Bandeja unificada</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            La bandeja unificada muestra todas las conversaciones de todos los canales en una sola
-            vista. Puedes filtrar por:
+            La bandeja muestra en una sola vista los chats de WhatsApp, Messenger e Instagram. El
+            correo se maneja aparte, en <strong style={{ color: "var(--foreground)" }}>Comunicación → Correo</strong>.
+            En la barra de arriba del tablero tienes:
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
             {[
-              { filter: "Todas", desc: "Sin filtro" },
-              { filter: "Sin asignar", desc: "Esperan atención" },
-              { filter: "Mis chats", desc: "Asignados a ti" },
-              { filter: "WhatsApp", desc: "Solo WA" },
-              { filter: "Email", desc: "Solo email" },
-              { filter: "Abiertos", desc: "En curso" },
-              { filter: "Resueltos", desc: "Cerrados" },
-              { filter: "Pendientes", desc: "En espera" },
+              { filter: "Asesor:", desc: "Solo los chats de un asesor (o \"- Sin Filtro -\")" },
+              { filter: "Pipeline:", desc: "Aparece si tienes 2 o más pipelines" },
+              { filter: "Línea:", desc: "Aparece si tienes 2 o más números de WhatsApp" },
+              { filter: "Actualizar", desc: "Recarga el tablero" },
+              { filter: "Buscar", desc: "Busca en los mensajes" },
+              { filter: "Nuevo Chat", desc: "Escríbele a un contacto con una plantilla" },
             ].map((f) => (
               <div key={f.filter} className="p-2 rounded border text-center text-sm" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
                 <p className="font-medium" style={{ color: "var(--foreground)" }}>{f.filter}</p>
@@ -82,8 +87,8 @@ export default function ConversationsPage() {
             ))}
           </div>
           <Callout type="tip">
-            Usa el filtro "Sin asignar" al inicio del día para ver los mensajes que llegaron fuera
-            del horario laboral y asignarlos al agente correspondiente.
+            El tablero recuerda en tu navegador el asesor, el pipeline y la línea que elegiste. Si hay
+            chats sin leer en otro pipeline, el selector "Pipeline:" muestra un punto rojo.
           </Callout>
         </section>
 
@@ -103,31 +108,34 @@ export default function ConversationsPage() {
             Para enviar el primer mensaje a un contacto o retomar una conversación pasada las 24h:
           </p>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. Abre la conversación del contacto o crea una nueva</li>
-            <li>2. Haz clic en el ícono de plantilla (📋) en el campo de mensaje</li>
-            <li>3. Selecciona la plantilla aprobada que deseas enviar</li>
-            <li>4. Completa las variables de la plantilla (nombre, fecha, etc.)</li>
-            <li>5. Envía el mensaje</li>
+            <li>1. Si ya existe el chat, ábrelo y pulsa el botón <strong style={{ color: "var(--foreground)" }}>"Plantillas"</strong> de la barra de mensaje.</li>
+            <li>2. Si es alguien nuevo, pulsa <strong style={{ color: "var(--foreground)" }}>"Nuevo Chat"</strong>, busca el contacto (mínimo 3 letras) y, si tienes varios números, elige desde cuál sale en "Enviar desde".</li>
+            <li>3. Elige la plantilla aprobada.</li>
+            <li>4. Completa sus variables: {"{{1}}"} se llena con el nombre del contacto y las demás las escribes tú.</li>
+            <li>5. Envía el mensaje.</li>
           </ol>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Con la ventana cerrada, los botones de texto y adjuntos del chat quedan deshabilitados con el
+            aviso "La ventana de 24 h está cerrada: envía una plantilla". En la barra de mensaje, Enter
+            envía y Shift + Enter hace un salto de línea.
+          </p>
         </section>
 
         <section id="message-types" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Tipos de mensajes</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            FusionCRM soporta todos los tipos de mensajes de WhatsApp Business API:
+            Desde la barra de mensaje tienes los botones Biblioteca, Adjuntos, Respuestas predefinidas,
+            Plantillas, Crear actividad, Botones y Nota de voz. Estos son los tipos que puedes enviar:
           </p>
           <div className="space-y-3 mb-4">
             {[
-              { type: "Texto", icon: "💬", desc: "Mensajes de texto plano. Soporte para emojis. Máximo 4096 caracteres.", usage: "Conversaciones generales, respuestas rápidas." },
-              { type: "Imagen", icon: "🖼️", desc: "Imágenes en formato JPG, PNG, WEBP. Tamaño máximo 5MB. Puedes agregar caption.", usage: "Enviar catálogos, comprobantes visuales, fotos de producto." },
-              { type: "Documento", icon: "📄", desc: "Archivos PDF, DOC, XLS, PPT y más. Tamaño máximo 100MB.", usage: "Contratos, cotizaciones, facturas, manuales." },
-              { type: "Video", icon: "🎥", desc: "Videos MP4, 3GP. Tamaño máximo 16MB.", usage: "Demostraciones de producto, tutoriales." },
-              { type: "Audio", icon: "🎤", desc: "Notas de voz o archivos de audio MP3, OGG.", usage: "Mensajes de voz personalizados." },
-              { type: "Ubicación", icon: "📍", desc: "Coordenadas GPS con nombre y dirección opcionales.", usage: "Indicar dirección de reuniones, tiendas, eventos." },
-              { type: "Contacto", icon: "👤", desc: "Tarjeta de contacto vCard con nombre, teléfono y email.", usage: "Compartir datos de contacto de vendedores o soporte." },
-              { type: "Template", icon: "📋", desc: "Plantilla aprobada por Meta para envío fuera de ventana 24h.", usage: "Mensajes proactivos, recordatorios, notificaciones." },
-              { type: "Botones", icon: "🔘", desc: "Hasta 3 botones de respuesta rápida en templates.", usage: "Encuestas, confirmaciones, menús de opciones." },
-              { type: "Lista", icon: "📝", desc: "Lista de opciones interactivas (hasta 10 ítems).", usage: "Menús de servicio, selección de productos." },
+              { type: "Texto", icon: "💬", desc: "Mensajes de texto con emojis. Máximo 4096 caracteres. Puedes responder citando un mensaje.", usage: "Conversaciones generales, respuestas rápidas." },
+              { type: "Imagen", icon: "🖼️", desc: "JPG, PNG o WEBP de hasta 5 MB, con texto opcional.", usage: "Catálogos, comprobantes, fotos de producto." },
+              { type: "Documento", icon: "📄", desc: "PDF, Word, Excel, PowerPoint, TXT, CSV o ZIP, de hasta 50 MB.", usage: "Contratos, cotizaciones, facturas, manuales." },
+              { type: "Video", icon: "🎥", desc: "MP4 o 3GP de hasta 16 MB.", usage: "Demostraciones de producto, tutoriales." },
+              { type: "Audio y nota de voz", icon: "🎤", desc: "Graba una nota de voz con el botón \"Nota de voz\" o adjunta un audio MP3 u OGG.", usage: "Mensajes de voz personalizados." },
+              { type: "Plantilla", icon: "📋", desc: "Plantilla aprobada por Meta, la única opción con la ventana de 24 h cerrada.", usage: "Mensajes proactivos, recordatorios, notificaciones." },
+              { type: "Botones y listas", icon: "🔘", desc: "Con la ventana de 24 h abierta, el botón \"Botones\" manda hasta 3 botones o una lista de hasta 10 opciones, sin plantilla. Las plantillas pueden llevar hasta 10 botones.", usage: "Encuestas, confirmaciones, menús de opciones." },
             ].map((m) => (
               <div key={m.type} className="flex gap-4 p-4 rounded-lg border" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
                 <span className="text-2xl flex-shrink-0">{m.icon}</span>
@@ -139,19 +147,24 @@ export default function ConversationsPage() {
               </div>
             ))}
           </div>
+          <Callout type="note">
+            Si un cliente te manda una ubicación o una tarjeta de contacto, la ves en el chat, pero
+            desde el CRM no puedes enviar ninguna de las dos.
+          </Callout>
         </section>
 
         <section id="quick-replies" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Respuestas rápidas</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Las respuestas rápidas son fragmentos de texto predefinidos que los agentes pueden
-            insertar rápidamente para agilizar la atención al cliente.
+            Las respuestas rápidas (fragmentos) son textos predefinidos que tu equipo inserta para
+            responder más rápido. Se crean en <strong style={{ color: "var(--foreground)" }}>Comunicación → Fragmentos</strong> y
+            pueden incluir una imagen.
           </p>
           <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Usar respuestas rápidas</h3>
           <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Escribe <code style={{ color: "#d1345b" }}>#</code> seguido del atajo de la respuesta (por ejemplo <code style={{ color: "#d1345b" }}>#precios</code>) en el campo de mensaje; mientras escribes aparecen las respuestas que coinciden</li>
-            <li>• Selecciona la respuesta para insertarla en el mensaje</li>
-            <li>• Edita el texto antes de enviar si es necesario</li>
+            <li>• Escribe <code style={{ color: "#d1345b" }}>#</code> seguido del atajo (por ejemplo <code style={{ color: "#d1345b" }}>#precios</code>); mientras escribes aparecen los que coinciden. Pulsa <strong style={{ color: "var(--foreground)" }}>Tab</strong> para insertarlo.</li>
+            <li>• También puedes abrir la lista con el botón <strong style={{ color: "var(--foreground)" }}>"Respuestas predefinidas"</strong> de la barra de mensaje.</li>
+            <li>• Edita el texto antes de enviar si es necesario.</li>
           </ul>
           <Callout type="tip">
             Crea respuestas rápidas para: saludos, preguntas frecuentes, confirmaciones de citas,
@@ -163,36 +176,44 @@ export default function ConversationsPage() {
         <section id="assignment" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Asignación de chats</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Cada conversación puede ser asignada a un agente específico del equipo.
+            Cada conversación puede quedar a cargo de una persona del equipo o de un agente IA.
           </p>
           <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Manual:</strong> Usa el selector de agente en el panel derecho de la conversación</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Auto-asignación:</strong> Configurable en las reglas de automatización</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Reasignación:</strong> Cualquier agente con permisos puede reasignar</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Manual:</strong> en la barra de arriba del chat, usa <strong style={{ color: "var(--foreground)" }}>"Asignado a:"</strong> y elige un asesor o un agente IA.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Por número de WhatsApp:</strong> en Ajustes → WhatsApp → editar línea → <strong style={{ color: "var(--foreground)" }}>"Asignar a"</strong>, cada chat nuevo de ese número llega a quien elijas.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Por columna:</strong> en Ajustes → Conversaciones → editar columna → <strong style={{ color: "var(--foreground)" }}>"Asignación automática"</strong>, los chats que entran a esa columna se asignan a un usuario.</li>
           </ul>
         </section>
 
         <section id="search" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Búsqueda en conversaciones</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Usa la búsqueda para encontrar conversaciones o mensajes específicos:
+            Pulsa <strong style={{ color: "var(--foreground)" }}>"Buscar"</strong> en la barra del tablero y escribe un solo término. Encuentra:
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Busca por nombre del contacto</li>
-            <li>• Busca por contenido del mensaje (texto)</li>
-            <li>• Filtra por fecha de la conversación</li>
-            <li>• Filtra por agente asignado</li>
+            <li>• Palabras dentro de los mensajes (sin importar tildes ni mayúsculas)</li>
+            <li>• Un número de teléfono o parte de él</li>
+            <li>• El nombre de usuario que el cliente tiene en WhatsApp</li>
           </ul>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            La búsqueda no filtra por fecha ni por asesor. Para ver solo los chats de una persona, usa el
+            filtro "Asesor:" del tablero.
+          </p>
         </section>
 
         <section id="status" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Estados de conversación</h2>
-          <div className="space-y-3">
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Las conversaciones no tienen un estado fijo tipo "abierto" o "resuelto": su estado es la
+            columna en la que están, y las columnas las decides tú. Además, en la barra de arriba de
+            cada chat puedes ajustar:
+          </p>
+          <div className="space-y-3 mb-4">
             {[
-              { status: "Abierto", color: "#3b82f6", desc: "Conversación activa que requiere atención." },
-              { status: "Pendiente", color: "#f59e0b", desc: "En espera de respuesta del cliente o de una acción interna." },
-              { status: "Resuelto", color: "#22c55e", desc: "Conversación finalizada satisfactoriamente." },
-              { status: "Sin asignar", color: "#6b7280", desc: "Llegó un mensaje nuevo sin agente asignado." },
+              { status: "Etapa", color: "#3b82f6", desc: "La columna del pipeline donde está el chat." },
+              { status: "Prioridad", color: "#f59e0b", desc: "Alta, Media o Baja." },
+              { status: "Puntuación", color: "#22c55e", desc: "Qué tan caliente está el lead, de 0 a 100." },
+              { status: "Asignado a", color: "#6b7280", desc: "La persona o el agente IA a cargo. Sin nadie, el chat queda sin asignar." },
             ].map((s) => (
               <div key={s.status} className="flex items-center gap-3 p-3 rounded-lg border" style={{ borderColor: "var(--border)" }}>
                 <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }} />
@@ -203,6 +224,11 @@ export default function ConversationsPage() {
               </div>
             ))}
           </div>
+          <Callout type="tip">
+            En <strong>Ajustes → Conversaciones</strong> también configuras los números bloqueados y el
+            autorespondedor fuera de horario laboral: eliges días, horas y el mensaje, que se envía una
+            sola vez por conversación.
+          </Callout>
         </section>
 
         <section id="kanban" className="mb-10">
@@ -235,7 +261,7 @@ export default function ConversationsPage() {
           <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
             <li>• <strong style={{ color: "var(--foreground)" }}>Arrastrar la tarjeta</strong> a otra columna, o menú ⋯ → <strong style={{ color: "var(--foreground)" }}>Mover a columna</strong>.</li>
             <li>• Menú ⋯ → <strong style={{ color: "var(--foreground)" }}>Mover a pipeline</strong>: eliges el pipeline destino y, sobre él, la columna donde quedará. Solo aparece con más de un pipeline.</li>
-            <li>• Desde el chat abierto, el chip <strong style={{ color: "var(--foreground)" }}>"Mover a otro pipeline"</strong> junto a la etapa.</li>
+            <li>• Desde el chat abierto, en la barra de arriba (junto a "Etapa:"), el botón <strong style={{ color: "var(--foreground)" }}>"Mover a otro pipeline"</strong>.</li>
           </ul>
           <Callout type="note">
             Todo chat nuevo nace en el pipeline de la línea de WhatsApp por la que entra o sale (entrante,
