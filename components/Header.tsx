@@ -80,7 +80,16 @@ export default function Header({ onMobileMenuOpen }: HeaderProps) {
             className="hidden sm:flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg transition-colors font-medium"
             style={{ color: "var(--foreground)", border: "1px solid var(--border)" }}
           >
-            Ir a FusionCRM →
+            Sitio web
+          </a>
+          <a
+            href="https://app.fusioncol.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg transition-colors font-medium text-white"
+            style={{ backgroundColor: "#d1345b" }}
+          >
+            Abrir la app →
           </a>
           <ThemeToggle />
         </div>
