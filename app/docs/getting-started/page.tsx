@@ -54,6 +54,11 @@ export default function GettingStartedPage() {
             comunicación. La facturación electrónica según la normativa DIAN de Colombia es un módulo
             adicional que se activa aparte.
           </Callout>
+          <Callout type="note">
+            WhatsApp en FusionCRM no funciona exactamente como en tu celular: para escribirle primero a un cliente necesitas una
+            plantilla aprobada por Meta. Antes de empezar, lee{" "}
+            <a href="/docs/conversations#iniciar-whatsapp" style={{ color: "#d1345b" }}>Cómo escribirle a un cliente por WhatsApp</a>.
+          </Callout>
         </section>
 
         <section id="acceder" className="mb-10">

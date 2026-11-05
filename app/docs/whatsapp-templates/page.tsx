@@ -37,6 +37,10 @@ export default function WhatsAppTemplatesPage() {
             un contacto dentro de las primeras 24 horas después de su último mensaje. Para
             contactarlos fuera de esta ventana, debes usar un template aprobado por Meta.
           </p>
+          <Callout type="note">
+            ¿Vienes del WhatsApp del celular y esto de las plantillas te suena raro? Lee primero{" "}
+            <a href="/docs/conversations#iniciar-whatsapp" style={{ color: "#d1345b" }}>Cómo escribirle a un cliente por WhatsApp</a>: ahí está explicado en palabras simples.
+          </Callout>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div className="p-4 rounded-lg border" style={{ backgroundColor: "rgba(34,197,94,0.08)", borderColor: "#22c55e" }}>
               <p className="font-semibold text-sm mb-2" style={{ color: "#16a34a" }}>✓ Templates permiten:</p>
@@ -53,7 +57,6 @@ export default function WhatsAppTemplatesPage() {
                 <li>• Publicidad engañosa</li>
                 <li>• Mensajes spam o no solicitados</li>
                 <li>• Contenido prohibido por Meta</li>
-                <li>• Mensajes dentro de la ventana 24h</li>
               </ul>
             </div>
           </div>

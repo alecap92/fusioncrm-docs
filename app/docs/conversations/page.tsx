@@ -9,6 +9,7 @@ export const metadata: Metadata = { title: "Conversaciones" };
 const toc = [
   { id: "overview", label: "Vista general" },
   { id: "inbox", label: "Bandeja unificada" },
+  { id: "iniciar-whatsapp", label: "Cómo escribirle a un cliente" },
   { id: "whatsapp", label: "WhatsApp" },
   { id: "message-types", label: "Tipos de mensajes" },
   { id: "quick-replies", label: "Respuestas rápidas" },
@@ -89,6 +90,66 @@ export default function ConversationsPage() {
           <Callout type="tip">
             El tablero recuerda en tu navegador el asesor, el pipeline y la línea que elegiste. Si hay
             chats sin leer en otro pipeline, el selector "Pipeline:" muestra un punto rojo.
+          </Callout>
+        </section>
+
+        <section id="iniciar-whatsapp" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Cómo escribirle a un cliente por WhatsApp</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Si vienes del WhatsApp del celular (o de WhatsApp Business en el celular), aquí hay una regla nueva que
+            confunde al principio: <strong style={{ color: "var(--foreground)" }}>no puedes escribirle a cualquiera cuando quieras con un mensaje normal</strong>.
+            FusionCRM usa la conexión oficial de WhatsApp para empresas, y Meta (la dueña de WhatsApp) la limita así para frenar
+            el spam. No es una falla del CRM: aplica igual en cualquier herramienta conectada a WhatsApp.
+          </p>
+
+          <div className="overflow-x-auto mb-6">
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr>
+                  <th className="text-left p-2 border-b" style={{ color: "var(--foreground)" }}></th>
+                  <th className="text-left p-2 border-b" style={{ color: "var(--foreground)" }}>WhatsApp en el celular</th>
+                  <th className="text-left p-2 border-b" style={{ color: "var(--foreground)" }}>WhatsApp en FusionCRM</th>
+                </tr>
+              </thead>
+              <tbody style={{ color: "var(--muted-foreground)" }}>
+                <tr><td className="p-2 border-b font-semibold" style={{ color: "var(--foreground)" }}>Escribirle primero a alguien</td><td className="p-2 border-b">Escribes lo que quieras</td><td className="p-2 border-b">Solo con una <strong style={{ color: "var(--foreground)" }}>plantilla</strong> aprobada por Meta</td></tr>
+                <tr><td className="p-2 border-b font-semibold" style={{ color: "var(--foreground)" }}>Cuando el cliente te escribe</td><td className="p-2 border-b">Chateas normal</td><td className="p-2 border-b">Chateas normal durante <strong style={{ color: "var(--foreground)" }}>24 horas</strong> desde su último mensaje</td></tr>
+                <tr><td className="p-2 border-b font-semibold" style={{ color: "var(--foreground)" }}>Si pasan más de 24 horas sin que te escriba</td><td className="p-2 border-b">Sigues escribiendo</td><td className="p-2 border-b">Vuelves a necesitar una plantilla</td></tr>
+                <tr><td className="p-2 border-b font-semibold" style={{ color: "var(--foreground)" }}>Varias personas atendiendo</td><td className="p-2 border-b">Un solo teléfono</td><td className="p-2 border-b">Todo el equipo, desde el computador o la app</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>El ciclo, en tres pasos</h3>
+          <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>1. <strong style={{ color: "var(--foreground)" }}>Abres la conversación con una plantilla.</strong> Es un mensaje que escribiste antes y Meta aprobó, por ejemplo: <em>&quot;Hola {"{{1}}"}, te escribo de Tienda Ejemplo sobre tu pedido. ¿Tienes un momento?&quot;</em></li>
+            <li>2. <strong style={{ color: "var(--foreground)" }}>El cliente responde.</strong> Con su respuesta se abre una ventana de 24 horas.</li>
+            <li>3. <strong style={{ color: "var(--foreground)" }}>Chateas normal.</strong> Durante esas 24 horas envías texto, fotos, audios, documentos y botones, igual que en el celular. Cada vez que el cliente vuelve a escribir, las 24 horas empiezan de nuevo.</li>
+          </ol>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Si el cliente no responde la plantilla, la ventana no se abre y no puedes mandarle mensajes normales. Puedes
+            enviarle otra plantilla más adelante, pero sin insistir: si la gente te bloquea o te reporta, Meta baja la calidad
+            de tu número (mira <a href="/docs/whatsapp-templates#limits" style={{ color: "#d1345b" }}>Límites de mensajes de Meta</a>).
+          </p>
+
+          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Qué ves en pantalla</h3>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Ventana abierta:</strong> la barra de mensaje funciona normal.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Ventana cerrada:</strong> el texto y los adjuntos quedan deshabilitados con el aviso <em>&quot;La ventana de 24 h está cerrada: envía una plantilla&quot;</em>. Pulsa el botón <strong style={{ color: "var(--foreground)" }}>Plantillas</strong> de la barra de mensaje y elige una.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Cliente nuevo que nunca te ha escrito:</strong> pulsa <strong style={{ color: "var(--foreground)" }}>Nuevo Chat</strong>, busca el contacto y envíale una plantilla.</li>
+          </ul>
+
+          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Preguntas frecuentes</h3>
+          <ul className="space-y-3 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li><strong style={{ color: "var(--foreground)" }}>&quot;¿Por qué no me deja escribirle?&quot;</strong> Porque pasaron más de 24 horas desde el último mensaje del cliente, o porque nunca te ha escrito. Envíale una plantilla.</li>
+            <li><strong style={{ color: "var(--foreground)" }}>&quot;No tengo plantillas, ¿qué hago?&quot;</strong> Crea una en <a href="/docs/whatsapp-templates#create" style={{ color: "#d1345b" }}>Plantillas de WhatsApp</a>. Meta la revisa, normalmente en minutos (a veces hasta 24 horas). Mientras no tengas al menos una aprobada, solo puedes responder a quien te escriba primero. Te conviene dejar lista desde el primer día una plantilla corta para retomar conversaciones.</li>
+            <li><strong style={{ color: "var(--foreground)" }}>&quot;¿Cuesta algo?&quot;</strong> Responder dentro de las 24 horas no tiene costo de Meta. Las plantillas sí pueden tener un cobro de Meta según su categoría (marketing, utilidad o autenticación) y el país del cliente. Consulta las tarifas vigentes en Meta.</li>
+            <li><strong style={{ color: "var(--foreground)" }}>&quot;¿Puedo mandarle una plantilla a alguien que ya me está escribiendo?&quot;</strong> Sí, pero no hace falta: con la ventana abierta escribe normal.</li>
+            <li><strong style={{ color: "var(--foreground)" }}>&quot;¿Y para escribirle a muchos a la vez?&quot;</strong> Usa <a href="/docs/mass-campaigns#whatsapp" style={{ color: "#d1345b" }}>WhatsApp masivo</a>. Funciona con las mismas plantillas.</li>
+          </ul>
+          <Callout type="tip">
+            Para que los clientes te escriban primero (y así abrir la ventana sin plantilla), pon el enlace de tu WhatsApp en tu
+            web, tus redes y tus <a href="/docs/landing-pages" style={{ color: "#d1345b" }}>landing pages</a>.
           </Callout>
         </section>
 
