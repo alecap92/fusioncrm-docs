@@ -38,7 +38,7 @@ export default function InvoicesPage() {
           La facturación electrónica no viene incluida en los planes: es un módulo que se contrata aparte y se activa
           para tu organización. Incluye facturas, notas crédito y débito, compras, recepción de
           facturas, documentos soporte y cuentas por cobrar. Si no ves el menú Facturación, pide su activación en{" "}
-          <strong style={{ color: "#d1345b" }}>ventas@fusioncol.com</strong>. Más detalle en{" "}
+          <strong style={{ color: "#d1345b" }}>comercial@fusioncol.com</strong>. Más detalle en{" "}
           <a href="/docs/settings#plan" style={{ color: "#d1345b" }}>Plan, asientos y módulos</a>.
         </Callout>
 
