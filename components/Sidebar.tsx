@@ -333,17 +333,19 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
       >
         {/* Logo */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 flex-shrink-0">
-          <Link href="/docs" className="flex items-center gap-2.5">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm"
-              style={{ background: "linear-gradient(135deg, #d1345b, #1f2a48)" }}
-            >
-              F
-            </div>
-            <div>
-              <div className="text-white font-bold text-sm leading-tight">FusionCRM</div>
-              <div className="text-white/50 text-xs">Documentación</div>
-            </div>
+          <Link href="/docs" className="flex items-center gap-3" aria-label="FusionCRM Documentación">
+            {/* Logo blanco de la app: el fondo del sidebar es oscuro en ambos temas. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo-fusion-white.png"
+              alt="FusionCRM"
+              width={640}
+              height={135}
+              className="h-7 w-auto"
+            />
+            <span className="text-white/50 text-xs border-l border-white/20 pl-3 leading-tight">
+              Documentación
+            </span>
           </Link>
           <button
             onClick={onClose}
