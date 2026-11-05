@@ -11,7 +11,7 @@ const toc = [
   { id: "rules", label: "Reglas de puntuación" },
   { id: "create-rule", label: "Crear regla" },
   { id: "score-view", label: "Ver puntajes" },
-  { id: "ai-scoring", label: "Scoring con IA" },
+  { id: "ai-scoring", label: "Cuándo se actualiza" },
 ];
 
 export default function LeadScoringPage() {
@@ -21,47 +21,50 @@ export default function LeadScoringPage() {
         <Breadcrumbs />
         <h1 className="text-3xl font-bold mb-2" style={{ color: "var(--foreground)" }}>Lead Scoring</h1>
         <p className="text-lg mb-8" style={{ color: "var(--muted-foreground)" }}>
-          El Lead Scoring califica automáticamente a tus contactos según su probabilidad de
-          convertirse en clientes, ayudando al equipo de ventas a priorizar esfuerzos.
+          El Lead Scoring le pone un puntaje a cada contacto según reglas que tú defines, para que
+          tu equipo sepa a quién darle prioridad.
         </p>
 
         <section id="overview" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>¿Qué es Lead Scoring?</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            El Lead Scoring es un sistema que asigna puntos a cada contacto en función de sus
-            características (perfil) y comportamiento (actividad). Los contactos con mayor puntaje
-            tienen mayor probabilidad de comprar y deben recibir mayor atención del equipo de ventas.
+            Cada regla suma o resta puntos cuando un contacto cumple sus condiciones. El puntaje del
+            contacto es la suma de todas las condiciones que cumple en las reglas activas. Las
+            condiciones pueden mirar dos tipos de datos:
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div className="p-4 rounded-lg border" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
-              <p className="font-semibold mb-2" style={{ color: "var(--foreground)" }}>Scoring demográfico (perfil)</p>
+              <p className="font-semibold mb-2" style={{ color: "var(--foreground)" }}>Datos del contacto</p>
               <ul className="space-y-1 text-sm" style={{ color: "var(--muted-foreground)" }}>
-                <li>• Empresa: ¿es del tamaño objetivo?</li>
-                <li>• Cargo: ¿es tomador de decisiones?</li>
-                <li>• Industria: ¿es tu segmento target?</li>
-                <li>• Ciudad/País: ¿zona de cobertura?</li>
+                <li>• Cualquier campo de la ficha: ciudad, tipo de empresa, origen, campos personalizados…</li>
+                <li>• Condiciones: Existe, Igual a, No igual a, Contiene, Mayor que, Menor que, En la lista</li>
               </ul>
             </div>
             <div className="p-4 rounded-lg border" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
-              <p className="font-semibold mb-2" style={{ color: "var(--foreground)" }}>Scoring conductual (actividad)</p>
+              <p className="font-semibold mb-2" style={{ color: "var(--foreground)" }}>Historial de compras</p>
               <ul className="space-y-1 text-sm" style={{ color: "var(--muted-foreground)" }}>
-                <li>• Abrió email de campaña</li>
-                <li>• Respondió mensaje de WhatsApp</li>
-                <li>• Tiene deal activo</li>
-                <li>• Última actividad reciente</li>
+                <li>• Antigüedad del último negocio, monto, estado y pipeline</li>
+                <li>• Cantidad y valor total de negocios</li>
+                <li>• Si compró un producto, frecuencia de compra y campos personalizados del negocio</li>
               </ul>
             </div>
           </div>
+          <Callout type="note">
+            Las reglas no miran aperturas de correo, respuestas de WhatsApp ni actividad reciente:
+            solo los datos del contacto y sus negocios.
+          </Callout>
         </section>
 
         <section id="rules" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Reglas de puntuación</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Las reglas definen cuántos puntos suma o resta cada condición. Puedes configurarlas
-            desde <strong style={{ color: "var(--foreground)" }}>Configuración → Lead Scoring → Reglas</strong>.
+            Las reglas se configuran en{" "}
+            <strong style={{ color: "var(--foreground)" }}>Configuración → Módulos del CRM → Lead Scoring</strong>.
+            Cada regla tiene nombre, descripción, un interruptor para activarla o desactivarla sin
+            borrarla, y una o varias condiciones con sus propios puntos.
           </p>
           <div className="rounded-lg overflow-hidden border mb-4" style={{ borderColor: "var(--border)" }}>
-            <div className="px-4 py-2 text-xs font-semibold" style={{ backgroundColor: "#1f2a48", color: "white" }}>Ejemplos de reglas</div>
+            <div className="px-4 py-2 text-xs font-semibold" style={{ backgroundColor: "#1f2a48", color: "white" }}>Ejemplos de condiciones</div>
             <table className="w-full text-sm">
               <thead style={{ backgroundColor: "var(--muted)" }}>
                 <tr>
@@ -71,15 +74,13 @@ export default function LeadScoringPage() {
               </thead>
               <tbody>
                 {[
-                  ["Tiene email registrado", "+5"],
-                  ["Tiene teléfono registrado", "+5"],
-                  ["Tiene empresa registrada", "+10"],
-                  ["Cargo contiene \"Gerente\" o \"Director\"", "+20"],
-                  ["Abrió email de campaña", "+15"],
-                  ["Tiene deal activo", "+30"],
-                  ["Respondió WhatsApp en últimos 7 días", "+20"],
-                  ["Sin actividad en más de 90 días", "-10"],
-                  ["Email rebotó (inválido)", "-20"],
+                  ["Email existe", "+5"],
+                  ["Teléfono existe", "+5"],
+                  ["Tipo de empresa igual a \"Hoteles\"", "+20"],
+                  ["Ciudad en la lista \"Medellín, Bogotá, Cali\"", "+10"],
+                  ["Valor total de negocios mayor que 5.000.000", "+30"],
+                  ["Ha comprado el producto X", "+15"],
+                  ["Último negocio más antiguo que 180 días", "-10"],
                 ].map(([cond, pts]) => (
                   <tr key={cond}>
                     <td className="p-3 border-b" style={{ borderColor: "var(--border)", color: "var(--muted-foreground)" }}>{cond}</td>
@@ -95,11 +96,12 @@ export default function LeadScoringPage() {
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Crear regla de scoring</h2>
           <ol className="space-y-3 mb-4">
             {[
-              { n: "1", t: "Ve a Configuración → Lead Scoring", d: "Sección de configuración de reglas." },
-              { n: "2", t: "Clic en \"+ Nueva regla\"", d: "Abre el formulario de configuración de regla." },
-              { n: "3", t: "Define la condición", d: "Selecciona el campo a evaluar (ej. Cargo), el operador (contiene, es igual a, etc.) y el valor." },
-              { n: "4", t: "Asigna los puntos", d: "Número positivo para sumar, negativo para restar." },
-              { n: "5", t: "Activa la regla", d: "Guarda y activa. Los puntajes se recalculan automáticamente." },
+              { n: "1", t: "Ve a Configuración → Módulos del CRM → Lead Scoring", d: "Ahí ves tus reglas y si están activas." },
+              { n: "2", t: "Haz clic en \"Nueva regla\"", d: "Ponle un nombre y, si quieres, una descripción." },
+              { n: "3", t: "Agrega las condiciones", d: "Para cada una eliges el campo, la condición, el valor y los puntos. Usa puntos negativos para restar." },
+              { n: "4", t: "Revisa la vista previa (opcional)", d: "Te muestra el impacto de la regla antes de guardarla." },
+              { n: "5", t: "Haz clic en \"Crear regla\"", d: "Deja la regla activa para que cuente en el puntaje." },
+              { n: "6", t: "Haz clic en \"Recalcular\"", d: "Crear, editar o activar una regla no cambia los puntajes que ya existen. \"Recalcular\" actualiza los de todos tus contactos en segundo plano; puede tardar unos minutos." },
             ].map((s) => (
               <li key={s.n} className="flex gap-3">
                 <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "#d1345b" }}>{s.n}</span>
@@ -119,43 +121,41 @@ export default function LeadScoringPage() {
         <section id="score-view" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Ver puntajes</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            El puntaje de cada contacto es visible en:
+            El puntaje de cada contacto se ve en:
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Directorio de contactos:</strong> Columna de puntaje, filtrable y ordenable</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Perfil del contacto:</strong> Indicador visual de puntaje con desglose por regla</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Reportes de Lead Scoring:</strong> Distribución de puntajes, top leads</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Ficha del contacto:</strong> tarjeta &quot;Puntaje del lead&quot; (el número total).</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Ficha de la empresa:</strong> &quot;Score de cuenta&quot;, que es el puntaje más alto entre sus contactos.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Conversación de WhatsApp:</strong> junto al chat, con un color según el número.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Automatizaciones:</strong> como la variable &quot;Puntaje del contacto&quot;.</li>
           </ul>
-          <div className="space-y-2 mb-4">
-            {[
-              { range: "80-100", label: "Lead caliente 🔥", color: "#ef4444", desc: "Prioridad máxima, contactar hoy." },
-              { range: "50-79", label: "Lead tibio 🌡️", color: "#f59e0b", desc: "Seguimiento en los próximos días." },
-              { range: "20-49", label: "Lead frío ❄️", color: "#3b82f6", desc: "Nutrir con contenido relevante." },
-              { range: "0-19", label: "Lead inactivo 😴", color: "#6b7280", desc: "Re-calificar o archivar." },
-            ].map((l) => (
-              <div key={l.range} className="flex items-center gap-3 p-3 rounded border" style={{ borderColor: "var(--border)" }}>
-                <span className="text-xs font-bold px-2 py-1 rounded font-mono text-white" style={{ backgroundColor: l.color }}>{l.range}</span>
-                <div>
-                  <span className="font-semibold text-sm" style={{ color: "var(--foreground)" }}>{l.label}:</span>
-                  <span className="text-sm ml-1" style={{ color: "var(--muted-foreground)" }}>{l.desc}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+          <Callout type="note">
+            FusionCRM no clasifica los contactos en caliente, tibio o frío ni pone un tope al
+            puntaje: el número depende de los puntos que pongas en tus reglas. Si quieres rangos,
+            defínelos tú (por ejemplo, &quot;más de 50 = prioridad&quot;) y úsalos en tus listas o
+            automatizaciones.
+          </Callout>
         </section>
 
         <section id="ai-scoring" className="mb-10">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Scoring y agentes IA</h2>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Cuándo se actualiza el puntaje</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            El puntaje se recalcula con cada evento que tus reglas miren: un negocio que cambia de
-            etapa (desde el kanban, el modal, la API o el MCP), un mensaje, un formulario enviado.
-            Un <a href="/docs/agentes-ia" style={{ color: "#d1345b" }}>agente IA</a> que califica
-            leads por WhatsApp alimenta esas mismas reglas: al mover la conversación de etapa o
-            guardar el estado del lead, el puntaje se actualiza como si lo hubiera hecho una persona.
+            El puntaje de un contacto se recalcula solo cuando:
+          </p>
+          <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• Uno de sus negocios cambia de etapa (desde el kanban, el modal, la API o el MCP).</li>
+            <li>• Creas o importas el contacto.</li>
+            <li>• Editas el contacto en la app.</li>
+          </ul>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Los mensajes, los formularios, mover una conversación de etapa o lo que guarde un{" "}
+            <a href="/docs/agentes-ia" style={{ color: "#d1345b" }}>agente IA</a> no recalculan el
+            puntaje por sí solos. Para todo lo demás (por ejemplo, después de cambiar tus reglas),
+            usa el botón &quot;Recalcular&quot;.
           </p>
           <Callout type="tip">
-            El puntaje de una empresa es el más alto entre sus contactos; úsalo para priorizar
-            cuentas, no solo personas.
+            Las reglas y el recálculo también se manejan por API y MCP (<code>list_scoring_rules</code>,{" "}
+            <code>create_scoring_rule</code>, <code>recalculate_scoring_rules</code>).
           </Callout>
         </section>
 
