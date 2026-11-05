@@ -17,6 +17,7 @@ export const metadata: Metadata = {
       "Cómo FusionCRM guarda la ciudad con el código DANE/DIVIPOLA: catálogo de municipios y departamentos de Colombia por API, errores y uso en factura DIAN.",
     url: "/docs/ciudades",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

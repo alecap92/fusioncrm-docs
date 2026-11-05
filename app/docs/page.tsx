@@ -17,6 +17,7 @@ export const metadata: Metadata = {
       "Guía de FusionCRM, el CRM para WhatsApp de emprendedores en Colombia: contactos, embudo de ventas, cotizaciones, factura electrónica DIAN y automatizaciones.",
     url: "/docs",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

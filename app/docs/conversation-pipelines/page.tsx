@@ -17,6 +17,7 @@ export const metadata: Metadata = {
       "Organiza los chats de WhatsApp en tableros kanban por negocio, equipo o línea: crea pipelines, define columnas, mueve conversaciones y conecta automatizaciones.",
     url: "/docs/conversation-pipelines",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

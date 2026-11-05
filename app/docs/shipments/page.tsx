@@ -17,6 +17,7 @@ export const metadata: Metadata = {
       "Despacha pedidos desde el CRM con tu cuenta de Envia.com: compara tarifas de varias transportadoras, genera la guía, imprime la etiqueta y rastrea cada envío.",
     url: "/docs/shipments",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

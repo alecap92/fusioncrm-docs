@@ -18,6 +18,7 @@ export const metadata: Metadata = {
       "Conecta Claude, Claude Code o Cursor al servidor MCP de FusionCRM y opera contactos, negocios, WhatsApp y cotizaciones con IA: credenciales, permisos y errores.",
     url: "/docs/mcp",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

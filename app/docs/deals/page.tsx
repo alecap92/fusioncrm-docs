@@ -16,6 +16,7 @@ export const metadata: Metadata = {
       "Gestiona tus oportunidades en un embudo de ventas kanban: crea negocios, muévelos entre etapas, agrega productos, fecha de cierre, próximo paso y previsión.",
     url: "/docs/deals",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

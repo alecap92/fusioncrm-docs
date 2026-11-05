@@ -16,6 +16,7 @@ export const metadata: Metadata = {
       "Qué es un CRM, cómo se ve un negocio que vende por WhatsApp sin uno, por qué importa y los conceptos clave: contactos, embudo de ventas, negocios y seguimiento.",
     url: "/docs/que-es-un-crm",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

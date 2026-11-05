@@ -16,6 +16,7 @@ export const metadata: Metadata = {
       "Diseña el pipeline de ventas de tu empresa: crea embudos, configura sus etapas, edítalos o elimínalos y aplica buenas prácticas para no perder negocios.",
     url: "/docs/pipelines",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

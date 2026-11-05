@@ -16,6 +16,7 @@ export const metadata: Metadata = {
       "Crea tu catálogo de productos y servicios con precios, impuestos y descripciones, y úsalo para armar cotizaciones y facturas electrónicas sin digitar dos veces.",
     url: "/docs/products",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

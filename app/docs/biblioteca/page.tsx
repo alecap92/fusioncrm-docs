@@ -17,6 +17,7 @@ export const metadata: Metadata = {
       "Guarda catálogos, listas de precios y fichas técnicas en la Biblioteca del CRM, ordénalos con tags, envíalos por WhatsApp y úsalos como base de la IA.",
     url: "/docs/biblioteca",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

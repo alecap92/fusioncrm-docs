@@ -16,6 +16,7 @@ export const metadata: Metadata = {
       "Crea cotizaciones en PDF con cálculo automático de impuestos, envíalas por correo o WhatsApp, sigue su estado y conviértelas en factura electrónica.",
     url: "/docs/quotes",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

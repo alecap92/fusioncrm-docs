@@ -17,6 +17,7 @@ export const metadata: Metadata = {
       "Gestiona clientes B2B en FusionCRM: crea empresas, vincula sus contactos y revisa en una ficha sus negocios, cotizaciones y facturas, también por API y MCP.",
     url: "/docs/companies",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

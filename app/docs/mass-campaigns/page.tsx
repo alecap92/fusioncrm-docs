@@ -16,6 +16,7 @@ export const metadata: Metadata = {
       "Envía campañas masivas de WhatsApp con plantillas aprobadas y de email a segmentos de contactos, mide aperturas, clics y respuestas, y aplica buenas prácticas.",
     url: "/docs/mass-campaigns",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

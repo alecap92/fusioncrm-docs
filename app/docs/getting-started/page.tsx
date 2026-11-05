@@ -16,6 +16,7 @@ export const metadata: Metadata = {
       "Empieza a usar FusionCRM desde cero: cómo registrarte y acceder, la ruta recomendada para configurar tu cuenta, los menús de cada módulo y tu organización.",
     url: "/docs/getting-started",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

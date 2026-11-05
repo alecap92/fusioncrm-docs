@@ -17,6 +17,7 @@ export const metadata: Metadata = {
       "Administra tu base de clientes en el CRM: crea y edita contactos, usa campos personalizados, arma listas y segmentos, importa desde Excel o CSV y filtra.",
     url: "/docs/contacts",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

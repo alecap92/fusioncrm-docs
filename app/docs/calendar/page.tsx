@@ -17,6 +17,7 @@ export const metadata: Metadata = {
       "Usa el calendario del CRM para agendar reuniones, tareas y recordatorios, y ver en una sola vista los seguimientos programados de tus contactos y empresas.",
     url: "/docs/calendar",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

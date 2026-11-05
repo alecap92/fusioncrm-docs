@@ -17,6 +17,7 @@ export const metadata: Metadata = {
       "Cotiza, genera, rastrea y cancela guías de Envia.com por la API REST de FusionCRM: endpoints, permisos, idempotencia, cobro de saldo y errores de ciudad.",
     url: "/docs/envios",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

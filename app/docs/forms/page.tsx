@@ -17,6 +17,7 @@ export const metadata: Metadata = {
       "Captura leads desde tu sitio o landing con formularios conectados al CRM: sin contactos duplicados, con la campaña de origen, negocio automático y anti-spam.",
     url: "/docs/forms",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

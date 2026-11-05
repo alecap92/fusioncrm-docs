@@ -17,6 +17,7 @@ export const metadata: Metadata = {
       "Conecta varios números de WhatsApp Business API al mismo CRM: cada línea con su nombre, color, plantillas, pipeline y perfil de negocio, también por API y MCP.",
     url: "/docs/whatsapp-lines",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

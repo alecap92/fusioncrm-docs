@@ -27,8 +27,9 @@ export const metadata: Metadata = {
     siteName: "FusionCRM Docs",
     type: "website",
     locale: "es_CO",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: { card: "summary_large_image", images: ["/og.png"] },
   robots: { index: true, follow: true },
 };
 

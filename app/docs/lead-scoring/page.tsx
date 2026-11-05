@@ -16,6 +16,7 @@ export const metadata: Metadata = {
       "Configura lead scoring en FusionCRM: crea reglas que suman o restan puntos a cada contacto, mira los puntajes y entiende cuándo se recalculan.",
     url: "/docs/lead-scoring",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

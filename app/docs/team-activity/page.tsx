@@ -17,6 +17,7 @@ export const metadata: Metadata = {
       "Revisa qué hace cada vendedor en el CRM: mensajes de WhatsApp enviados, negocios movidos, cotizaciones y última conexión, con informe diario por correo.",
     url: "/docs/team-activity",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

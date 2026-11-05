@@ -16,6 +16,7 @@ export const metadata: Metadata = {
       "Crea plantillas de WhatsApp aprobadas por Meta: variables, categorías, proceso de aprobación, límites de mensajes y consejos de redacción para envíos masivos.",
     url: "/docs/whatsapp-templates",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

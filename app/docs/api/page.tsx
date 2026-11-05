@@ -18,6 +18,7 @@ export const metadata: Metadata = {
       "Conecta tu sistema con FusionCRM por API REST: autenticación con tokens, permisos, endpoints en OpenAPI, webhooks salientes, errores y límites del plan.",
     url: "/docs/api",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

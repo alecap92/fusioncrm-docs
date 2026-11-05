@@ -17,6 +17,7 @@ export const metadata: Metadata = {
       "Mira tus ventas del mes, la previsión de ventas, las compras y los informes de facturación en reportes del CRM que armas a tu medida y exportas a Excel.",
     url: "/docs/reports",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

@@ -16,6 +16,7 @@ export const metadata: Metadata = {
       "Emite factura electrónica DIAN desde el CRM: configuración, notas crédito y débito, compras, documentos soporte, retenciones, cuentas por cobrar e informes.",
     url: "/docs/invoices",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

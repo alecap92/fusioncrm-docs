@@ -17,6 +17,7 @@ export const metadata: Metadata = {
       "Documenta tu estrategia de marketing en el CRM: qué hacer en cada etapa del funnel, la descripción de tu buyer persona y tus palabras clave.",
     url: "/docs/estrategia",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

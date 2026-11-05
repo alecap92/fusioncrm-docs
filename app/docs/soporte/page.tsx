@@ -17,6 +17,7 @@ export const metadata: Metadata = {
       "Cómo contactar al soporte de FusionCRM por WhatsApp, correo o desde la app, y qué revisar antes de escribirnos para resolver tu duda más rápido.",
     url: "/docs/soporte",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };

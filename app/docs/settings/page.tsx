@@ -16,6 +16,7 @@ export const metadata: Metadata = {
       "Ajusta FusionCRM a tu empresa: datos de la organización, usuarios y permisos, líneas de WhatsApp, correo, integraciones, tokens de API, seguridad y tu plan.",
     url: "/docs/settings",
     siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
     type: "website",
   },
 };
