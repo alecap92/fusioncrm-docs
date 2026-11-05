@@ -5,6 +5,7 @@ import { Search, X, ArrowRight } from "lucide-react";
 
 const searchIndex = [
   { title: "¿Qué es FusionCRM?", href: "/docs", section: "Introducción", keywords: ["fusioncrm", "crm", "introduccion"] },
+  { title: "Soporte: WhatsApp y correo", href: "/docs/soporte", section: "Soporte", keywords: ["soporte", "ayuda", "contacto", "whatsapp", "correo", "problema"] },
   { title: "Cómo acceder y configurar la cuenta", href: "/docs/getting-started", section: "Primeros Pasos", keywords: ["acceder", "login", "cuenta", "configurar"] },
   { title: "Directorio de contactos", href: "/docs/contacts", section: "Contactos", keywords: ["contactos", "directorio", "personas"] },
   { title: "Campos personalizados en contactos", href: "/docs/contacts#custom-fields", section: "Contactos", keywords: ["campos", "custom", "personalizados"] },
@@ -99,7 +100,14 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 px-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 backdrop-blur-sm"
+      style={{ backgroundColor: "rgba(15, 22, 41, 0.45)" }}
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Buscar en la documentación"
+    >
       <div
         className="w-full max-w-xl rounded-xl shadow-2xl overflow-hidden"
         style={{ backgroundColor: "var(--card)", border: "1px solid var(--border)" }}
@@ -139,10 +147,10 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
                 className="flex items-center justify-between px-4 py-2.5 group transition-colors hover:bg-[#d1345b]/10"
               >
                 <div>
-                  <p className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
+                  <p className="m-0 text-sm font-medium leading-snug" style={{ color: "var(--foreground)" }}>
                     {item.title}
                   </p>
-                  <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+                  <p className="m-0 mt-0.5 text-xs leading-snug" style={{ color: "var(--muted-foreground)" }}>
                     {item.section}
                   </p>
                 </div>

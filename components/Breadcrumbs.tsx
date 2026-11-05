@@ -29,6 +29,7 @@ const labels: Record<string, string> = {
   shipments: "Envíos",
   biblioteca: "Biblioteca",
   estrategia: "Estrategia",
+  soporte: "Soporte",
   integrations: "Integraciones",
   companies: "Empresas",
   forms: "Formularios web",

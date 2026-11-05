@@ -6,7 +6,7 @@ import {
   Home, Users, Briefcase, GitBranch, MessageSquare, Mail, FileText,
   BarChart2, Settings, Code2, Puzzle, Zap, Star, Package, ShoppingCart,
   FileBarChart, Calendar, FolderKanban, ChevronDown, ChevronRight, X, Menu,
-  BookOpen, Send, CreditCard, TrendingUp, LayoutTemplate, Activity, Library, Target, Truck } from "lucide-react";
+  BookOpen, Send, LifeBuoy, CreditCard, TrendingUp, LayoutTemplate, Activity, Library, Target, Truck } from "lucide-react";
 
 interface NavItem {
   title: string;
@@ -14,11 +14,13 @@ interface NavItem {
   icon?: React.ReactNode;
   children?: NavItem[];
   badge?: string;
+  group?: string;
 }
 
 const navigation: NavItem[] = [
   {
     title: "Primeros Pasos",
+    group: "Primeros pasos",
     icon: <Home size={16} />,
     children: [
       { title: "¿Qué es FusionCRM?", href: "/docs" },
@@ -28,6 +30,7 @@ const navigation: NavItem[] = [
   },
   {
     title: "Contactos",
+    group: "Contactos",
     icon: <Users size={16} />,
     children: [
       { title: "Directorio de contactos", href: "/docs/contacts" },
@@ -42,8 +45,8 @@ const navigation: NavItem[] = [
   },
   {
     title: "Empresas",
+    group: "Contactos",
     icon: <Briefcase size={16} />,
-    badge: "B2B",
     children: [
       { title: "Personas y cuentas", href: "/docs/companies" },
       { title: "Crear y vincular", href: "/docs/companies#create" },
@@ -51,28 +54,8 @@ const navigation: NavItem[] = [
     ],
   },
   {
-    title: "Formularios web",
-    icon: <Send size={16} />,
-    children: [
-      { title: "Para qué sirven", href: "/docs/forms" },
-      { title: "Link, embed o webhook", href: "/docs/forms#share" },
-      { title: "Qué pasa con cada envío", href: "/docs/forms#submit" },
-      { title: "Después del envío", href: "/docs/forms#after" },
-    ],
-  },
-  {
-    title: "Páginas de aterrizaje",
-    icon: <LayoutTemplate size={16} />,
-    children: [
-      { title: "Para qué sirven", href: "/docs/landing-pages" },
-      { title: "Crear una en 10 minutos", href: "/docs/landing-pages#create" },
-      { title: "Los 8 bloques", href: "/docs/landing-pages#blocks" },
-      { title: "Publicar y compartir", href: "/docs/landing-pages#publish" },
-      { title: "Estadísticas", href: "/docs/landing-pages#stats" },
-    ],
-  },
-  {
-    title: "Deals / Negocios",
+    title: "Negocios",
+    group: "Negocio",
     icon: <Briefcase size={16} />,
     children: [
       { title: "Vista Kanban", href: "/docs/deals" },
@@ -87,6 +70,7 @@ const navigation: NavItem[] = [
   },
   {
     title: "Pipelines",
+    group: "Negocio",
     icon: <GitBranch size={16} />,
     children: [
       { title: "Pipelines de negocios", href: "/docs/pipelines" },
@@ -95,57 +79,8 @@ const navigation: NavItem[] = [
     ],
   },
   {
-    title: "Conversaciones",
-    icon: <MessageSquare size={16} />,
-    children: [
-      { title: "Vista general", href: "/docs/conversations" },
-      { title: "Cómo escribirle a un cliente (WhatsApp)", href: "/docs/conversations#iniciar-whatsapp" },
-      { title: "Tipos de mensajes", href: "/docs/conversations#message-types" },
-      { title: "WhatsApp", href: "/docs/conversations#whatsapp" },
-      { title: "Respuestas rápidas", href: "/docs/conversations#quick-replies" },
-      { title: "Asignación de chats", href: "/docs/conversations#assignment" },
-      { title: "Kanban, líneas y pipelines", href: "/docs/conversations#kanban" },
-      { title: "Pipelines de conversación", href: "/docs/conversation-pipelines" },
-      { title: "Líneas de WhatsApp (varios números)", href: "/docs/whatsapp-lines" },
-      { title: "Perfil de negocio (foto y datos)", href: "/docs/whatsapp-lines#profile" },
-    ],
-  },
-  {
-    title: "Templates WhatsApp",
-    icon: <BookOpen size={16} />,
-    children: [
-      { title: "Gestión de plantillas", href: "/docs/whatsapp-templates" },
-      { title: "Crear template", href: "/docs/whatsapp-templates#create" },
-      { title: "Variables y parámetros", href: "/docs/whatsapp-templates#variables" },
-      { title: "Envío masivo", href: "/docs/whatsapp-templates#mass-send" },
-      { title: "Límites de mensajes de Meta", href: "/docs/whatsapp-templates#limits" },
-      { title: "Plantillas por línea", href: "/docs/whatsapp-templates#lines" },
-      { title: "Crear por API o MCP", href: "/docs/whatsapp-templates#api" },
-    ],
-  },
-  {
-    title: "Correo / Email",
-    icon: <Mail size={16} />,
-    children: [
-      { title: "Bandeja de entrada", href: "/docs/email" },
-      { title: "Conectar cuenta de correo", href: "/docs/email#connect" },
-      { title: "Asignar correos al equipo", href: "/docs/email#assign" },
-      { title: "Redactar correo", href: "/docs/email#compose" },
-      { title: "Correos programados", href: "/docs/email#scheduled" },
-      { title: "Fragmentos", href: "/docs/email#snippets" },
-    ],
-  },
-  {
-    title: "Campañas Masivas",
-    icon: <Send size={16} />,
-    children: [
-      { title: "Email masivo", href: "/docs/mass-campaigns" },
-      { title: "WhatsApp masivo", href: "/docs/mass-campaigns#whatsapp" },
-      { title: "Segmentación", href: "/docs/mass-campaigns#segmentation" },
-    ],
-  },
-  {
     title: "Cotizaciones",
+    group: "Negocio",
     icon: <FileText size={16} />,
     children: [
       { title: "Gestión de cotizaciones", href: "/docs/quotes" },
@@ -154,7 +89,44 @@ const navigation: NavItem[] = [
     ],
   },
   {
+    title: "Productos",
+    group: "Negocio",
+    icon: <Package size={16} />,
+    children: [
+      { title: "Catálogo de productos", href: "/docs/products" },
+      { title: "Crear producto", href: "/docs/products#create" },
+    ],
+  },
+  {
+    title: "Envíos",
+    group: "Negocio",
+    icon: <Truck size={16} />,
+    children: [
+      { title: "Qué puedes hacer", href: "/docs/shipments" },
+      { title: "Antes de empezar", href: "/docs/shipments#setup" },
+      { title: "Cotizar y generar una guía", href: "/docs/shipments#quote" },
+      { title: "Estados del envío", href: "/docs/shipments#statuses" },
+      { title: "Rastrear, etiqueta y cancelar", href: "/docs/shipments#actions" },
+      { title: "Configuración de envíos", href: "/docs/shipments#settings" },
+      { title: "Etiquetas y rótulos", href: "/docs/shipments#labels" },
+      { title: "Errores comunes", href: "/docs/shipments#errors" },
+    ],
+  },
+  {
+    title: "Reportes",
+    group: "Negocio",
+    icon: <BarChart2 size={16} />,
+    children: [
+      { title: "Mis Reportes", href: "/docs/reports" },
+      { title: "Ventas de un mes", href: "/docs/reports#sales" },
+      { title: "Crear tus propios reportes", href: "/docs/reports#custom" },
+      { title: "Previsión de ventas", href: "/docs/reports#forecast" },
+      { title: "Lead Scoring", href: "/docs/lead-scoring" },
+    ],
+  },
+  {
     title: "Facturación",
+    group: "Facturación",
     icon: <CreditCard size={16} />,
     children: [
       { title: "Facturas electrónicas", href: "/docs/invoices" },
@@ -173,50 +145,95 @@ const navigation: NavItem[] = [
     ],
   },
   {
-    title: "Productos",
-    icon: <Package size={16} />,
+    title: "Conversaciones",
+    group: "Comunicación",
+    icon: <MessageSquare size={16} />,
     children: [
-      { title: "Catálogo de productos", href: "/docs/products" },
-      { title: "Crear producto", href: "/docs/products#create" },
+      { title: "Vista general", href: "/docs/conversations" },
+      { title: "Cómo escribirle a un cliente (WhatsApp)", href: "/docs/conversations#iniciar-whatsapp" },
+      { title: "Tipos de mensajes", href: "/docs/conversations#message-types" },
+      { title: "WhatsApp", href: "/docs/conversations#whatsapp" },
+      { title: "Respuestas rápidas", href: "/docs/conversations#quick-replies" },
+      { title: "Asignación de chats", href: "/docs/conversations#assignment" },
+      { title: "Kanban, líneas y pipelines", href: "/docs/conversations#kanban" },
+      { title: "Pipelines de conversación", href: "/docs/conversation-pipelines" },
+      { title: "Líneas de WhatsApp (varios números)", href: "/docs/whatsapp-lines" },
+      { title: "Perfil de negocio (foto y datos)", href: "/docs/whatsapp-lines#profile" },
     ],
   },
   {
-    title: "Envíos",
-    icon: <Truck size={16} />,
+    title: "Plantillas de WhatsApp",
+    group: "Comunicación",
+    icon: <BookOpen size={16} />,
     children: [
-      { title: "Qué puedes hacer", href: "/docs/shipments" },
-      { title: "Antes de empezar", href: "/docs/shipments#setup" },
-      { title: "Cotizar y generar una guía", href: "/docs/shipments#quote" },
-      { title: "Estados del envío", href: "/docs/shipments#statuses" },
-      { title: "Rastrear, etiqueta y cancelar", href: "/docs/shipments#actions" },
-      { title: "Configuración de envíos", href: "/docs/shipments#settings" },
-      { title: "Etiquetas y rótulos", href: "/docs/shipments#labels" },
-      { title: "Errores comunes", href: "/docs/shipments#errors" },
+      { title: "Gestión de plantillas", href: "/docs/whatsapp-templates" },
+      { title: "Crear template", href: "/docs/whatsapp-templates#create" },
+      { title: "Variables y parámetros", href: "/docs/whatsapp-templates#variables" },
+      { title: "Envío masivo", href: "/docs/whatsapp-templates#mass-send" },
+      { title: "Límites de mensajes de Meta", href: "/docs/whatsapp-templates#limits" },
+      { title: "Plantillas por línea", href: "/docs/whatsapp-templates#lines" },
+      { title: "Crear por API o MCP", href: "/docs/whatsapp-templates#api" },
     ],
   },
   {
-    title: "Reportes y Analytics",
-    icon: <BarChart2 size={16} />,
+    title: "Correo",
+    group: "Comunicación",
+    icon: <Mail size={16} />,
     children: [
-      { title: "Mis Reportes", href: "/docs/reports" },
-      { title: "Ventas de un mes", href: "/docs/reports#sales" },
-      { title: "Crear tus propios reportes", href: "/docs/reports#custom" },
-      { title: "Previsión de ventas", href: "/docs/reports#forecast" },
-      { title: "Lead Scoring", href: "/docs/lead-scoring" },
+      { title: "Bandeja de entrada", href: "/docs/email" },
+      { title: "Conectar cuenta de correo", href: "/docs/email#connect" },
+      { title: "Asignar correos al equipo", href: "/docs/email#assign" },
+      { title: "Redactar correo", href: "/docs/email#compose" },
+      { title: "Correos programados", href: "/docs/email#scheduled" },
+      { title: "Fragmentos", href: "/docs/email#snippets" },
     ],
   },
   {
-    title: "Automatizaciones",
-    icon: <Zap size={16} />,
+    title: "Campañas Masivas",
+    group: "Comunicación",
+    icon: <Send size={16} />,
     children: [
-      { title: "Automatizaciones", href: "/docs/workflows" },
-      { title: "Disparadores", href: "/docs/workflows#triggers" },
-      { title: "Acciones disponibles", href: "/docs/workflows#actions" },
-      { title: "Historial de ejecución", href: "/docs/workflows#history" },
+      { title: "Email masivo", href: "/docs/mass-campaigns" },
+      { title: "WhatsApp masivo", href: "/docs/mass-campaigns#whatsapp" },
+      { title: "Segmentación", href: "/docs/mass-campaigns#segmentation" },
+    ],
+  },
+  {
+    title: "Formularios web",
+    group: "Comunicación",
+    icon: <Send size={16} />,
+    children: [
+      { title: "Para qué sirven", href: "/docs/forms" },
+      { title: "Link, embed o webhook", href: "/docs/forms#share" },
+      { title: "Qué pasa con cada envío", href: "/docs/forms#submit" },
+      { title: "Después del envío", href: "/docs/forms#after" },
+    ],
+  },
+  {
+    title: "Páginas de aterrizaje",
+    group: "Comunicación",
+    icon: <LayoutTemplate size={16} />,
+    children: [
+      { title: "Para qué sirven", href: "/docs/landing-pages" },
+      { title: "Crear una en 10 minutos", href: "/docs/landing-pages#create" },
+      { title: "Los 8 bloques", href: "/docs/landing-pages#blocks" },
+      { title: "Publicar y compartir", href: "/docs/landing-pages#publish" },
+      { title: "Estadísticas", href: "/docs/landing-pages#stats" },
+    ],
+  },
+  {
+    title: "Biblioteca",
+    group: "Comunicación",
+    icon: <Library size={16} />,
+    children: [
+      { title: "Para qué sirve", href: "/docs/biblioteca" },
+      { title: "Subir archivos", href: "/docs/biblioteca#upload" },
+      { title: "Usar archivos en la IA", href: "/docs/biblioteca#ai" },
     ],
   },
   {
     title: "Agentes IA",
+    group: "Comunicación",
     icon: <Star size={16} />,
     badge: "IA",
     children: [
@@ -228,6 +245,7 @@ const navigation: NavItem[] = [
   },
   {
     title: "Calendario",
+    group: "Planeación",
     icon: <Calendar size={16} />,
     children: [
       { title: "Vista de calendario", href: "/docs/calendar" },
@@ -236,22 +254,15 @@ const navigation: NavItem[] = [
   },
   {
     title: "Proyectos",
+    group: "Planeación",
     icon: <FolderKanban size={16} />,
     children: [
       { title: "Gestión de proyectos", href: "/docs/projects" },
     ],
   },
   {
-    title: "Biblioteca",
-    icon: <Library size={16} />,
-    children: [
-      { title: "Para qué sirve", href: "/docs/biblioteca" },
-      { title: "Subir archivos", href: "/docs/biblioteca#upload" },
-      { title: "Usar archivos en la IA", href: "/docs/biblioteca#ai" },
-    ],
-  },
-  {
     title: "Estrategia",
+    group: "Planeación",
     icon: <Target size={16} />,
     children: [
       { title: "Para qué sirve", href: "/docs/estrategia" },
@@ -261,7 +272,19 @@ const navigation: NavItem[] = [
     ],
   },
   {
+    title: "Automatizaciones",
+    group: "Planeación",
+    icon: <Zap size={16} />,
+    children: [
+      { title: "Automatizaciones", href: "/docs/workflows" },
+      { title: "Disparadores", href: "/docs/workflows#triggers" },
+      { title: "Acciones disponibles", href: "/docs/workflows#actions" },
+      { title: "Historial de ejecución", href: "/docs/workflows#history" },
+    ],
+  },
+  {
     title: "Configuración",
+    group: "Configuración",
     icon: <Settings size={16} />,
     children: [
       { title: "Organización", href: "/docs/settings" },
@@ -284,6 +307,7 @@ const navigation: NavItem[] = [
   },
   {
     title: "Actividad del equipo",
+    group: "Configuración",
     icon: <Activity size={16} />,
     children: [
       { title: "Revisa qué hacen tus empleados", href: "/docs/team-activity" },
@@ -293,7 +317,19 @@ const navigation: NavItem[] = [
     ],
   },
   {
+    title: "Integraciones",
+    group: "Configuración",
+    icon: <Puzzle size={16} />,
+    children: [
+      { title: "WhatsApp Business", href: "/docs/integrations" },
+      { title: "N8N, Make, Zapier", href: "/docs/integrations#n8n" },
+      { title: "Webhooks y datos entrantes", href: "/docs/integrations#webhooks" },
+      { title: "Redes sociales", href: "/docs/integrations#social" },
+    ],
+  },
+  {
     title: "API REST",
+    group: "Desarrolladores",
     icon: <Code2 size={16} />,
     badge: "REST",
     children: [
@@ -308,6 +344,7 @@ const navigation: NavItem[] = [
   },
   {
     title: "MCP (IA)",
+    group: "Desarrolladores",
     icon: <Star size={16} />,
     badge: "MCP",
     children: [
@@ -318,15 +355,15 @@ const navigation: NavItem[] = [
     ],
   },
   {
-    title: "Integraciones",
-    icon: <Puzzle size={16} />,
+    title: "Soporte",
+    group: "Soporte",
+    icon: <LifeBuoy size={16} />,
     children: [
-      { title: "WhatsApp Business", href: "/docs/integrations" },
-      { title: "N8N, Make, Zapier", href: "/docs/integrations#n8n" },
-      { title: "Webhooks y datos entrantes", href: "/docs/integrations#webhooks" },
-      { title: "Redes sociales", href: "/docs/integrations#social" },
+      { title: "Contactar a soporte", href: "/docs/soporte" },
+      { title: "Antes de escribirnos", href: "/docs/soporte#before" },
     ],
   },
+
 ];
 
 interface SidebarProps {
@@ -387,7 +424,7 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
               height={135}
               className="h-7 w-auto"
             />
-            <span className="text-white/50 text-xs border-l border-white/20 pl-3 leading-tight">
+            <span className="text-white/75 text-xs border-l border-white/20 pl-3 leading-tight">
               Documentación
             </span>
           </Link>
@@ -401,7 +438,8 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-4 px-3">
-          {navigation.map((section) => {
+          {navigation.map((section, i) => {
+            const showGroup = section.group && section.group !== navigation[i - 1]?.group;
             const isOpen = openSections[section.title] ?? false;
             const hasActive = section.children?.some(
               (child) => child.href && isActive(child.href)
@@ -409,17 +447,22 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
 
             return (
               <div key={section.title} className="mb-1">
+                {showGroup && (
+                  <p className={`px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/45 ${i === 0 ? "pt-0" : "pt-5"}`}>
+                    {section.group}
+                  </p>
+                )}
                 <button
                   onClick={() => toggle(section.title)}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-xs font-semibold uppercase tracking-wider transition-colors ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     hasActive
                       ? "text-white"
-                      : "text-white/50 hover:text-white/80"
+                      : "text-white/75 hover:text-white"
                   }`}
                   style={hasActive ? { backgroundColor: "var(--sidebar-hover)" } : {}}
                 >
                   <span className="flex items-center gap-2">
-                    <span className={hasActive ? "text-[#d1345b]" : "text-white/40"}>
+                    <span className={hasActive ? "text-[#d1345b]" : "text-white/60"}>
                       {section.icon}
                     </span>
                     {section.title}
@@ -447,7 +490,7 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
                         className={`block py-1.5 px-2 text-sm rounded-md transition-colors ${
                           child.href && isActive(child.href)
                             ? "text-white font-medium"
-                            : "text-white/55 hover:text-white/90"
+                            : "text-white/80 hover:text-white"
                         }`}
                         style={
                           child.href && isActive(child.href)
