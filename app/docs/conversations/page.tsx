@@ -149,8 +149,7 @@ export default function ConversationsPage() {
           </p>
           <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Usar respuestas rápidas</h3>
           <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Escribe <code style={{ color: "#d1345b" }}>/</code> en el campo de mensaje para abrir el menú de respuestas rápidas</li>
-            <li>• Busca por nombre o contenido de la respuesta</li>
+            <li>• Escribe <code style={{ color: "#d1345b" }}>#</code> seguido del atajo de la respuesta (por ejemplo <code style={{ color: "#d1345b" }}>#precios</code>) en el campo de mensaje; mientras escribes aparecen las respuestas que coinciden</li>
             <li>• Selecciona la respuesta para insertarla en el mensaje</li>
             <li>• Edita el texto antes de enviar si es necesario</li>
           </ul>
