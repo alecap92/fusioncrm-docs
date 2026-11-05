@@ -4,7 +4,21 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Automatizaciones" };
+export const metadata: Metadata = {
+  title: "Automatizaciones sin código",
+  description:
+    "Automatiza tareas repetitivas del CRM sin código: disparadores como un mensaje de WhatsApp o una factura vencida, acciones, historial de ejecución y ejemplos.",
+  keywords: ["automatizaciones", "workflows", "automatizar WhatsApp", "disparadores", "sin código"],
+  alternates: { canonical: "/docs/workflows" },
+  openGraph: {
+    title: "Automatizaciones sin código",
+    description:
+      "Automatiza tareas repetitivas del CRM sin código: disparadores como un mensaje de WhatsApp o una factura vencida, acciones, historial de ejecución y ejemplos.",
+    url: "/docs/workflows",
+    siteName: "FusionCRM Docs",
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "¿Qué es una automatización?" },

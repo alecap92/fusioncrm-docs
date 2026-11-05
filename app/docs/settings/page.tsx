@@ -4,7 +4,21 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Configuración" };
+export const metadata: Metadata = {
+  title: "Configuración de la cuenta y la organización",
+  description:
+    "Ajusta FusionCRM a tu empresa: datos de la organización, usuarios y permisos, líneas de WhatsApp, correo, integraciones, tokens de API, seguridad y tu plan.",
+  keywords: ["configuración", "usuarios y permisos", "líneas de WhatsApp", "tokens de API", "seguridad", "plan"],
+  alternates: { canonical: "/docs/settings" },
+  openGraph: {
+    title: "Configuración de la cuenta y la organización",
+    description:
+      "Ajusta FusionCRM a tu empresa: datos de la organización, usuarios y permisos, líneas de WhatsApp, correo, integraciones, tokens de API, seguridad y tu plan.",
+    url: "/docs/settings",
+    siteName: "FusionCRM Docs",
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Panel de configuración" },

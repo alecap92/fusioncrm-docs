@@ -4,7 +4,21 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "¿Qué es un CRM?" };
+export const metadata: Metadata = {
+  title: "¿Qué es un CRM y para qué sirve?",
+  description:
+    "Qué es un CRM, cómo se ve un negocio que vende por WhatsApp sin uno, por qué importa y los conceptos clave: contactos, embudo de ventas, negocios y seguimiento.",
+  keywords: ["qué es un CRM", "para qué sirve un CRM", "CRM para WhatsApp", "embudo de ventas", "CRM para emprendedores"],
+  alternates: { canonical: "/docs/que-es-un-crm" },
+  openGraph: {
+    title: "¿Qué es un CRM y para qué sirve?",
+    description:
+      "Qué es un CRM, cómo se ve un negocio que vende por WhatsApp sin uno, por qué importa y los conceptos clave: contactos, embudo de ventas, negocios y seguimiento.",
+    url: "/docs/que-es-un-crm",
+    siteName: "FusionCRM Docs",
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "definicion", label: "¿Qué es un CRM?" },

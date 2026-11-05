@@ -4,7 +4,21 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Integraciones" };
+export const metadata: Metadata = {
+  title: "Integraciones: WhatsApp Business API, n8n y más",
+  description:
+    "Conecta FusionCRM con WhatsApp Business API, Facebook, Instagram, Gmail, Outlook, proveedores de IA, n8n y webhooks para conectar otros sistemas.",
+  keywords: ["integraciones CRM", "WhatsApp Business API", "n8n", "webhooks", "Instagram", "Gmail", "Outlook"],
+  alternates: { canonical: "/docs/integrations" },
+  openGraph: {
+    title: "Integraciones: WhatsApp Business API, n8n y más",
+    description:
+      "Conecta FusionCRM con WhatsApp Business API, Facebook, Instagram, Gmail, Outlook, proveedores de IA, n8n y webhooks para conectar otros sistemas.",
+    url: "/docs/integrations",
+    siteName: "FusionCRM Docs",
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Integraciones disponibles" },

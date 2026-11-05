@@ -4,7 +4,21 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Facturación" };
+export const metadata: Metadata = {
+  title: "Factura electrónica DIAN en Colombia",
+  description:
+    "Emite factura electrónica DIAN desde el CRM: configuración, notas crédito y débito, compras, documentos soporte, retenciones, cuentas por cobrar e informes.",
+  keywords: ["factura electrónica DIAN", "facturación electrónica Colombia", "notas crédito", "documento soporte", "retenciones", "cuentas por cobrar", "CUFE"],
+  alternates: { canonical: "/docs/invoices" },
+  openGraph: {
+    title: "Factura electrónica DIAN en Colombia",
+    description:
+      "Emite factura electrónica DIAN desde el CRM: configuración, notas crédito y débito, compras, documentos soporte, retenciones, cuentas por cobrar e informes.",
+    url: "/docs/invoices",
+    siteName: "FusionCRM Docs",
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Facturación electrónica" },
