@@ -11,7 +11,7 @@ const toc = [
   { id: "config", label: "Configuración DIAN" },
   { id: "create", label: "Crear factura" },
   { id: "fields", label: "Campos de factura" },
-  { id: "incoming", label: "Facturas de compra" },
+  { id: "incoming", label: "Recepción de facturas" },
   { id: "credit-notes", label: "Notas crédito" },
   { id: "purchases", label: "Compras" },
 ];
@@ -28,7 +28,8 @@ export default function InvoicesPage() {
         </p>
         <Callout type="note" title="Módulo adicional">
           La facturación electrónica no viene incluida en los planes: es un módulo que se contrata aparte y se activa
-          para tu organización. Si no ves el menú de Facturas, pide su activación en{" "}
+          para tu organización. Incluye facturas, notas crédito y débito, compras, recepción de
+          facturas, documentos soporte y cuentas por cobrar. Si no ves el menú Facturación, pide su activación en{" "}
           <strong style={{ color: "#d1345b" }}>ventas@fusioncol.com</strong>. Más detalle en{" "}
           <a href="/docs/settings#plan" style={{ color: "#d1345b" }}>Plan, asientos y módulos</a>.
         </Callout>
@@ -44,7 +45,7 @@ export default function InvoicesPage() {
             {[
               { title: "Factura de venta", desc: "Documento de venta electrónico CUFE.", color: "#3b82f6" },
               { title: "Nota crédito", desc: "Anulación o ajuste de factura emitida.", color: "#8b5cf6" },
-              { title: "Factura de compra", desc: "Registro de facturas recibidas de proveedores.", color: "#22c55e" },
+              { title: "Recepción de facturas", desc: "Buzón de las facturas que te envían tus proveedores.", color: "#22c55e" },
             ].map((t) => (
               <div key={t.title} className="p-4 rounded-lg border text-center" style={{ borderColor: t.color, backgroundColor: `${t.color}10` }}>
                 <p className="font-bold" style={{ color: t.color }}>{t.title}</p>
@@ -52,22 +53,36 @@ export default function InvoicesPage() {
               </div>
             ))}
           </div>
+          <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>
+            En el menú <strong style={{ color: "var(--foreground)" }}>Facturación</strong> también encuentras:
+          </p>
+          <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Notas débito</strong>, para cobrar un valor adicional sobre una factura emitida.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Cuentas por cobrar</strong>: lo que te deben tus clientes. Desde la lista de facturas usa «Registrar pago» para anotar pagos y abonos.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Documentos Soporte</strong>, para compras a quien no factura electrónicamente.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Certificados de retención</strong> y las retenciones que te practicó cada cliente en sus facturas (se configuran en Configuración → Facturación → Retenciones).</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Verificador CUFE</strong>, para consultar una factura electrónica por su CUFE.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Informes</strong> de facturación, visibles solo para el propietario y el contador.</li>
+          </ul>
         </section>
 
         <section id="config" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Configuración DIAN</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Antes de emitir facturas electrónicas, debes completar la configuración DIAN. Este proceso
-            se realiza una sola vez desde <strong style={{ color: "var(--foreground)" }}>
-            Facturas → Configuración</strong>.
+            Antes de emitir facturas electrónicas, debes completar la configuración DIAN en{" "}
+            <strong style={{ color: "var(--foreground)" }}>Configuración → Facturación → Facturación electrónica</strong>.
+            Está organizada en pestañas; arriba ves el estado actual: <em>Producción</em> o <em>Desarrollo</em> (pruebas).
           </p>
           <div className="space-y-4 mb-6">
             {[
-              { step: "Paso 1: Datos de empresa", desc: "NIT, razón social, dirección, actividad económica (CIIU), régimen tributario." },
-              { step: "Paso 2: Certificado digital", desc: "Sube tu certificado .p12 o .pfx y su contraseña. Este certificado firma las facturas electrónicamente." },
-              { step: "Paso 3: Resolución DIAN", desc: "Número de resolución, prefijo (ej. FV), rango de numeración y fecha de vigencia." },
-              { step: "Paso 4: Verificación", desc: "FusionCRM envía una factura de prueba a la DIAN en ambiente de habilitación para validar la configuración." },
-              { step: "Paso 5: Activación", desc: "Una vez verificado, activa el modo de producción para emitir facturas reales." },
+              { step: "Resolución", desc: "Número de resolución DIAN, prefijo (ej. FV), rango de numeración y vigencia." },
+              { step: "Compañía", desc: "Datos de tu empresa que salen en la factura: NIT y DV, dirección, municipio, teléfono, correo, tipo de régimen y de responsabilidad." },
+              { step: "Email y Placeholders", desc: "Plantilla del correo con el que se envían las facturas y textos que aparecen en el PDF." },
+              { step: "Software", desc: "ID del Software y PIN de tu software de facturación electrónica." },
+              { step: "Certificado", desc: "Sube tu certificado digital en formato .p12 y su contraseña. Con él se firman las facturas." },
+              { step: "Token", desc: "Token de autenticación con la API de facturación electrónica." },
+              { step: "Actions", desc: "«Crear empresa» y «Sincronizar numeración» con la DIAN." },
+              { step: "Doc Soporte", desc: "Configuración de los documentos soporte." },
             ].map((s) => (
               <div key={s.step} className="p-4 rounded-lg border" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
                 <p className="font-semibold text-sm mb-1" style={{ color: "var(--foreground)" }}>{s.step}</p>
@@ -86,13 +101,14 @@ export default function InvoicesPage() {
           <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>Para emitir una nueva factura de venta:</p>
           <ol className="space-y-3 mb-6">
             {[
-              { n: "1", t: "Ve a Facturas → Nueva factura", d: "O conviértela desde una cotización aceptada." },
+              { n: "1", t: "Ve a Facturación → Facturas → «Nueva Factura»", d: "O usa «Generar factura» desde una cotización aceptada." },
               { n: "2", t: "Selecciona el cliente", d: "El sistema precargará sus datos de identificación (NIT o cédula)." },
               { n: "3", t: "Configura fechas y condiciones", d: "Fecha de emisión, fecha de vencimiento, condición de pago (contado/crédito)." },
               { n: "4", t: "Agrega los ítems", d: "Productos o servicios con código, descripción, cantidad, precio y IVA." },
               { n: "5", t: "Revisa el total", d: "Verifica subtotal, IVA desglosado, retenciones si aplican y total." },
-              { n: "6", t: "Emite la factura", d: "Al hacer clic en \"Emitir\", se firma y envía a la DIAN. El proceso toma unos segundos." },
-              { n: "7", t: "Envía al cliente", d: "El sistema puede enviar automáticamente el PDF y XML al email del cliente." },
+              { n: "6", t: "Revisa el PDF (opcional)", d: "«Ver PDF antes de emitir» genera un PDF marcado como BORRADOR sin gastar el consecutivo." },
+              { n: "7", t: "Emite la factura", d: "Pulsa «Guardar» y confirma con «Emitir factura»: se firma y envía a la DIAN. El proceso toma unos segundos." },
+              { n: "8", t: "Envía al cliente", d: "Desde el menú de la factura en la lista puedes «Enviar por correo», «Enviar por WhatsApp» o descargar el PDF, el XML o el ZIP." },
             ].map((s) => (
               <li key={s.n} className="flex gap-3">
                 <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "#d1345b" }}>{s.n}</span>
@@ -143,15 +159,14 @@ export default function InvoicesPage() {
         <section id="incoming" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Facturas de compra</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            El módulo de facturas de compra (también llamadas facturas de proveedor o facturas entrantes)
-            te permite registrar las facturas que recibes de tus proveedores.
+            <strong style={{ color: "var(--foreground)" }}>Facturación → Recepción de facturas</strong> es el
+            buzón donde llegan las facturas electrónicas que te envían tus proveedores.
           </p>
           <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Ve a Facturas → Facturas de compra</li>
-            <li>• Registra manualmente o importa desde un XML de la DIAN</li>
-            <li>• Asocia la factura a un proveedor (contacto)</li>
-            <li>• Registra la fecha de vencimiento para control de pagos</li>
-            <li>• Marca como pagada cuando realices el pago</li>
+            <li>• Llegan solas desde el correo de facturas que configures; pulsa «Sincronizar» para revisar el buzón en ese momento.</li>
+            <li>• También puedes registrarlas tú con «Subir XML» (y, según tu configuración, pegando el CUFE).</li>
+            <li>• Para que una factura cuente como gasto y se le calculen las retenciones, pulsa «Crear compra» en su fila, revisa los datos y confirma. Nada se crea solo.</li>
+            <li>• El pago al proveedor se marca después en <a href="#purchases" style={{ color: "#d1345b" }}>Compras</a>.</li>
           </ul>
         </section>
 
@@ -163,9 +178,9 @@ export default function InvoicesPage() {
           </p>
           <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Crear nota crédito</h3>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. Ve a Facturas → Notas crédito → Nueva nota crédito</li>
+            <li>1. Ve a Facturación → Notas crédito → «Nueva»</li>
             <li>2. Selecciona la factura original a la que aplica</li>
-            <li>3. Indica el concepto (devolución de mercancía, descuento, anulación)</li>
+            <li>3. Elige la «Razón de Devolución» (obligatoria), de la lista oficial de motivos de la DIAN</li>
             <li>4. Ajusta los ítems y montos si es una anulación parcial</li>
             <li>5. Emite la nota crédito (se envía automáticamente a la DIAN)</li>
           </ol>
@@ -178,7 +193,7 @@ export default function InvoicesPage() {
         <section id="purchases" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Compras</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            El módulo de Compras gestiona las facturas de tus proveedores y las órdenes de compra:
+            El módulo de Compras registra lo que le compras a tus proveedores y tus órdenes de compra:
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
             <li>• Crea órdenes de compra para tus proveedores</li>
@@ -191,8 +206,10 @@ export default function InvoicesPage() {
               facturas anuladas). El Neto no descuenta lo que ya pagaste: es lo comprado, no lo
               que debes
             </li>
-            <li>• Importa compras masivamente desde Excel/CSV</li>
-            <li>• Asocia compras a proyectos o centros de costo</li>
+            <li>• Registra un «Gasto sin documento» cuando no tienes factura del proveedor</li>
+            <li>• Calcula y ajusta las retenciones de cada compra</li>
+            <li>• Marca cada compra como Pendiente, Pagada o Cancelada (las órdenes de compra: Abierta, Facturada o Cancelada)</li>
+            <li>• Importa compras masivamente desde Excel/CSV con «Importar»</li>
             <li>• Genera reportes de compras por proveedor y período</li>
           </ul>
         </section>

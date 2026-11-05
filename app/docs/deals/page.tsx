@@ -9,14 +9,14 @@ export const metadata: Metadata = { title: "Deals" };
 const toc = [
   { id: "overview", label: "Vista general" },
   { id: "kanban", label: "Vista Kanban" },
-  { id: "crud", label: "CRUD de deals" },
-  { id: "create", label: "Crear deal", depth: 3 },
-  { id: "edit", label: "Editar deal", depth: 3 },
+  { id: "crud", label: "Crear y editar" },
+  { id: "create", label: "Crear negocio", depth: 3 },
+  { id: "edit", label: "Ver y editar", depth: 3 },
   { id: "stages", label: "Mover entre etapas" },
   { id: "close-dates", label: "Fecha de cierre" },
   { id: "filters", label: "Filtros y búsqueda" },
-  { id: "products", label: "Productos en deals" },
-  { id: "activities", label: "Actividades y notas" },
+  { id: "products", label: "Productos en negocios" },
+  { id: "activities", label: "Actividades y próximo paso" },
   { id: "requirements", label: "Requisitos por etapa" },
   { id: "owner", label: "Dueño y previsión" },
 ];
@@ -28,28 +28,31 @@ export default function DealsPage() {
         <Breadcrumbs />
         <h1 className="text-3xl font-bold mb-2" style={{ color: "var(--foreground)" }}>Deals / Negocios</h1>
         <p className="text-lg mb-8" style={{ color: "var(--muted-foreground)" }}>
-          El módulo de Deals gestiona tus oportunidades de venta a través de pipelines visuales
-          con vista Kanban y seguimiento completo del ciclo de ventas.
+          El módulo de negocios gestiona tus oportunidades de venta en pipelines visuales con
+          vista Kanban, desde el primer contacto hasta el cierre.
         </p>
 
         <section id="overview" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Vista general</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Un <strong style={{ color: "var(--foreground)" }}>Deal</strong> (negocio u oportunidad) representa
-            una venta potencial con un contacto o empresa. Cada deal tiene:
+            Un <strong style={{ color: "var(--foreground)" }}>negocio</strong> (deal u oportunidad) representa
+            una venta potencial. En el menú lo encuentras en <strong style={{ color: "var(--foreground)" }}>Negocio → Oportunidades</strong>.
+            Cada negocio tiene:
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
             {[
-              { label: "Nombre del deal", desc: "Identificador del negocio" },
+              { label: "Nombre del negocio", desc: "Identificador del negocio" },
               { label: "Valor", desc: "Monto estimado de la venta" },
-              { label: "Contacto asociado", desc: "Cliente o prospecto" },
+              { label: "Contactos", desc: "Uno o varios clientes o prospectos" },
+              { label: "Empresa", desc: "Opcional: la empresa a la que le vendes" },
               { label: "Etapa del pipeline", desc: "Fase actual del negocio" },
-              { label: "Propietario", desc: "Vendedor responsable" },
+              { label: "Dueño", desc: "Vendedor responsable" },
               { label: "Fecha de cierre", desc: "Estimada mientras está abierto; real al ganar o perder" },
               { label: "Ganado / Perdido el", desc: "Sello con la fecha y hora del cierre" },
-              { label: "Probabilidad", desc: "% de éxito estimado" },
-              { label: "Productos", desc: "Ítems del negocio" },
-              { label: "Actividades", desc: "Llamadas, emails, reuniones" },
+              { label: "Probabilidad", desc: "La toma de la etapa en la que está (se configura en el pipeline)" },
+              { label: "Actividades", desc: "Llamadas, mensajes, reuniones, notas" },
+              { label: "Checklist de cierre", desc: "Pasos para cerrar, con % de avance" },
+              { label: "Campos personalizados", desc: "Los que definas en el pipeline" },
             ].map((f) => (
               <div key={f.label} className="p-3 rounded-lg border text-sm" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
                 <p className="font-semibold" style={{ color: "var(--foreground)" }}>{f.label}</p>
@@ -57,19 +60,24 @@ export default function DealsPage() {
               </div>
             ))}
           </div>
+          <Callout type="note">
+            Antes de crear negocios necesitas al menos un pipeline. Si el tablero dice «No hay pipelines
+            configurados», créalo en Configuración → Módulos del CRM → Negocios (ver{" "}
+            <a href="/docs/pipelines" style={{ color: "#d1345b" }}>Pipelines</a>).
+          </Callout>
         </section>
 
         <section id="kanban" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Vista Kanban</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            La vista principal de Deals es un tablero Kanban donde cada columna representa una
-            etapa del pipeline. Puedes mover deals entre etapas arrastrando las tarjetas.
+            La vista principal es un tablero Kanban donde cada columna representa una etapa del
+            pipeline. Puedes mover negocios entre etapas arrastrando las tarjetas.
           </p>
           <div
             className="rounded-lg p-4 border mb-4"
             style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}
           >
-            <p className="text-sm font-semibold mb-3" style={{ color: "var(--foreground)" }}>Ejemplo de pipeline estándar:</p>
+            <p className="text-sm font-semibold mb-3" style={{ color: "var(--foreground)" }}>Ejemplo de pipeline:</p>
             <div className="flex gap-2 overflow-x-auto pb-2">
               {["Prospección", "Contactado", "Propuesta", "Negociación", "Cerrado Ganado", "Cerrado Perdido"].map((stage, i) => (
                 <div
@@ -87,33 +95,38 @@ export default function DealsPage() {
             </div>
           </div>
           <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>
-            En la parte superior del Kanban puedes:
+            En la barra superior del tablero tienes:
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Seleccionar el pipeline a visualizar</li>
-            <li>• Filtrar deals por propietario, valor, fecha de cierre</li>
-            <li>• Buscar deals por nombre</li>
-            <li>• Ver el valor total por etapa</li>
+            <li>• El selector de pipeline</li>
+            <li>• Los filtros por rango de fechas, empresa y dueño (ver <a href="#filters" style={{ color: "#d1345b" }}>Filtros y búsqueda</a>)</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Buscar</strong>: abre un buscador de negocios por nombre</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Exportar</strong>: descarga los negocios</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Importar</strong>: carga negocios desde un archivo</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Nuevo Negocio</strong></li>
           </ul>
           <Callout type="tip">
-            El número en el encabezado de cada columna muestra la cantidad de deals y el valor
-            total acumulado en esa etapa. Útil para saber dónde está "atascado" tu pipeline.
+            El encabezado de cada columna muestra la cantidad de negocios y el valor total acumulado
+            en esa etapa. Útil para saber dónde está &ldquo;atascado&rdquo; tu pipeline.
           </Callout>
         </section>
 
         <section id="crud" className="mb-10">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>CRUD de deals</h2>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Crear y editar negocios</h2>
 
           <div id="create" className="mb-8">
-            <h3 className="text-xl font-semibold mb-3" style={{ color: "var(--foreground)" }}>Crear deal</h3>
-            <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>Puedes crear un deal de tres formas:</p>
+            <h3 className="text-xl font-semibold mb-3" style={{ color: "var(--foreground)" }}>Crear negocio</h3>
+            <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>Puedes crear un negocio desde:</p>
             <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-              <li>• <strong style={{ color: "var(--foreground)" }}>Botón "+" en el Kanban:</strong> Crea un deal directamente en una etapa específica.</li>
-              <li>• <strong style={{ color: "var(--foreground)" }}>Botón "Nuevo deal":</strong> Disponible en la barra superior del módulo.</li>
-              <li>• <strong style={{ color: "var(--foreground)" }}>Desde el perfil de contacto:</strong> En la sección "Deals" del contacto.</li>
+              <li>• <strong style={{ color: "var(--foreground)" }}>El botón «Nuevo Negocio»</strong> en la barra superior de Oportunidades.</li>
+              <li>• <strong style={{ color: "var(--foreground)" }}>La ficha del contacto</strong>, en la pestaña «Negocios».</li>
+              <li>• <strong style={{ color: "var(--foreground)" }}>El panel lateral del chat</strong>, mientras atiendes una conversación.</li>
             </ul>
+            <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>
+              Desde el tablero, el negocio se crea en el pipeline que tengas abierto; el formulario no tiene selector de pipeline.
+            </p>
             <div className="rounded-lg overflow-hidden border mb-4" style={{ borderColor: "var(--border)" }}>
-              <div className="px-4 py-2 text-xs font-semibold" style={{ backgroundColor: "#1f2a48", color: "white" }}>Campos del formulario de deal</div>
+              <div className="px-4 py-2 text-xs font-semibold" style={{ backgroundColor: "#1f2a48", color: "white" }}>Campos del formulario</div>
               <table className="w-full text-sm">
                 <thead style={{ backgroundColor: "var(--muted)" }}>
                   <tr>
@@ -124,15 +137,14 @@ export default function DealsPage() {
                 </thead>
                 <tbody>
                   {[
-                    ["Nombre", "Título descriptivo del negocio", "Sí"],
-                    ["Pipeline", "Pipeline al que pertenece", "Sí"],
-                    ["Etapa", "Fase inicial del deal", "Sí"],
-                    ["Contacto", "Cliente asociado", "No"],
-                    ["Valor", "Monto estimado en COP/USD", "No"],
+                    ["Contacto", "Cliente asociado; puedes agregar varios", "Sí"],
+                    ["Empresa", "Empresa a la que le vendes", "No"],
+                    ["Nombre del negocio", "Título descriptivo del negocio", "Sí"],
+                    ["Valor", "Monto estimado de la venta", "Sí"],
                     ["Fecha de cierre", "Estimada; al ganar o perder se guarda la real", "No"],
-                    ["Propietario", "Vendedor asignado", "Auto"],
-                    ["Probabilidad", "% estimado de ganar", "No"],
-                    ["Descripción", "Notas adicionales", "No"],
+                    ["Etapa", "Fase del pipeline en la que arranca", "Sí"],
+                    ["Dueño", "Si lo dejas en «Heredar del contacto», toma el dueño del contacto", "No"],
+                    ["Campos personalizados", "Los que definiste en el pipeline (algunos pueden ser obligatorios)", "Según el campo"],
                   ].map(([c, d, r]) => (
                     <tr key={c}>
                       <td className="p-3 border-b font-medium" style={{ borderColor: "var(--border)", color: "var(--foreground)" }}>{c}</td>
@@ -143,18 +155,27 @@ export default function DealsPage() {
                 </tbody>
               </table>
             </div>
+            <Callout type="note">
+              El botón para crear no se activa hasta que eliges al menos un contacto y escribes el valor.
+            </Callout>
           </div>
 
           <div id="edit" className="mb-8">
-            <h3 className="text-xl font-semibold mb-3" style={{ color: "var(--foreground)" }}>Editar deal</h3>
+            <h3 className="text-xl font-semibold mb-3" style={{ color: "var(--foreground)" }}>Ver y editar un negocio</h3>
             <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>
-              Haz clic en cualquier tarjeta del Kanban para abrir el panel de detalles del deal.
-              Desde ahí puedes editar todos los campos, agregar actividades, ver el historial y
-              gestionar los productos asociados.
+              Haz clic en una tarjeta del tablero para abrir el detalle del negocio. Ahí ves sus
+              actividades, el checklist de cierre, los contactos, la empresa (con «Asociar» o
+              «Cambiar») y los campos personalizados. Para cambiar el nombre, el valor, la etapa, el
+              dueño u otros datos, pulsa <strong style={{ color: "var(--foreground)" }}>«Editar negocio»</strong>.
+            </p>
+            <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>
+              El negocio también tiene su página completa, donde además ves los productos que tenga
+              asociados y los otros negocios del mismo contacto.
             </p>
             <Callout type="note">
-              Los cambios en el valor y etapa del deal se registran automáticamente en el historial
-              de actividades para trazabilidad completa.
+              Los cambios de etapa quedan registrados en la{" "}
+              <a href="/docs/team-activity" style={{ color: "#d1345b" }}>actividad del equipo</a>, no en la
+              lista de actividades del negocio (esa lista muestra solo lo que tu equipo registra).
             </Callout>
           </div>
         </section>
@@ -162,26 +183,31 @@ export default function DealsPage() {
         <section id="stages" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Mover entre etapas</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Puedes mover un deal de etapa de dos formas:
+            Puedes mover un negocio de etapa de dos formas:
           </p>
           <ul className="space-y-3 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
             <li>
               <strong style={{ color: "var(--foreground)" }}>Arrastrar y soltar:</strong>{" "}
-              En el Kanban, arrastra la tarjeta del deal a la columna destino.
+              En el tablero, arrastra la tarjeta a la columna destino.
             </li>
             <li>
-              <strong style={{ color: "var(--foreground)" }}>Selector de etapa:</strong>{" "}
-              En el panel de detalles del deal, usa el selector "Etapa" en la parte superior.
+              <strong style={{ color: "var(--foreground)" }}>Desde el detalle:</strong>{" "}
+              Abre el negocio, pulsa «Editar negocio» y cambia la «Etapa».
             </li>
           </ul>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Si la etapa destino tiene <a href="#requirements" style={{ color: "#d1345b" }}>requisitos</a> sin
+            cumplir, la app te muestra qué falta. Si una etapa tiene un tope de días configurado,
+            el negocio que lleve más tiempo ahí se marca como estancado.
+          </p>
           <Callout type="tip">
-            Cuando muevas un deal a "Cerrado Ganado" o "Cerrado Perdido", el sistema te pedirá
-            confirmar y opcionalmente registrar un motivo de pérdida. Esta información es valiosa
-            para los reportes de conversión.
+            Al mover un negocio a ganado o perdido no se pide confirmación ni motivo. Si quieres
+            registrar por qué se perdió, crea un campo personalizado (por ejemplo «Motivo de pérdida»)
+            y hazlo obligatorio para llegar a la etapa de perdido.
           </Callout>
         </section>
 
-        <section id="close-dates&ldquo; className=&rdquo;mb-10">
+        <section id="close-dates" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Fecha de cierre: estimada vs real</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
             Mientras un negocio está en una etapa abierta, su fecha de cierre es una <strong style={{ color: "var(--foreground)" }}>estimación</strong> del
@@ -209,48 +235,44 @@ export default function DealsPage() {
         <section id="filters" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Filtros y búsqueda</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Usa los filtros del Kanban para enfocar la vista en un subconjunto de deals:
+            Usa los filtros de la barra superior para enfocar el tablero:
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Por pipeline:</strong> Selector en la barra superior</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Por propietario:</strong> Filtra los deals de un vendedor específico</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Por fecha de cierre:</strong> Rango de fechas (estimadas en abiertos, reales en cerrados)</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Por valor:</strong> Rango de monto mínimo y máximo</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Búsqueda por nombre:</strong> Texto libre en el campo de búsqueda</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Por pipeline:</strong> selector en la barra superior</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Por fecha de cierre:</strong> rango de fechas (estimadas en abiertos, reales en cerrados)</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Por empresa:</strong> «Filtrar por empresa...»</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Por dueño:</strong> «Todos los dueños», «Sin dueño» o un vendedor específico</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Búsqueda por nombre:</strong> botón «Buscar», que abre un buscador con los resultados</li>
           </ul>
+          <Callout type="warning">
+            Por defecto el tablero muestra los negocios cuya fecha de cierre cae en el mes actual. Si
+            no ves un negocio, amplía el rango de fechas.
+          </Callout>
         </section>
 
         <section id="products" className="mb-10">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Productos en deals</h2>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Productos en negocios</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Puedes asociar productos del catálogo a un deal para detallar qué está vendiendo
-            y calcular automáticamente el valor total.
+            Si un negocio tiene productos asociados (por ejemplo, porque llegó desde tu tienda en línea,
+            una integración o la API), los verás en la página completa del negocio. Por ahora no se
+            agregan productos a mano desde la web, y el valor del negocio no se calcula a partir de ellos.
           </p>
-          <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. Abre el panel de detalles del deal</li>
-            <li>2. Ve a la sección "Productos"</li>
-            <li>3. Haz clic en "Agregar producto"</li>
-            <li>4. Busca y selecciona el producto del catálogo</li>
-            <li>5. Ajusta la cantidad y el precio si es necesario</li>
-            <li>6. El valor del deal se actualiza automáticamente</li>
-          </ol>
           <Callout type="note">
-            Los productos en deals se transfieren automáticamente cuando generas una cotización
-            o factura desde el panel de detalles del deal.
+            Las cotizaciones no se generan desde el negocio: créalas desde{" "}
+            <a href="/docs/quotes" style={{ color: "#d1345b" }}>Cotizaciones</a>, la ficha del contacto, la
+            ficha de la empresa o el chat.
           </Callout>
         </section>
 
         <section id="activities" className="mb-10">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Actividades y notas</h2>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Actividades y próximo paso</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            El panel de detalles del deal incluye una línea de tiempo de actividades donde puedes:
+            En el detalle del negocio puedes registrar actividades de tipo Llamada, Mensaje, Reunión,
+            Visita, Correo, WhatsApp o Nota, y verlas en orden.
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Registrar notas internas</li>
-            <li>• Programar llamadas, reuniones y tareas</li>
-            <li>• Ver el historial completo de cambios en el deal</li>
-            <li>• Ver conversaciones de WhatsApp/email relacionadas</li>
-            <li>• Adjuntar documentos y archivos</li>
+            <li>• Si le pones un <strong style={{ color: "var(--foreground)" }}>recordatorio</strong> a la actividad, se convierte en el <strong style={{ color: "var(--foreground)" }}>próximo paso</strong> del negocio.</li>
+            <li>• Registrar ciertos tipos de actividad puede marcar solo ítems del <strong style={{ color: "var(--foreground)" }}>checklist de cierre</strong>, según lo configures en el pipeline.</li>
           </ul>
         </section>
 
