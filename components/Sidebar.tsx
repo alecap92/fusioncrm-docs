@@ -75,11 +75,13 @@ const navigation: NavItem[] = [
     icon: <Briefcase size={16} />,
     children: [
       { title: "Vista Kanban", href: "/docs/deals" },
-      { title: "Crear y gestionar deals", href: "/docs/deals#crud" },
+      { title: "Crear y editar negocios", href: "/docs/deals#crud" },
       { title: "Etapas y movimiento", href: "/docs/deals#stages" },
       { title: "Filtros y búsqueda", href: "/docs/deals#filters" },
-      { title: "Productos en deals", href: "/docs/deals#products" },
+      { title: "Productos en negocios", href: "/docs/deals#products" },
       { title: "Requisitos por etapa", href: "/docs/deals#requirements" },
+      { title: "Fecha de cierre", href: "/docs/deals#close-dates" },
+      { title: "Actividades y próximo paso", href: "/docs/deals#activities" },
     ],
   },
   {
@@ -124,9 +126,11 @@ const navigation: NavItem[] = [
     icon: <Mail size={16} />,
     children: [
       { title: "Bandeja de entrada", href: "/docs/email" },
+      { title: "Conectar cuenta de correo", href: "/docs/email#connect" },
+      { title: "Asignar correos al equipo", href: "/docs/email#assign" },
       { title: "Redactar correo", href: "/docs/email#compose" },
-      { title: "Respuestas programadas", href: "/docs/email#scheduled" },
-      { title: "Fragmentos / Snippets", href: "/docs/email#snippets" },
+      { title: "Correos programados", href: "/docs/email#scheduled" },
+      { title: "Fragmentos", href: "/docs/email#snippets" },
     ],
   },
   {
@@ -153,7 +157,7 @@ const navigation: NavItem[] = [
     children: [
       { title: "Facturas electrónicas", href: "/docs/invoices" },
       { title: "Crear factura", href: "/docs/invoices#create" },
-      { title: "Facturas de compra", href: "/docs/invoices#incoming" },
+      { title: "Recepción de facturas", href: "/docs/invoices#incoming" },
       { title: "Notas crédito", href: "/docs/invoices#credit-notes" },
       { title: "Configuración DIAN", href: "/docs/invoices#config" },
     ],
@@ -170,9 +174,10 @@ const navigation: NavItem[] = [
     title: "Reportes y Analytics",
     icon: <BarChart2 size={16} />,
     children: [
-      { title: "Dashboard analytics", href: "/docs/reports" },
-      { title: "Reportes de ventas", href: "/docs/reports#sales" },
-      { title: "Reportes personalizados", href: "/docs/reports#custom" },
+      { title: "Mis Reportes", href: "/docs/reports" },
+      { title: "Ventas de un mes", href: "/docs/reports#sales" },
+      { title: "Crear tus propios reportes", href: "/docs/reports#custom" },
+      { title: "Previsión de ventas", href: "/docs/reports#forecast" },
       { title: "Lead Scoring", href: "/docs/lead-scoring" },
     ],
   },
@@ -180,8 +185,8 @@ const navigation: NavItem[] = [
     title: "Automatizaciones",
     icon: <Zap size={16} />,
     children: [
-      { title: "Editor de workflows", href: "/docs/workflows" },
-      { title: "Tipos de trigger", href: "/docs/workflows#triggers" },
+      { title: "Automatizaciones", href: "/docs/workflows" },
+      { title: "Disparadores", href: "/docs/workflows#triggers" },
       { title: "Acciones disponibles", href: "/docs/workflows#actions" },
       { title: "Historial de ejecución", href: "/docs/workflows#history" },
     ],
@@ -202,7 +207,7 @@ const navigation: NavItem[] = [
     icon: <Calendar size={16} />,
     children: [
       { title: "Vista de calendario", href: "/docs/calendar" },
-      { title: "Eventos y tareas", href: "/docs/calendar#events" },
+      { title: "Crear eventos", href: "/docs/calendar#events" },
     ],
   },
   {
@@ -224,6 +229,8 @@ const navigation: NavItem[] = [
       { title: "Campos personalizados", href: "/docs/settings#fields" },
       { title: "Lead Scoring config", href: "/docs/settings#lead-scoring" },
       { title: "Seguridad y 2FA", href: "/docs/settings#security" },
+      { title: "Notificaciones", href: "/docs/settings#notifications" },
+      { title: "Historial de importaciones", href: "/docs/settings#import-history" },
       { title: "Conectores MCP", href: "/docs/settings#mcp" },
       { title: "Tokens de API", href: "/docs/settings#api-keys" },
       { title: "Plan, asientos y módulos", href: "/docs/settings#plan" },
@@ -251,6 +258,7 @@ const navigation: NavItem[] = [
       { title: "Errores y límites", href: "/docs/api#errors" },
       { title: "Ciudades (catálogo DANE)", href: "/docs/ciudades" },
       { title: "Envíos (Envia.com)", href: "/docs/envios" },
+      { title: "Envíos desde la app", href: "/docs/envios#app" },
     ],
   },
   {
@@ -271,7 +279,7 @@ const navigation: NavItem[] = [
       { title: "WhatsApp Business", href: "/docs/integrations" },
       { title: "N8N, Make, Zapier", href: "/docs/integrations#n8n" },
       { title: "Webhooks y datos entrantes", href: "/docs/integrations#webhooks" },
-      { title: "Social Media", href: "/docs/integrations#social" },
+      { title: "Redes sociales", href: "/docs/integrations#social" },
     ],
   },
 ];
