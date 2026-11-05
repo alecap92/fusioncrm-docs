@@ -5,7 +5,21 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Calendario" };
+export const metadata: Metadata = {
+  title: "Calendario, tareas y seguimientos",
+  description:
+    "Usa el calendario del CRM para agendar reuniones, tareas y recordatorios, y ver en una sola vista los seguimientos programados de tus contactos y empresas.",
+  keywords: ["calendario CRM", "agendar reuniones", "tareas", "recordatorios", "seguimientos de clientes"],
+  alternates: { canonical: "/docs/calendar" },
+  openGraph: {
+    title: "Calendario, tareas y seguimientos",
+    description:
+      "Usa el calendario del CRM para agendar reuniones, tareas y recordatorios, y ver en una sola vista los seguimientos programados de tus contactos y empresas.",
+    url: "/docs/calendar",
+    siteName: "FusionCRM Docs",
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Vista de calendario" },

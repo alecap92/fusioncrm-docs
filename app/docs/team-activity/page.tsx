@@ -5,7 +5,21 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Actividad del equipo: revisa qué hacen tus empleados" };
+export const metadata: Metadata = {
+  title: "Actividad del equipo: qué hacen tus vendedores",
+  description:
+    "Revisa qué hace cada vendedor en el CRM: mensajes de WhatsApp enviados, negocios movidos, cotizaciones y última conexión, con informe diario por correo.",
+  keywords: ["actividad del equipo", "rendimiento de vendedores", "productividad", "informe diario", "supervisión de ventas"],
+  alternates: { canonical: "/docs/team-activity" },
+  openGraph: {
+    title: "Actividad del equipo: qué hacen tus vendedores",
+    description:
+      "Revisa qué hace cada vendedor en el CRM: mensajes de WhatsApp enviados, negocios movidos, cotizaciones y última conexión, con informe diario por correo.",
+    url: "/docs/team-activity",
+    siteName: "FusionCRM Docs",
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Para qué sirve" },

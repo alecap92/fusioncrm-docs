@@ -6,7 +6,21 @@ import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 import SwaggerEmbed from "@/components/SwaggerEmbed";
 
-export const metadata: Metadata = { title: "API REST" };
+export const metadata: Metadata = {
+  title: "API REST de FusionCRM: tokens, endpoints y webhooks",
+  description:
+    "Conecta tu sistema con FusionCRM por API REST: autenticación con tokens, permisos, endpoints en OpenAPI, webhooks salientes, errores y límites del plan.",
+  keywords: ["API REST CRM", "OpenAPI", "tokens de API", "webhooks salientes", "integración CRM", "endpoints"],
+  alternates: { canonical: "/docs/api" },
+  openGraph: {
+    title: "API REST de FusionCRM: tokens, endpoints y webhooks",
+    description:
+      "Conecta tu sistema con FusionCRM por API REST: autenticación con tokens, permisos, endpoints en OpenAPI, webhooks salientes, errores y límites del plan.",
+    url: "/docs/api",
+    siteName: "FusionCRM Docs",
+    type: "website",
+  },
+};
 
 const API_BASE = "https://api.fusioncol.com/api";
 const SPEC_URL = `${API_BASE}/openapi.json`;

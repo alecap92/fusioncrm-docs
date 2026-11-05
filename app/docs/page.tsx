@@ -5,7 +5,21 @@ import {
   BarChart2, Settings, Code2, Puzzle, Zap, Star, Package, CreditCard,
   ArrowRight, BookOpen, Send, Calendar, FolderKanban, TrendingUp, LayoutTemplate, Activity, Phone, Columns3, Truck } from "lucide-react";
 
-export const metadata: Metadata = { title: "Introducción" };
+export const metadata: Metadata = {
+  title: "CRM para WhatsApp: guía de inicio y módulos",
+  description:
+    "Guía de FusionCRM, el CRM para WhatsApp de emprendedores en Colombia: contactos, embudo de ventas, cotizaciones, factura electrónica DIAN y automatizaciones.",
+  keywords: ["CRM para WhatsApp", "CRM Colombia", "documentación FusionCRM", "embudo de ventas", "factura electrónica DIAN", "automatizaciones"],
+  alternates: { canonical: "/docs" },
+  openGraph: {
+    title: "CRM para WhatsApp: guía de inicio y módulos",
+    description:
+      "Guía de FusionCRM, el CRM para WhatsApp de emprendedores en Colombia: contactos, embudo de ventas, cotizaciones, factura electrónica DIAN y automatizaciones.",
+    url: "/docs",
+    siteName: "FusionCRM Docs",
+    type: "website",
+  },
+};
 
 const cards = [
   { icon: <Users size={20} />, title: "Contactos", desc: "Gestiona tu base de clientes, importa contactos y crea segmentos.", href: "/docs/contacts", color: "#3b82f6" },

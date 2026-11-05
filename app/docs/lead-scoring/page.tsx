@@ -4,7 +4,21 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Lead Scoring" };
+export const metadata: Metadata = {
+  title: "Lead scoring: prioriza a tus mejores prospectos",
+  description:
+    "Configura lead scoring en FusionCRM: crea reglas que suman o restan puntos a cada contacto, mira los puntajes y entiende cuándo se recalculan.",
+  keywords: ["lead scoring", "puntaje de leads", "calificar prospectos", "reglas de puntuación", "priorizar ventas"],
+  alternates: { canonical: "/docs/lead-scoring" },
+  openGraph: {
+    title: "Lead scoring: prioriza a tus mejores prospectos",
+    description:
+      "Configura lead scoring en FusionCRM: crea reglas que suman o restan puntos a cada contacto, mira los puntajes y entiende cuándo se recalculan.",
+    url: "/docs/lead-scoring",
+    siteName: "FusionCRM Docs",
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "¿Qué es Lead Scoring?" },

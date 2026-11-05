@@ -5,7 +5,21 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Soporte" };
+export const metadata: Metadata = {
+  title: "Soporte y ayuda de FusionCRM",
+  description:
+    "Cómo contactar al soporte de FusionCRM por WhatsApp, correo o desde la app, y qué revisar antes de escribirnos para resolver tu duda más rápido.",
+  keywords: ["soporte FusionCRM", "ayuda", "contacto", "WhatsApp de soporte"],
+  alternates: { canonical: "/docs/soporte" },
+  openGraph: {
+    title: "Soporte y ayuda de FusionCRM",
+    description:
+      "Cómo contactar al soporte de FusionCRM por WhatsApp, correo o desde la app, y qué revisar antes de escribirnos para resolver tu duda más rápido.",
+    url: "/docs/soporte",
+    siteName: "FusionCRM Docs",
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "contact", label: "Contactar a soporte" },

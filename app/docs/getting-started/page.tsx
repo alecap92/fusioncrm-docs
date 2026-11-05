@@ -4,7 +4,21 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Primeros Pasos" };
+export const metadata: Metadata = {
+  title: "Primeros pasos en FusionCRM",
+  description:
+    "Empieza a usar FusionCRM desde cero: cómo registrarte y acceder, la ruta recomendada para configurar tu cuenta, los menús de cada módulo y tu organización.",
+  keywords: ["primeros pasos", "registro", "configurar CRM", "navegación", "organización"],
+  alternates: { canonical: "/docs/getting-started" },
+  openGraph: {
+    title: "Primeros pasos en FusionCRM",
+    description:
+      "Empieza a usar FusionCRM desde cero: cómo registrarte y acceder, la ruta recomendada para configurar tu cuenta, los menús de cada módulo y tu organización.",
+    url: "/docs/getting-started",
+    siteName: "FusionCRM Docs",
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "ruta", label: "Ruta para empezar" },

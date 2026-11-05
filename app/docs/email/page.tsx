@@ -4,7 +4,21 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Correo / Email" };
+export const metadata: Metadata = {
+  title: "Correo en el CRM: Gmail, Outlook y plantillas",
+  description:
+    "Conecta Gmail, Outlook o tu correo IMAP al CRM, asigna correos al equipo, redacta con plantillas y fragmentos, programa envíos y ve la ficha del cliente.",
+  keywords: ["correo en el CRM", "Gmail", "Outlook", "IMAP", "plantillas de correo", "correos programados"],
+  alternates: { canonical: "/docs/email" },
+  openGraph: {
+    title: "Correo en el CRM: Gmail, Outlook y plantillas",
+    description:
+      "Conecta Gmail, Outlook o tu correo IMAP al CRM, asigna correos al equipo, redacta con plantillas y fragmentos, programa envíos y ve la ficha del cliente.",
+    url: "/docs/email",
+    siteName: "FusionCRM Docs",
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Bandeja de entrada" },

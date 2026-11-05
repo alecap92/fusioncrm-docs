@@ -4,7 +4,21 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Deals" };
+export const metadata: Metadata = {
+  title: "Negocios y embudo de ventas",
+  description:
+    "Gestiona tus oportunidades en un embudo de ventas kanban: crea negocios, muévelos entre etapas, agrega productos, fecha de cierre, próximo paso y previsión.",
+  keywords: ["embudo de ventas", "negocios", "oportunidades de venta", "kanban de ventas", "previsión de ventas", "pipeline"],
+  alternates: { canonical: "/docs/deals" },
+  openGraph: {
+    title: "Negocios y embudo de ventas",
+    description:
+      "Gestiona tus oportunidades en un embudo de ventas kanban: crea negocios, muévelos entre etapas, agrega productos, fecha de cierre, próximo paso y previsión.",
+    url: "/docs/deals",
+    siteName: "FusionCRM Docs",
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Vista general" },

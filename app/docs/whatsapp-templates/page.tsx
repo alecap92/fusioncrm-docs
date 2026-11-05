@@ -4,7 +4,21 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Templates WhatsApp" };
+export const metadata: Metadata = {
+  title: "Plantillas de WhatsApp: crearlas y aprobarlas",
+  description:
+    "Crea plantillas de WhatsApp aprobadas por Meta: variables, categorías, proceso de aprobación, límites de mensajes y consejos de redacción para envíos masivos.",
+  keywords: ["plantillas de WhatsApp", "templates de WhatsApp", "aprobación de Meta", "WhatsApp Business API", "mensajes masivos"],
+  alternates: { canonical: "/docs/whatsapp-templates" },
+  openGraph: {
+    title: "Plantillas de WhatsApp: crearlas y aprobarlas",
+    description:
+      "Crea plantillas de WhatsApp aprobadas por Meta: variables, categorías, proceso de aprobación, límites de mensajes y consejos de redacción para envíos masivos.",
+    url: "/docs/whatsapp-templates",
+    siteName: "FusionCRM Docs",
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "¿Qué son los templates?" },

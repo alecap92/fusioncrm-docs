@@ -5,7 +5,21 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Contactos" };
+export const metadata: Metadata = {
+  title: "Contactos: base de clientes, listas e importación",
+  description:
+    "Administra tu base de clientes en el CRM: crea y edita contactos, usa campos personalizados, arma listas y segmentos, importa desde Excel o CSV y filtra.",
+  keywords: ["base de clientes", "contactos CRM", "importar contactos Excel", "segmentos", "campos personalizados", "filtros avanzados"],
+  alternates: { canonical: "/docs/contacts" },
+  openGraph: {
+    title: "Contactos: base de clientes, listas e importación",
+    description:
+      "Administra tu base de clientes en el CRM: crea y edita contactos, usa campos personalizados, arma listas y segmentos, importa desde Excel o CSV y filtra.",
+    url: "/docs/contacts",
+    siteName: "FusionCRM Docs",
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Vista general" },

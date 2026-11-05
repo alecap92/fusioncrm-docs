@@ -5,7 +5,21 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Reportes y Analytics" };
+export const metadata: Metadata = {
+  title: "Reportes de ventas y previsión",
+  description:
+    "Mira tus ventas del mes, la previsión de ventas, las compras y los informes de facturación en reportes del CRM que armas a tu medida y exportas a Excel.",
+  keywords: ["reportes de ventas", "previsión de ventas", "dashboard", "informes de facturación", "exportar a Excel"],
+  alternates: { canonical: "/docs/reports" },
+  openGraph: {
+    title: "Reportes de ventas y previsión",
+    description:
+      "Mira tus ventas del mes, la previsión de ventas, las compras y los informes de facturación en reportes del CRM que armas a tu medida y exportas a Excel.",
+    url: "/docs/reports",
+    siteName: "FusionCRM Docs",
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Mis Reportes" },
