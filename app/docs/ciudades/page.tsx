@@ -5,7 +5,22 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Ciudades: catálogo DANE" };
+export const metadata: Metadata = {
+  title: "Ciudades y municipios con código DANE",
+  description:
+    "Cómo FusionCRM guarda la ciudad con el código DANE/DIVIPOLA: catálogo de municipios y departamentos de Colombia por API, errores y uso en factura DIAN.",
+  keywords: ["código DANE", "DIVIPOLA", "municipios de Colombia", "departamentos", "API de ciudades", "factura electrónica DIAN"],
+  alternates: { canonical: "/docs/ciudades" },
+  openGraph: {
+    title: "Ciudades y municipios con código DANE",
+    description:
+      "Cómo FusionCRM guarda la ciudad con el código DANE/DIVIPOLA: catálogo de municipios y departamentos de Colombia por API, errores y uso en factura DIAN.",
+    url: "/docs/ciudades",
+    siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
+    type: "website",
+  },
+};
 
 const API_BASE = "https://api.fusioncol.com/api";
 

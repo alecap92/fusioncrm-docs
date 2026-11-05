@@ -5,7 +5,22 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Agentes IA" };
+export const metadata: Metadata = {
+  title: "Agentes IA para atender WhatsApp",
+  description:
+    "Crea un agente de IA que responde por WhatsApp con el contexto del cliente, califica leads, usa tu base de conocimiento y pasa el chat a un asesor cuando toca.",
+  keywords: ["agente IA WhatsApp", "chatbot WhatsApp", "inteligencia artificial CRM", "calificar leads", "base de conocimiento", "traspaso a asesor"],
+  alternates: { canonical: "/docs/agentes-ia" },
+  openGraph: {
+    title: "Agentes IA para atender WhatsApp",
+    description:
+      "Crea un agente de IA que responde por WhatsApp con el contexto del cliente, califica leads, usa tu base de conocimiento y pasa el chat a un asesor cuando toca.",
+    url: "/docs/agentes-ia",
+    siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "¿Qué es un agente IA?" },

@@ -4,7 +4,22 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Pipelines" };
+export const metadata: Metadata = {
+  title: "Pipelines de ventas con etapas a tu medida",
+  description:
+    "Diseña el pipeline de ventas de tu empresa: crea embudos, configura sus etapas, edítalos o elimínalos y aplica buenas prácticas para no perder negocios.",
+  keywords: ["pipeline de ventas", "embudo de ventas", "etapas de venta", "proceso comercial", "buenas prácticas"],
+  alternates: { canonical: "/docs/pipelines" },
+  openGraph: {
+    title: "Pipelines de ventas con etapas a tu medida",
+    description:
+      "Diseña el pipeline de ventas de tu empresa: crea embudos, configura sus etapas, edítalos o elimínalos y aplica buenas prácticas para no perder negocios.",
+    url: "/docs/pipelines",
+    siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "¿Qué es un pipeline?" },

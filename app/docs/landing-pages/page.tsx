@@ -5,7 +5,22 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Páginas de aterrizaje (landing pages)" };
+export const metadata: Metadata = {
+  title: "Landing pages para anuncios que llevan a WhatsApp",
+  description:
+    "Crea una landing page para Meta Ads o Google Ads sin diseñador: plantillas, botón de WhatsApp o formulario, estadísticas propias, Pixel de Meta y GA4.",
+  keywords: ["landing page", "página de aterrizaje", "Meta Ads", "Google Ads", "botón de WhatsApp", "Pixel de Meta", "GA4"],
+  alternates: { canonical: "/docs/landing-pages" },
+  openGraph: {
+    title: "Landing pages para anuncios que llevan a WhatsApp",
+    description:
+      "Crea una landing page para Meta Ads o Google Ads sin diseñador: plantillas, botón de WhatsApp o formulario, estadísticas propias, Pixel de Meta y GA4.",
+    url: "/docs/landing-pages",
+    siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Para qué sirven" },

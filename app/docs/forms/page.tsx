@@ -5,7 +5,22 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Formularios web" };
+export const metadata: Metadata = {
+  title: "Formularios web para capturar leads",
+  description:
+    "Captura leads desde tu sitio o landing con formularios conectados al CRM: sin contactos duplicados, con la campaña de origen, negocio automático y anti-spam.",
+  keywords: ["formularios web", "capturar leads", "formulario de contacto", "UTM", "anti-spam", "insertar formulario"],
+  alternates: { canonical: "/docs/forms" },
+  openGraph: {
+    title: "Formularios web para capturar leads",
+    description:
+      "Captura leads desde tu sitio o landing con formularios conectados al CRM: sin contactos duplicados, con la campaña de origen, negocio automático y anti-spam.",
+    url: "/docs/forms",
+    siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Para qué sirven" },

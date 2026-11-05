@@ -4,7 +4,22 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Cotizaciones" };
+export const metadata: Metadata = {
+  title: "Cotizaciones: crea, envía y convierte en factura",
+  description:
+    "Crea cotizaciones en PDF con cálculo automático de impuestos, envíalas por correo o WhatsApp, sigue su estado y conviértelas en factura electrónica.",
+  keywords: ["cotizaciones", "cotización en PDF", "presupuestos", "enviar cotización por WhatsApp", "convertir a factura"],
+  alternates: { canonical: "/docs/quotes" },
+  openGraph: {
+    title: "Cotizaciones: crea, envía y convierte en factura",
+    description:
+      "Crea cotizaciones en PDF con cálculo automático de impuestos, envíalas por correo o WhatsApp, sigue su estado y conviértelas en factura electrónica.",
+    url: "/docs/quotes",
+    siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "¿Qué son las cotizaciones?" },

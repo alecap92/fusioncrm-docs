@@ -4,7 +4,22 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Conversaciones" };
+export const metadata: Metadata = {
+  title: "Conversaciones: bandeja de WhatsApp e Instagram",
+  description:
+    "Atiende WhatsApp, Messenger e Instagram desde una bandeja kanban del CRM: escribe a clientes, usa respuestas rápidas, asigna chats al equipo y busca mensajes.",
+  keywords: ["CRM para WhatsApp", "bandeja unificada", "WhatsApp Business API", "Instagram", "Messenger", "respuestas rápidas", "asignación de chats"],
+  alternates: { canonical: "/docs/conversations" },
+  openGraph: {
+    title: "Conversaciones: bandeja de WhatsApp e Instagram",
+    description:
+      "Atiende WhatsApp, Messenger e Instagram desde una bandeja kanban del CRM: escribe a clientes, usa respuestas rápidas, asigna chats al equipo y busca mensajes.",
+    url: "/docs/conversations",
+    siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Vista general" },

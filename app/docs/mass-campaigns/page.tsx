@@ -4,7 +4,22 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Campañas Masivas" };
+export const metadata: Metadata = {
+  title: "Campañas masivas de WhatsApp y email",
+  description:
+    "Envía campañas masivas de WhatsApp con plantillas aprobadas y de email a segmentos de contactos, mide aperturas, clics y respuestas, y aplica buenas prácticas.",
+  keywords: ["campañas masivas", "WhatsApp masivo", "email marketing", "plantillas de WhatsApp", "segmentación", "métricas de campaña"],
+  alternates: { canonical: "/docs/mass-campaigns" },
+  openGraph: {
+    title: "Campañas masivas de WhatsApp y email",
+    description:
+      "Envía campañas masivas de WhatsApp con plantillas aprobadas y de email a segmentos de contactos, mide aperturas, clics y respuestas, y aplica buenas prácticas.",
+    url: "/docs/mass-campaigns",
+    siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "¿Qué son las campañas?" },

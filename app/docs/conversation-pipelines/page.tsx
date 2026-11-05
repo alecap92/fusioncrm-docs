@@ -5,7 +5,22 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Pipelines de conversación" };
+export const metadata: Metadata = {
+  title: "Pipelines de conversación para WhatsApp",
+  description:
+    "Organiza los chats de WhatsApp en tableros kanban por negocio, equipo o línea: crea pipelines, define columnas, mueve conversaciones y conecta automatizaciones.",
+  keywords: ["pipeline de conversación", "kanban WhatsApp", "inbox WhatsApp", "organizar chats", "automatizaciones", "líneas de WhatsApp"],
+  alternates: { canonical: "/docs/conversation-pipelines" },
+  openGraph: {
+    title: "Pipelines de conversación para WhatsApp",
+    description:
+      "Organiza los chats de WhatsApp en tableros kanban por negocio, equipo o línea: crea pipelines, define columnas, mueve conversaciones y conecta automatizaciones.",
+    url: "/docs/conversation-pipelines",
+    siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Qué es un pipeline de conversación" },

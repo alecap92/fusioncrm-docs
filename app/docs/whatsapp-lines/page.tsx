@@ -5,7 +5,22 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Líneas de WhatsApp" };
+export const metadata: Metadata = {
+  title: "Varios números de WhatsApp en un mismo CRM",
+  description:
+    "Conecta varios números de WhatsApp Business API al mismo CRM: cada línea con su nombre, color, plantillas, pipeline y perfil de negocio, también por API y MCP.",
+  keywords: ["varios números de WhatsApp", "WhatsApp Business API", "líneas de WhatsApp", "perfil de negocio", "CRM para WhatsApp"],
+  alternates: { canonical: "/docs/whatsapp-lines" },
+  openGraph: {
+    title: "Varios números de WhatsApp en un mismo CRM",
+    description:
+      "Conecta varios números de WhatsApp Business API al mismo CRM: cada línea con su nombre, color, plantillas, pipeline y perfil de negocio, también por API y MCP.",
+    url: "/docs/whatsapp-lines",
+    siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Qué es una línea" },

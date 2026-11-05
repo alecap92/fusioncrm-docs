@@ -6,7 +6,22 @@ import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 import catalog from "@/data/mcp-tools.json";
 
-export const metadata: Metadata = { title: "MCP: el CRM desde tu IA" };
+export const metadata: Metadata = {
+  title: "MCP: usa el CRM desde Claude, Cursor y tu IA",
+  description:
+    "Conecta Claude, Claude Code o Cursor al servidor MCP de FusionCRM y opera contactos, negocios, WhatsApp y cotizaciones con IA: credenciales, permisos y errores.",
+  keywords: ["MCP", "Model Context Protocol", "Claude", "Cursor", "CRM con IA", "servidor MCP"],
+  alternates: { canonical: "/docs/mcp" },
+  openGraph: {
+    title: "MCP: usa el CRM desde Claude, Cursor y tu IA",
+    description:
+      "Conecta Claude, Claude Code o Cursor al servidor MCP de FusionCRM y opera contactos, negocios, WhatsApp y cotizaciones con IA: credenciales, permisos y errores.",
+    url: "/docs/mcp",
+    siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
+    type: "website",
+  },
+};
 
 const MCP_URL = "https://api.fusioncol.com/api/mcp";
 const API_ME_URL = "https://api.fusioncol.com/api/me";

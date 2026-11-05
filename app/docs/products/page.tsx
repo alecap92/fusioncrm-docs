@@ -4,7 +4,22 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Productos" };
+export const metadata: Metadata = {
+  title: "Catálogo de productos y precios",
+  description:
+    "Crea tu catálogo de productos y servicios con precios, impuestos y descripciones, y úsalo para armar cotizaciones y facturas electrónicas sin digitar dos veces.",
+  keywords: ["catálogo de productos", "precios", "impuestos", "IVA", "cotizaciones", "facturas"],
+  alternates: { canonical: "/docs/products" },
+  openGraph: {
+    title: "Catálogo de productos y precios",
+    description:
+      "Crea tu catálogo de productos y servicios con precios, impuestos y descripciones, y úsalo para armar cotizaciones y facturas electrónicas sin digitar dos veces.",
+    url: "/docs/products",
+    siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Catálogo de productos" },

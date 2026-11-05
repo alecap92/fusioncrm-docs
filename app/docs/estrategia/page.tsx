@@ -5,7 +5,22 @@ import Callout from "@/components/Callout";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Estrategia" };
+export const metadata: Metadata = {
+  title: "Estrategia de marketing: funnel y buyer persona",
+  description:
+    "Documenta tu estrategia de marketing en el CRM: qué hacer en cada etapa del funnel, la descripción de tu buyer persona y tus palabras clave.",
+  keywords: ["estrategia de marketing", "funnel de marketing", "buyer persona", "palabras clave", "audiencia"],
+  alternates: { canonical: "/docs/estrategia" },
+  openGraph: {
+    title: "Estrategia de marketing: funnel y buyer persona",
+    description:
+      "Documenta tu estrategia de marketing en el CRM: qué hacer en cada etapa del funnel, la descripción de tu buyer persona y tus palabras clave.",
+    url: "/docs/estrategia",
+    siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Para qué sirve" },

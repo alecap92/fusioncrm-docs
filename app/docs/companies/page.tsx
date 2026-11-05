@@ -5,7 +5,22 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Empresas" };
+export const metadata: Metadata = {
+  title: "Empresas: clientes B2B con sus contactos",
+  description:
+    "Gestiona clientes B2B en FusionCRM: crea empresas, vincula sus contactos y revisa en una ficha sus negocios, cotizaciones y facturas, también por API y MCP.",
+  keywords: ["CRM B2B", "empresas", "cuentas de clientes", "contactos de empresa", "negocios por empresa", "campos personalizados"],
+  alternates: { canonical: "/docs/companies" },
+  openGraph: {
+    title: "Empresas: clientes B2B con sus contactos",
+    description:
+      "Gestiona clientes B2B en FusionCRM: crea empresas, vincula sus contactos y revisa en una ficha sus negocios, cotizaciones y facturas, también por API y MCP.",
+    url: "/docs/companies",
+    siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Personas y cuentas" },

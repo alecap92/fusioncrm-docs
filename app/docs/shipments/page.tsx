@@ -6,9 +6,20 @@ import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
 export const metadata: Metadata = {
-  title: "Envíos",
+  title: "Envíos y guías con Envia.com",
   description:
-    "Cotiza con varias transportadoras, genera la guía, imprime la etiqueta y rastrea tus envíos desde la ficha del contacto, con tu cuenta de Envia.com.",
+    "Despacha pedidos desde el CRM con tu cuenta de Envia.com: compara tarifas de varias transportadoras, genera la guía, imprime la etiqueta y rastrea cada envío.",
+  keywords: ["envíos", "guías de envío", "Envia.com", "transportadoras", "rastreo de envíos", "etiquetas"],
+  alternates: { canonical: "/docs/shipments" },
+  openGraph: {
+    title: "Envíos y guías con Envia.com",
+    description:
+      "Despacha pedidos desde el CRM con tu cuenta de Envia.com: compara tarifas de varias transportadoras, genera la guía, imprime la etiqueta y rastrea cada envío.",
+    url: "/docs/shipments",
+    siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
+    type: "website",
+  },
 };
 
 const toc = [

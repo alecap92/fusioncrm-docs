@@ -4,7 +4,22 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Proyectos" };
+export const metadata: Metadata = {
+  title: "Proyectos y tareas del equipo",
+  description:
+    "Organiza el trabajo de tu equipo en proyectos y tareas dentro del CRM: responsables, fechas límite, comentarios y asignaciones para que nada se quede sin hacer.",
+  keywords: ["gestión de proyectos", "tareas", "responsables", "fechas límite", "trabajo en equipo"],
+  alternates: { canonical: "/docs/projects" },
+  openGraph: {
+    title: "Proyectos y tareas del equipo",
+    description:
+      "Organiza el trabajo de tu equipo en proyectos y tareas dentro del CRM: responsables, fechas límite, comentarios y asignaciones para que nada se quede sin hacer.",
+    url: "/docs/projects",
+    siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Gestión de proyectos" },

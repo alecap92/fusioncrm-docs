@@ -5,7 +5,22 @@ import Callout from "@/components/Callout";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Biblioteca" };
+export const metadata: Metadata = {
+  title: "Biblioteca de archivos para el equipo y la IA",
+  description:
+    "Guarda catálogos, listas de precios y fichas técnicas en la Biblioteca del CRM, ordénalos con tags, envíalos por WhatsApp y úsalos como base de la IA.",
+  keywords: ["biblioteca de archivos", "catálogos", "listas de precios", "base de conocimiento", "RAG", "enviar archivos por WhatsApp"],
+  alternates: { canonical: "/docs/biblioteca" },
+  openGraph: {
+    title: "Biblioteca de archivos para el equipo y la IA",
+    description:
+      "Guarda catálogos, listas de precios y fichas técnicas en la Biblioteca del CRM, ordénalos con tags, envíalos por WhatsApp y úsalos como base de la IA.",
+    url: "/docs/biblioteca",
+    siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
+    type: "website",
+  },
+};
 
 const toc = [
   { id: "overview", label: "Para qué sirve" },

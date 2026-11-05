@@ -6,8 +6,20 @@ import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
 export const metadata: Metadata = {
-  title: "Envíos por API (Envia.com)",
-  description: "Cotiza, genera, rastrea y cancela guías de Envia.com por la API REST de FusionCRM: endpoints, permisos, idempotencia y errores.",
+  title: "API de envíos con Envia.com",
+  description:
+    "Cotiza, genera, rastrea y cancela guías de Envia.com por la API REST de FusionCRM: endpoints, permisos, idempotencia, cobro de saldo y errores de ciudad.",
+  keywords: ["API de envíos", "Envia.com", "guías de envío", "Coordinadora", "Servientrega", "Inter Rapidísimo", "idempotencia"],
+  alternates: { canonical: "/docs/envios" },
+  openGraph: {
+    title: "API de envíos con Envia.com",
+    description:
+      "Cotiza, genera, rastrea y cancela guías de Envia.com por la API REST de FusionCRM: endpoints, permisos, idempotencia, cobro de saldo y errores de ciudad.",
+    url: "/docs/envios",
+    siteName: "FusionCRM Docs",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FusionCRM Docs: el CRM para negocios que venden por WhatsApp" }],
+    type: "website",
+  },
 };
 
 const API_BASE = "https://api.fusioncol.com/api";
