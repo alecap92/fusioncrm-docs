@@ -52,10 +52,10 @@ export default function LandingPagesPage() {
         <section id="create" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Crear una página en 10 minutos</h2>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. Páginas → <em>Nueva página</em>. Elige una plantilla: <strong style={{ color: "var(--foreground)" }}>Captación</strong>, <strong style={{ color: "var(--foreground)" }}>Cotización de producto</strong>, <strong style={{ color: "var(--foreground)" }}>Evento</strong>, <strong style={{ color: "var(--foreground)" }}>Recurso descargable</strong> o <strong style={{ color: "var(--foreground)" }}>En blanco</strong>. Todas traen textos de ejemplo en español.</li>
-            <li>2. Ponle nombre (define el link, que puedes cambiar después) y elige el formulario que irá dentro: uno que ya tengas o uno rápido con nombre, correo y celular.</li>
+            <li>1. Páginas → <em>Nueva página</em>. Elige una plantilla: <strong style={{ color: "var(--foreground)" }}>Captación de clientes</strong>, <strong style={{ color: "var(--foreground)" }}>Cotización de producto</strong>, <strong style={{ color: "var(--foreground)" }}>Evento o lanzamiento</strong>, <strong style={{ color: "var(--foreground)" }}>Recurso descargable</strong> o <strong style={{ color: "var(--foreground)" }}>En blanco</strong>. Todas traen textos de ejemplo en español.</li>
+            <li>2. Ponle nombre (define el link, que puedes cambiar después) y elige el formulario que irá dentro: uno que ya tengas, uno rápido con nombre, correo y celular, o <strong style={{ color: "var(--foreground)" }}>Sin formulario por ahora</strong> (lo agregas después).</li>
             <li>3. En <em>Contenido</em>, activa, ordena y edita cada bloque. A la derecha ves la página real tal como la verá el cliente, en escritorio o celular; se actualiza sola con cada cambio (se guarda cada 2 segundos).</li>
-            <li>4. En <em>Diseño</em>, color principal, acento, tipografía y logo. En <em>SEO y seguimiento</em>, título y descripción para Google y WhatsApp, número de WhatsApp y, si quieres, tu Pixel de Meta o GA4.</li>
+            <li>4. En <em>Diseño</em>, color principal, acento, tipografía (Moderna, Clásica o Redondeada) y logo. En <em>SEO y seguimiento</em>, título y descripción para Google y WhatsApp, número de WhatsApp y, si quieres, tu Pixel de Meta o GA4.</li>
             <li>5. En <em>Compartir</em>, <em>Publicar</em>. Copia el link, descarga el QR o prueba el envío del formulario sin ensuciar tus estadísticas.</li>
           </ol>
           <Callout type="tip">
@@ -78,8 +78,9 @@ export default function LandingPagesPage() {
             <li>• <strong style={{ color: "var(--foreground)" }}>Déjame tus datos:</strong> tu formulario de captación, dentro de la página (uno por página).</li>
           </ul>
           <p style={{ color: "var(--muted-foreground)" }}>
-            Puedes apagar un bloque sin borrarlo y volver a la versión publicada si te arrepientes de un
-            cambio. Todo lo que escribes se muestra como texto: no hay forma de meter HTML ni scripts, así
+            Una página admite hasta 12 secciones. Puedes apagar un bloque sin borrarlo, usar{" "}
+            <strong style={{ color: "var(--foreground)" }}>Descartar</strong> para deshacer lo que no has
+            publicado o volver a la versión publicada si te arrepientes de un cambio. Todo lo que escribes se muestra como texto: no hay forma de meter HTML ni scripts, así
             nadie rompe la página.
           </p>
         </section>
@@ -114,6 +115,7 @@ export default function LandingPagesPage() {
             <li>• <strong style={{ color: "var(--foreground)" }}>Probar mi página</strong> abre la versión de prueba: el formulario envía de verdad (crea el contacto) pero no suma a las estadísticas.</li>
             <li>• <strong style={{ color: "var(--foreground)" }}>Exportar HTML</strong> descarga la página completa para alojarla donde quieras; el formulario sigue funcionando.</li>
             <li>• Cambiar el slug rompe el link anterior; hazlo antes de lanzar la campaña.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Despublicar</strong> la saca del aire sin borrarla, y desde la lista de Páginas puedes <strong style={{ color: "var(--foreground)" }}>Duplicar</strong> una página para reutilizarla en otra campaña.</li>
           </ul>
           <div className="rounded-lg p-4 mb-4" style={codeBox}>
             <pre className="text-sm overflow-x-auto" style={{ color: "var(--foreground)" }}>{`https://forms.fusioncol.com/p/manillas-para-eventos?utm_source=meta_ads&utm_campaign=eventos-sep`}</pre>

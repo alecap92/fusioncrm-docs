@@ -8,12 +8,12 @@ export const metadata: Metadata = { title: "Correo / Email" };
 
 const toc = [
   { id: "overview", label: "Bandeja de entrada" },
-  { id: "connect", label: "Conectar cuenta de email" },
+  { id: "connect", label: "Conectar cuenta de correo" },
+  { id: "assign", label: "Asignar correos al equipo" },
   { id: "compose", label: "Redactar correo" },
   { id: "scheduled", label: "Correos programados" },
-  { id: "snippets", label: "Fragmentos (Snippets)" },
-  { id: "templates", label: "Plantillas de email" },
-  { id: "auto-responder", label: "Auto-responder" },
+  { id: "snippets", label: "Fragmentos" },
+  { id: "templates", label: "Plantillas de correo" },
 ];
 
 export default function EmailPage() {
@@ -23,73 +23,113 @@ export default function EmailPage() {
         <Breadcrumbs />
         <h1 className="text-3xl font-bold mb-2" style={{ color: "var(--foreground)" }}>Correo / Email</h1>
         <p className="text-lg mb-8" style={{ color: "var(--muted-foreground)" }}>
-          FusionCRM incluye un cliente de email completo que centraliza tus correos junto con
-          WhatsApp y chat, permitiendo gestionar toda la comunicación desde un solo lugar.
+          FusionCRM trae tu correo al CRM: lees los buzones de la empresa, respondes, asignas cada
+          correo a un asesor y ves la ficha del cliente al lado, sin salir de la plataforma. Lo
+          encuentras en <strong style={{ color: "var(--foreground)" }}>Comunicación → Correo</strong>.
         </p>
 
         <section id="overview" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Bandeja de entrada</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            La bandeja de entrada muestra todos los correos electrónicos de tus cuentas conectadas.
-            Puedes ver, responder y gestionar emails sin salir de FusionCRM.
+            A la izquierda ves las carpetas de tu buzón, las mismas que tienes en tu proveedor de
+            correo (Recibidos, Enviados, Spam, etc.), cada una con su contador de no leídos. En la
+            lista puedes filtrar para ver solo los no leídos, marcar varios como leídos o no leídos,
+            eliminarlos en lote o marcar todos como leídos.
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Al abrir un correo, el CRM busca al remitente entre tus contactos y te muestra su ficha y
+            su actividad reciente al lado, con un acceso para abrir el contacto.
+          </p>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Atajos de teclado</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
             {[
-              { label: "Entrada", desc: "Emails recibidos" },
-              { label: "Enviados", desc: "Emails enviados" },
-              { label: "Borradores", desc: "Sin enviar" },
-              { label: "Programados", desc: "Envío futuro" },
-              { label: "Archivados", desc: "Procesados" },
-              { label: "Spam", desc: "No deseados" },
-              { label: "Papelera", desc: "Eliminados" },
-              { label: "Sin leer", desc: "Pendientes" },
-            ].map((f) => (
-              <div key={f.label} className="p-2 rounded border text-sm text-center" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
-                <p className="font-medium" style={{ color: "var(--foreground)" }}>{f.label}</p>
-                <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{f.desc}</p>
+              { key: "j / k", desc: "Siguiente / anterior" },
+              { key: "c", desc: "Redactar" },
+              { key: "r", desc: "Responder" },
+              { key: "f", desc: "Reenviar" },
+              { key: "#", desc: "Eliminar" },
+              { key: "Shift + U", desc: "Marcar no leído" },
+              { key: "/", desc: "Buscar" },
+              { key: "?", desc: "Ver todos los atajos" },
+            ].map((s) => (
+              <div key={s.key} className="p-2 rounded border text-sm text-center" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
+                <p className="font-mono font-medium" style={{ color: "var(--foreground)" }}>{s.key}</p>
+                <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{s.desc}</p>
               </div>
             ))}
           </div>
+          <Callout type="note">
+            El rol contador no tiene acceso al módulo de correo.
+          </Callout>
         </section>
 
         <section id="connect" className="mb-10">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Conectar cuenta de email</h2>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Conectar cuenta de correo</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            FusionCRM soporta conexión con las principales plataformas de email:
+            Todo se configura en{" "}
+            <strong style={{ color: "var(--foreground)" }}>Configuración → Correo → Cuentas de correo</strong>,
+            que tiene tres pestañas:
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="space-y-3 mb-6">
             {[
-              { name: "Gmail / Google Workspace", proto: "OAuth 2.0", steps: "Configuración → Email → Conectar Gmail → Autorizar con Google" },
-              { name: "Microsoft Outlook / 365", proto: "OAuth 2.0", steps: "Configuración → Email → Conectar Outlook → Autorizar con Microsoft" },
-              { name: "IMAP/SMTP genérico", proto: "IMAP + SMTP", steps: "Configuración → Email → Agregar cuenta IMAP → Ingresar servidor y credenciales" },
-            ].map((p) => (
-              <div key={p.name} className="p-4 rounded-lg border" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
-                <p className="font-semibold text-sm mb-1" style={{ color: "var(--foreground)" }}>{p.name}</p>
-                <span className="text-xs px-2 py-0.5 rounded font-mono mb-2 inline-block" style={{ backgroundColor: "#1f2a48", color: "white" }}>{p.proto}</span>
-                <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{p.steps}</p>
+              { tab: "Envío (SMTP)", desc: "Tu cuenta personal para ENVIAR: por aquí salen los correos que redactas, las cotizaciones y las respuestas. Cada usuario configura la suya." },
+              { tab: "Firmas", desc: "Tus firmas reutilizables. Puedes tener varias (comercial, soporte, personal) y marcar una como predeterminada." },
+              { tab: "Bandeja de entrada", desc: "Los buzones de la EMPRESA que el CRM lee y muestra en Comunicación → Correo. Son compartidos por todo el equipo, no personales." },
+            ].map((t) => (
+              <div key={t.tab} className="flex gap-3 p-3 rounded-lg border" style={{ borderColor: "var(--border)" }}>
+                <span style={{ color: "#3b82f6" }}>✦</span>
+                <div>
+                  <span className="font-medium text-sm" style={{ color: "var(--foreground)" }}>{t.tab}:</span>
+                  <span className="text-sm ml-1" style={{ color: "var(--muted-foreground)" }}>{t.desc}</span>
+                </div>
               </div>
             ))}
           </div>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Agregar un buzón</h3>
+          <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>1. En la pestaña <strong style={{ color: "var(--foreground)" }}>Bandeja de entrada</strong>, agrega una cuenta.</li>
+            <li>2. Elige tu proveedor: Gmail, Yahoo, iCloud, Zoho, Hostinger u Otro. Al escribir el correo, el CRM intenta encontrar solo el servidor.</li>
+            <li>3. Escribe tu correo completo y la contraseña (en Gmail, Yahoo e iCloud es una contraseña de aplicación; el asistente te da el enlace para crearla).</li>
+            <li>4. Prueba la conexión y guarda.</li>
+          </ol>
           <Callout type="warning">
-            Para Gmail, asegúrate de habilitar el acceso de aplicaciones de terceros en la
-            configuración de tu cuenta Google. En cuentas de Google Workspace, el administrador
-            de IT puede necesitar autorizar FusionCRM en la consola de administración.
+            En Gmail y Google Workspace no sirve tu contraseña normal: activa la verificación en dos
+            pasos en tu cuenta de Google, crea una contraseña de aplicación (16 letras) y pégala en el
+            campo de contraseña. En Google Workspace, el administrador debe tener IMAP habilitado.
           </Callout>
+          <Callout type="note">
+            Por ahora no puedes conectar cuentas de Outlook, Hotmail o Microsoft 365: Microsoft solo
+            permite entrar iniciando sesión con su cuenta, y esa conexión todavía no está disponible
+            en el CRM.
+          </Callout>
+        </section>
+
+        <section id="assign" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Asignar correos al equipo</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Cada correo se puede asignar a un asesor desde el correo abierto, y en la bandeja tienes un
+            filtro por asesor para que cada uno vea lo suyo. En la pestaña{" "}
+            <strong style={{ color: "var(--foreground)" }}>Bandeja de entrada</strong> de la configuración
+            decides qué pasa con los correos nuevos:{" "}
+            <strong style={{ color: "var(--foreground)" }}>No asignar</strong>,{" "}
+            <strong style={{ color: "var(--foreground)" }}>A un asesor</strong> (todos a la misma persona) o{" "}
+            <strong style={{ color: "var(--foreground)" }}>Rotar entre asesores</strong> (por turnos entre los que elijas).
+          </p>
         </section>
 
         <section id="compose" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Redactar correo</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            El editor de correo incluye todas las funciones estándar más características adicionales:
+            El redactor incluye:
           </p>
           <div className="space-y-3 mb-4">
             {[
-              { feature: "Editor de texto enriquecido", desc: "Formato de texto (negrita, cursiva, subrayado), listas, tablas, colores." },
-              { feature: "Adjuntos", desc: "Agrega archivos desde tu computador o desde la biblioteca de documentos de FusionCRM." },
-              { feature: "Firma de email", desc: "Firma HTML personalizable por usuario. Configurable en Configuración → Email." },
-              { feature: "CC / BCC", desc: "Agrega destinatarios en copia o copia oculta." },
-              { feature: "Responder / Reenviar", desc: "Botones estándar para responder y reenviar emails recibidos." },
-              { feature: "Insertar snippet", desc: "Inserta fragmentos de texto predefinidos mientras redactas." },
+              { feature: "Editor con formato", desc: "Negrita, cursiva, listas, tablas, colores y tamaño de letra. También puedes ver y editar el HTML del cuerpo." },
+              { feature: "Adjuntos", desc: "Agrega archivos desde tu computador con el ícono del clip." },
+              { feature: "Firma", desc: "Tu firma predeterminada entra sola; con el botón «Insertar firma» la cambias por otra de las que tengas en Configuración → Correo → Cuentas de correo → Firmas." },
+              { feature: "CC / BCC", desc: "Agrega destinatarios en copia (CC) o copia oculta (BCC)." },
+              { feature: "Responder / Reenviar", desc: "Desde el correo abierto, con los botones o con las teclas r y f." },
+              { feature: "Fragmentos", desc: "Inserta textos guardados con el botón de la burbuja de mensaje (ver abajo)." },
             ].map((f) => (
               <div key={f.feature} className="flex gap-3 p-3 rounded-lg border" style={{ borderColor: "var(--border)" }}>
                 <span style={{ color: "#3b82f6" }}>✦</span>
@@ -105,76 +145,65 @@ export default function EmailPage() {
         <section id="scheduled" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Correos programados</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Puedes programar el envío de un email para una fecha y hora específica:
+            Puedes dejar un correo listo para que salga en una fecha y hora específica:
           </p>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. Redacta el email normalmente</li>
-            <li>2. En lugar de "Enviar", haz clic en la flecha junto al botón de envío</li>
-            <li>3. Selecciona "Programar envío"</li>
-            <li>4. Elige la fecha y hora de envío</li>
-            <li>5. El email aparecerá en la carpeta "Programados" hasta la hora de envío</li>
+            <li>1. Redacta el correo normalmente.</li>
+            <li>2. Toca el ícono del reloj que está junto a <strong style={{ color: "var(--foreground)" }}>Enviar</strong>.</li>
+            <li>3. Elige la fecha y la hora; el botón cambia a <strong style={{ color: "var(--foreground)" }}>Programar</strong>.</li>
+            <li>4. Pulsa <strong style={{ color: "var(--foreground)" }}>Programar</strong>. Te sale un aviso confirmando cuándo se enviará.</li>
           </ol>
+          <Callout type="note">
+            Hoy no hay una carpeta ni una lista donde ver los correos programados: una vez programado,
+            sale solo a la hora indicada. El rol contador no ve esta opción.
+          </Callout>
           <Callout type="tip">
-            Usa el envío programado para entregar propuestas y cotizaciones a primera hora de la
-            mañana, que es cuando tienen mayor tasa de apertura.
+            Usa el envío programado para que tus propuestas y cotizaciones lleguen a primera hora de
+            la mañana.
           </Callout>
         </section>
 
         <section id="snippets" className="mb-10">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Fragmentos (Snippets)</h2>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Fragmentos</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Los snippets son bloques de texto o HTML predefinidos que puedes insertar rápidamente
-            al redactar un email. Son diferentes a las plantillas de email completas: los snippets
-            son fragmentos de texto para partes recurrentes de un email.
+            Los fragmentos son textos guardados que insertas en segundos: saludos, datos de pago,
+            condiciones de envío. Sirven tanto para el correo como para el chat de WhatsApp.
           </p>
-          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Crear un snippet</h3>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Crear un fragmento</h3>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. Ve a la sección <strong style={{ color: "var(--foreground)" }}>Snippets</strong> en la barra lateral</li>
-            <li>2. Haz clic en <strong style={{ color: "var(--foreground)" }}>"+ Nuevo snippet"</strong></li>
-            <li>3. Asigna un nombre corto (será el shortcode)</li>
-            <li>4. Escribe el contenido del fragmento</li>
-            <li>5. Guarda el snippet</li>
+            <li>1. Ve a <strong style={{ color: "var(--foreground)" }}>Comunicación → Fragmentos</strong></li>
+            <li>2. Haz clic en <strong style={{ color: "var(--foreground)" }}>Nuevo Fragmento</strong></li>
+            <li>3. Escribe un <strong style={{ color: "var(--foreground)" }}>Título</strong> y elige el <strong style={{ color: "var(--foreground)" }}>Tipo de formato</strong>: «Texto / WhatsApp» o «Correo (con formato)»</li>
+            <li>4. Escribe el <strong style={{ color: "var(--foreground)" }}>Contenido</strong> (y un <strong style={{ color: "var(--foreground)" }}>Asunto</strong> si es para correo). Puedes agregar una imagen.</li>
+            <li>5. Si quieres, ponle un <strong style={{ color: "var(--foreground)" }}>Atajo</strong> de una palabra y guarda</li>
           </ol>
-          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Usar un snippet</h3>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Usar un fragmento en un correo</h3>
           <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>
-            Al redactar un email, escribe <code style={{ color: "#d1345b" }}>/</code> seguido del
-            nombre del snippet para buscarlo e insertarlo. También puedes usar el botón de snippets
-            en la barra de herramientas del editor.
+            En el redactor, toca el botón de la burbuja de mensaje que está en la barra de abajo y
+            elige el fragmento. Si el fragmento tiene asunto y todavía no escribiste uno, el asunto se
+            rellena solo.
           </p>
+          <Callout type="note">
+            El atajo (<code style={{ color: "#d1345b" }}>#atajo</code> + Tab) funciona en el chat de
+            WhatsApp; en el correo los fragmentos se insertan con el botón.
+          </Callout>
         </section>
 
         <section id="templates" className="mb-10">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Plantillas de email</h2>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Plantillas de correo</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            A diferencia de los snippets, las plantillas de email son emails completos (asunto +
-            cuerpo) que puedes usar como punto de partida para emails frecuentes.
+            Las plantillas de correo (con el editor de arrastrar y soltar) se usan en{" "}
+            <strong style={{ color: "var(--foreground)" }}>Email Marketing</strong>, para campañas a
+            muchos contactos. En el redactor del correo uno a uno no hay selector de plantillas.
           </p>
-          <div className="rounded-lg p-4 border mb-4" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
-            <p className="text-sm font-semibold mb-2" style={{ color: "var(--foreground)" }}>Casos de uso comunes:</p>
-            <ul className="space-y-1 text-sm" style={{ color: "var(--muted-foreground)" }}>
-              <li>• Email de bienvenida a nuevos clientes</li>
-              <li>• Seguimiento post-reunión</li>
-              <li>• Envío de propuesta comercial</li>
-              <li>• Confirmación de pedido</li>
-              <li>• Email de reactivación de cliente inactivo</li>
-            </ul>
-          </div>
-        </section>
-
-        <section id="auto-responder" className="mb-10">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Auto-responder</h2>
-          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            El auto-responder envía automáticamente un email de respuesta cuando recibes un nuevo
-            correo en una cuenta conectada. Útil para confirmar recepción y establecer expectativas
-            de tiempo de respuesta.
-          </p>
-          <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>
-            Configura el auto-responder en{" "}
-            <strong style={{ color: "var(--foreground)" }}>Configuración → Email → Auto-responder</strong>.
-          </p>
+          <Callout type="tip">
+            Para correos que repites seguido (bienvenida, seguimiento después de una reunión, envío de
+            propuesta), crea un fragmento de tipo «Correo (con formato)» con su asunto: lo insertas
+            con un clic y el asunto se llena solo.
+          </Callout>
           <Callout type="note">
-            El auto-responder solo se activa para el primer email de una conversación. No responde
-            automáticamente a emails de seguimiento dentro de un mismo hilo.
+            La respuesta automática fuera de horario existe solo para WhatsApp, en Configuración →
+            Conversaciones. El correo no tiene respuesta automática.
           </Callout>
         </section>
 

@@ -50,12 +50,24 @@ export default function FormsPage() {
         <section id="create" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Crear un formulario</h2>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. Formularios → <em>Nuevo formulario</em>. Nombre y slug (la parte de la URL).</li>
-            <li>2. Agrega campos: cada campo se mapea a una propiedad del contacto (nombre, correo, celular, empresa o cualquier campo personalizado). Marca los obligatorios.</li>
-            <li>3. Campos ocultos: valores fijos que viajan con cada envío (ej. <code>source</code>), sin que el visitante los vea.</li>
-            <li>4. Apariencia: colores, texto del botón y mensaje o redirección al terminar.</li>
-            <li>5. Guarda. En la pestaña <em>Compartir</em> tienes el link, el snippet y la URL de webhook.</li>
+            <li>1. Ve a Comunicación → Formularios → <strong style={{ color: "var(--foreground)" }}>Nuevo Formulario</strong> y escribe el nombre. El link del formulario se crea solo a partir de ese nombre.</li>
+            <li>2. Pestaña <strong style={{ color: "var(--foreground)" }}>Campos</strong>: agrega campos; cada uno se mapea a una propiedad del contacto (nombre, correo, celular, empresa o cualquier campo personalizado). Ordénalos y marca los obligatorios.</li>
+            <li>3. Campos ocultos: activa los que quieras capturar (<code>utm_source</code>, <code>utm_medium</code>, <code>utm_campaign</code>, <code>utm_term</code>, <code>utm_content</code>, <code>gclid</code>, <code>fbclid</code>, la página y el referente). Se llenan solos con los datos del link y del navegador; no se escriben a mano.</li>
+            <li>4. Pestaña <strong style={{ color: "var(--foreground)" }}>Diseño</strong>: color, texto del botón, título, descripción, logo, apariencia clara u oscura y, si quieres, un widget flotante (botón en una esquina de tu web que abre el formulario).</li>
+            <li>5. Pestaña <strong style={{ color: "var(--foreground)" }}>Después de enviar</strong>: qué ve el visitante (mostrar un mensaje, redirigir a una URL o abrir WhatsApp con un mensaje inicial) y qué hace el CRM con el contacto (ver abajo).</li>
+            <li>6. Pulsa <strong style={{ color: "var(--foreground)" }}>Crear formulario</strong>. En la pestaña <strong style={{ color: "var(--foreground)" }}>Compartir</strong> tienes el link, el código para tu web y la URL de webhook; en <strong style={{ color: "var(--foreground)" }}>Respuestas</strong>, los envíos recibidos.</li>
           </ol>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            A la derecha del editor ves una vista previa real del formulario, en escritorio o celular.
+            Con <strong style={{ color: "var(--foreground)" }}>Pausar</strong> dejas de recibir envíos sin
+            borrarlo (y con <strong style={{ color: "var(--foreground)" }}>Activar</strong> lo vuelves a abrir), y
+            desde la lista puedes <strong style={{ color: "var(--foreground)" }}>Duplicar</strong> uno existente.
+          </p>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            En <strong style={{ color: "var(--foreground)" }}>Respuestas</strong> ves cuántos envíos crearon o
+            actualizaron contactos, puedes ocultar o ver solo los sospechosos de spam, exportarlos con{" "}
+            <strong style={{ color: "var(--foreground)" }}>Exportar CSV</strong> y borrar respuestas.
+          </p>
         </section>
 
         <section id="share" className="mb-10">
@@ -81,6 +93,11 @@ export default function FormsPage() {
             Al enviarse, el snippet publica el evento <code>fusioncol_form_submitted</code> en el{" "}
             <code>dataLayer</code>, listo para medir conversiones en Google Analytics o Ads.
           </p>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Si tu plataforma no permite scripts, en Compartir también tienes el código de un iframe
+            directo. Y si activaste el widget flotante en Diseño, ahí mismo aparece su snippet para
+            mostrar el formulario como un botón en la esquina de tu web.
+          </p>
 
           <h3 id="webhook" className="text-lg font-semibold mb-2" style={{ color: "var(--foreground)" }}>Conectar un formulario que ya tienes</h3>
           <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>
@@ -102,19 +119,25 @@ Content-Type: application/json
   "page_url": "https://tusitio.com/contacto"
 }`}</pre>
           </div>
+          <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>
+            Las claves del JSON son las claves de los campos del formulario. La URL acepta JSON, un
+            formulario normal y el formato <code>fields[clave][value]</code> que envía Elementor. Si
+            crees que la clave se filtró, usa <strong style={{ color: "var(--foreground)" }}>Regenerar clave</strong>{" "}
+            en Compartir: la anterior deja de funcionar, así que actualiza tu sitio.
+          </p>
           <p style={{ color: "var(--muted-foreground)" }}>
-            Las claves del JSON son las claves de los campos del formulario. Desde un servidor
-            también puedes usar la <Link href="/docs/api" style={{ color: "#d1345b" }}>API</Link> con un
+            Desde un servidor también puedes usar la <Link href="/docs/api" style={{ color: "#d1345b" }}>API</Link> con un
             token (<code>POST /forms/&#123;id&#125;/submit</code>) o el tool <code>submit_form</code> del{" "}
-            <Link href="/docs/mcp" style={{ color: "#d1345b" }}>MCP</Link>.
+            <Link href="/docs/mcp" style={{ color: "#d1345b" }}>MCP</Link>. La API y el MCP hacen parte de los planes
+            Pro e Ilimitado; el link, el código para tu web y el webhook funcionan en todos los planes.
           </p>
         </section>
 
         <section id="submit" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Qué pasa con cada envío</h2>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. Se busca un contacto con el mismo correo o celular. Si existe, se completan <strong style={{ color: "var(--foreground)" }}>solo los campos vacíos</strong>: lo que un vendedor corrigió a mano nunca se pisa. Si no existe, se crea.</li>
-            <li>2. Se guarda el origen: <code>source</code> (del <code>utm_source</code> o el que definas por defecto) y la atribución completa de primer contacto (campaña, medio, página). La atribución se escribe una sola vez.</li>
+            <li>1. Si tienes encendido <strong style={{ color: "var(--foreground)" }}>Registrar el contacto</strong> (en Después de enviar), se busca un contacto con el mismo correo o celular. Si existe, se completan <strong style={{ color: "var(--foreground)" }}>solo los campos vacíos</strong>: lo que un vendedor corrigió a mano nunca se pisa. Si no existe, se crea, y cuenta para el límite de contactos de tu plan. Si lo apagas, el envío solo queda guardado en Respuestas.</li>
+            <li>2. Se guarda el origen: <code>source</code> (del <code>utm_source</code> o, si no llega, la <strong style={{ color: "var(--foreground)" }}>Fuente por defecto</strong> que pongas en Después de enviar) y la atribución completa de primer contacto (campaña, medio, página). La atribución se escribe una sola vez.</li>
             <li>3. Se aplican las etiquetas y la lista de contactos que hayas configurado, y el dueño del contacto.</li>
             <li>4. Queda la respuesta completa en el historial del formulario y como evento «Formulario» en la línea de tiempo del contacto.</li>
           </ol>
