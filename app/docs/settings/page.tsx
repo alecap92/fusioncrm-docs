@@ -10,16 +10,29 @@ const toc = [
   { id: "overview", label: "Panel de configuración" },
   { id: "organization", label: "Organización" },
   { id: "users", label: "Usuarios y permisos" },
+  { id: "notifications", label: "Notificaciones" },
   { id: "fields", label: "Campos personalizados" },
   { id: "whatsapp", label: "WhatsApp (líneas)" },
   { id: "conversations", label: "Conversaciones (pipelines)" },
   { id: "integrations", label: "Integraciones" },
-  { id: "email-settings", label: "Configuración de email" },
+  { id: "email-settings", label: "Cuentas de correo" },
   { id: "lead-scoring", label: "Lead Scoring" },
   { id: "mcp", label: "Conectores MCP" },
   { id: "api-keys", label: "Tokens de API" },
   { id: "security", label: "Seguridad" },
+  { id: "import-history", label: "Historial de importaciones" },
   { id: "plan", label: "Plan y facturación" },
+];
+
+const groups: { group: string; items: string; note?: string }[] = [
+  { group: "General", items: "Organización, WhatsApp, Usuarios, Seguridad, Notificaciones, Plan e Historial de importaciones" },
+  { group: "Módulos del CRM", items: "Contactos, Empresas y Negocios (campos personalizados; en Negocios también pipelines y etapas), Conversaciones y Lead Scoring" },
+  { group: "Documentos", items: "Cotizaciones y Plantillas PDF" },
+  { group: "Correo", items: "Cuentas de correo, Envío masivo y Dominios (Dominios solo lo ve el propietario)" },
+  { group: "Automatización", items: "Agentes IA" },
+  { group: "Desarrollador", items: "Integraciones, API y Conectores MCP (Conectores MCP solo lo ve el propietario)" },
+  { group: "Facturación", items: "Facturación electrónica y Retenciones", note: "solo si tienes el módulo de Facturación electrónica" },
+  { group: "Envíos", items: "Envíos (Envia.com)", note: "solo si tienes el módulo de Envíos" },
 ];
 
 export default function SettingsPage() {
@@ -29,72 +42,65 @@ export default function SettingsPage() {
         <Breadcrumbs />
         <h1 className="text-3xl font-bold mb-2" style={{ color: "var(--foreground)" }}>Configuración</h1>
         <p className="text-lg mb-8" style={{ color: "var(--muted-foreground)" }}>
-          El panel de configuración permite personalizar cada aspecto de FusionCRM para tu
-          organización: desde el perfil de empresa hasta integraciones avanzadas con IA.
+          En Configuración ajustas FusionCRM a tu empresa: los datos de la organización, tu equipo,
+          tus números de WhatsApp, el correo, las integraciones y tu plan.
         </p>
 
         <section id="overview" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Panel de configuración</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Accede desde la barra lateral → Configuración (ícono ⚙️). El panel está organizado
-            en secciones en una barra lateral izquierda:
+            Entra haciendo clic en el ícono de tu organización, arriba a la derecha →{" "}
+            <strong style={{ color: "var(--foreground)" }}>Configuración</strong>. En el celular, abre el
+            menú (☰) y toca Configuración. Las secciones están agrupadas así:
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-            {[
-              { section: "Organización", desc: "Logo, nombre, dirección, datos de empresa" },
-              { section: "Usuarios", desc: "Equipo, roles, invitaciones" },
-              { section: "Seguridad", desc: "Contraseñas, 2FA, sesiones" },
-              { section: "Campos de contacto", desc: "Campos personalizados" },
-              { section: "Deals", desc: "Pipelines y etapas" },
-              { section: "Email", desc: "Cuentas de correo, firma, auto-responder" },
-              { section: "Facturas", desc: "Config DIAN, plantilla de factura" },
-              { section: "Cotizaciones", desc: "Plantilla, numeración" },
-              { section: "WhatsApp", desc: "Líneas (números) conectadas, línea por defecto, pipeline de cada línea" },
-              { section: "Conversaciones", desc: "Pipelines de conversación y sus columnas, números bloqueados" },
-              { section: "Lead Scoring", desc: "Reglas de puntuación" },
-              { section: "Automatizaciones", desc: "Lista de workflows activos" },
-              { section: "Integraciones", desc: "Conectores externos" },
-              { section: "API", desc: "Claves API, documentación" },
-              { section: "MCP Connectors", desc: "IA y conectores MCP" },
-              { section: "Plan y facturación", desc: "Suscripción, pagos" },
-            ].map((s) => (
-              <div key={s.section} className="flex gap-2 p-3 rounded border text-sm" style={{ borderColor: "var(--border)" }}>
+            {groups.map((s) => (
+              <div key={s.group} className="flex gap-2 p-3 rounded border text-sm" style={{ borderColor: "var(--border)" }}>
                 <span style={{ color: "#d1345b" }}>⚙</span>
                 <div>
-                  <span className="font-medium" style={{ color: "var(--foreground)" }}>{s.section}:</span>
-                  <span className="ml-1" style={{ color: "var(--muted-foreground)" }}>{s.desc}</span>
+                  <span className="font-medium" style={{ color: "var(--foreground)" }}>{s.group}:</span>
+                  <span className="ml-1" style={{ color: "var(--muted-foreground)" }}>
+                    {s.items}
+                    {s.note ? <em> ({s.note})</em> : null}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Las automatizaciones no están aquí: se manejan desde el menú{" "}
+            <strong style={{ color: "var(--foreground)" }}>Planeación → Automatizaciones</strong>. Los agentes
+            IA se configuran en Configuración → Automatización → Agentes IA con tu propia clave de OpenAI o
+            Claude (guía en <a href="/docs/agentes-ia" style={{ color: "#d1345b" }}>Agentes IA</a>).
+          </p>
           <Callout type="note">
-            Solo los usuarios con rol <strong>Administrador</strong> u <strong>Propietario</strong> tienen
-            acceso completo a la configuración. Los usuarios regulares solo pueden ver algunas
-            secciones como Email y su propio perfil.
+            Lo que ves depende de tu rol. El <strong>propietario</strong> ve y cambia todo. El{" "}
+            <strong>empleado</strong> ve casi todas las secciones, menos Dominios y Conectores MCP, y no puede
+            crear usuarios ni pagar el plan. El <strong>contador</strong> solo ve Seguridad y Notificaciones.
+            El <strong>lector</strong> puede mirar, pero no guardar cambios.
           </Callout>
         </section>
 
         <section id="organization" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Organización</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Configura los datos de tu empresa que aparecerán en cotizaciones, facturas y comunicaciones:
+            En Configuración → General → Organización llenas los datos de tu empresa que salen en
+            cotizaciones, facturas y comunicaciones:
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Nombre de la organización</strong></li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Logo</strong> (PNG o JPG, máx 2MB, fondo transparente recomendado)</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>NIT / Identificación tributaria</strong></li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Dirección</strong> (calle, ciudad, país)</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Teléfono de contacto</strong></li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Sitio web</strong></li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Zona horaria</strong></li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Moneda predeterminada</strong></li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Logo de la Organización</strong> (el que va en tus documentos)</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Icono de la Organización</strong> (el que ves en la barra superior)</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Nombre de la Organización</strong> y <strong style={{ color: "var(--foreground)" }}>Nit</strong></li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Email</strong> (solo lectura) y <strong style={{ color: "var(--foreground)" }}>Teléfono</strong></li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Dirección</strong>, <strong style={{ color: "var(--foreground)" }}>Ciudad</strong> (de la lista de municipios) y <strong style={{ color: "var(--foreground)" }}>Departamento</strong> (se llena solo al elegir la ciudad)</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Idioma y moneda</strong>: definen cómo se muestran los precios y las fechas, por ejemplo en tus cotizaciones.</li>
           </ul>
         </section>
 
         <section id="users" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Usuarios y permisos</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Gestiona los miembros del equipo que tienen acceso a FusionCRM.
+            En Configuración → General → Usuarios manejas a las personas de tu equipo que entran a FusionCRM.
           </p>
           <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Roles de usuario</h3>
           <div className="rounded-lg overflow-hidden border mb-6" style={{ borderColor: "var(--border)" }}>
@@ -108,10 +114,10 @@ export default function SettingsPage() {
               </thead>
               <tbody>
                 {[
-                  ["Propietario", "Acceso total. Solo uno por organización. Puede eliminar la organización."],
-                  ["Administrador", "Acceso total a configuración, usuarios, exportaciones y todas las funciones."],
-                  ["Vendedor", "Gestión de contactos, deals, conversaciones, cotizaciones y facturas. Sin acceso a configuración avanzada."],
-                  ["Solo lectura", "Puede ver datos pero no crear, editar ni eliminar nada."],
+                  ["Propietario", "Acceso total: usuarios, plan, exportaciones y toda la configuración. Puede haber más de uno. Ocupa un asiento."],
+                  ["Empleado", "Usa todo el CRM, menos lo reservado al propietario (exportar, pagar el plan, crear usuarios). Ocupa un asiento."],
+                  ["Lector", "Solo puede mirar: no crea, no edita ni borra. No ocupa asiento."],
+                  ["Contador", "Solo contactos, empresas y facturación, y solo en la web. Necesita el módulo de Facturación electrónica. Ocupa un asiento."],
                 ].map(([r, p]) => (
                   <tr key={r}>
                     <td className="p-3 border-b font-medium" style={{ borderColor: "var(--border)", color: "var(--foreground)" }}>{r}</td>
@@ -121,72 +127,102 @@ export default function SettingsPage() {
               </tbody>
             </table>
           </div>
-          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Invitar usuarios</h3>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Crear un usuario</h3>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. Ve a Configuración → Usuarios</li>
-            <li>2. Haz clic en "Invitar usuario"</li>
-            <li>3. Ingresa el email del nuevo usuario</li>
-            <li>4. Selecciona el rol que tendrá</li>
-            <li>5. Envía la invitación. El usuario recibirá un email para activar su cuenta.</li>
+            <li>1. Ve a Configuración → Usuarios y haz clic en <strong style={{ color: "var(--foreground)" }}>Crear Usuario</strong> (solo el propietario).</li>
+            <li>2. Escribe nombre, apellido, correo, una contraseña temporal y el rol.</li>
+            <li>3. La cuenta queda activa de una vez: compártele la contraseña por un canal seguro. La persona la cambia en Configuración → Seguridad.</li>
           </ol>
           <Callout type="tip">
-            Los usuarios invitados deben aceptar la invitación dentro de 72 horas. Puedes
-            reenviar la invitación desde la lista de usuarios si expira.
+            No se envían invitaciones por correo: tú creas la cuenta y le das la contraseña. Para crear un
+            empleado necesitas un asiento libre; si no tienes, usa <strong>Agregar asiento</strong> en la misma
+            pantalla o créalo como Lector.
           </Callout>
+          <h3 className="text-lg font-semibold mb-3 mt-6" style={{ color: "var(--foreground)" }}>Más opciones en Usuarios</h3>
+          <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• Arriba ves cuántos asientos usas y cuántos lectores tienes; desde ahí agregas o liberas asientos.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Actividad del equipo</strong>: qué hizo cada persona (guía en <a href="/docs/team-activity" style={{ color: "#d1345b" }}>Actividad del equipo</a>).</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Acceso por API</strong>: el propietario ajusta, usuario por usuario, qué puede hacer cada uno por API.</li>
+            <li>• Al eliminar un usuario eliges a quién pasan sus negocios, contactos y conversaciones.</li>
+          </ul>
+        </section>
+
+        <section id="notifications" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Notificaciones</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            En Configuración → General → Notificaciones cada usuario elige qué avisos quiere recibir y por
+            dónde: <strong style={{ color: "var(--foreground)" }}>Campana</strong> (dentro del CRM),{" "}
+            <strong style={{ color: "var(--foreground)" }}>Celular</strong> o{" "}
+            <strong style={{ color: "var(--foreground)" }}>Correo</strong>. También puedes activar un resumen diario.
+          </p>
         </section>
 
         <section id="fields" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Campos personalizados</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Los campos personalizados te permiten agregar información adicional a los contactos
-            más allá de los campos estándar. Consulta la documentación de{" "}
+            Puedes crear campos propios para contactos, empresas y negocios, cada uno en su sección de{" "}
+            <strong style={{ color: "var(--foreground)" }}>Configuración → Módulos del CRM</strong> (Contactos,
+            Empresas, Negocios). En Negocios también configuras los pipelines, las etapas con su probabilidad,
+            los requisitos para avanzar de etapa y la lista de chequeo de cierre. Más detalle en{" "}
             <a href="/docs/contacts#custom-fields" style={{ color: "#d1345b" }}>Contactos → Campos personalizados</a>{" "}
-            para más detalles.
+            y <a href="/docs/pipelines" style={{ color: "#d1345b" }}>Pipelines</a>.
           </p>
         </section>
 
         <section id="whatsapp" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>WhatsApp (líneas)</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Ajustes → WhatsApp lista los números conectados (líneas). Por cada uno: nombre, color,
-            quién atiende los chats nuevos, el pipeline en el que nacen y si es la línea por defecto.
-            Aquí también se conectan números nuevos y vive el switch de confirmaciones de lectura.
-            Guía completa en <a href="/docs/whatsapp-lines" style={{ color: "#d1345b" }}>Líneas de WhatsApp</a>.
+            Configuración → General → WhatsApp lista tus números conectados (líneas). Por cada uno defines
+            nombre, color, quién atiende los chats nuevos, el pipeline en el que nacen y si es la línea por
+            defecto. Desde cada línea también editas su perfil de negocio de WhatsApp (foto, descripción y
+            datos de contacto), ves si la conexión está sana y la puedes desconectar. Los números nuevos se
+            agregan con <strong style={{ color: "var(--foreground)" }}>Conectar línea</strong>, y aquí vive también
+            el switch de confirmaciones de lectura. Guía completa en{" "}
+            <a href="/docs/whatsapp-lines" style={{ color: "#d1345b" }}>Líneas de WhatsApp</a>.
           </p>
         </section>
 
         <section id="conversations" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Conversaciones (pipelines)</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Ajustes → Conversaciones administra los pipelines de conversación (crear, renombrar, marcar
-            predeterminado, eliminar moviendo sus chats) y las columnas de cada uno, con asignación
-            automática, reapertura y webhook por columna. También los números bloqueados.
-            Guía completa en <a href="/docs/conversation-pipelines" style={{ color: "#d1345b" }}>Pipelines de conversación</a>.
+            Configuración → Módulos del CRM → Conversaciones administra los pipelines de conversación (crear,
+            renombrar, marcar predeterminado, eliminar moviendo sus chats) y las columnas de cada uno, con
+            asignación automática, reapertura y webhook por columna. Aquí también manejas los números
+            bloqueados y el autorespondedor. Guía completa en{" "}
+            <a href="/docs/conversation-pipelines" style={{ color: "#d1345b" }}>Pipelines de conversación</a>.
           </p>
         </section>
 
         <section id="integrations" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Integraciones</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Desde Configuración → Integraciones puedes gestionar todas las conexiones con
-            servicios externos. Ver la documentación completa en{" "}
-            <a href="/docs/integrations" style={{ color: "#d1345b" }}>Integraciones</a>.
+            En Configuración → Desarrollador → Integraciones conectas servicios externos: OpenAI, Claude AI,
+            Google Maps, Meta (Facebook + Instagram), ElevenLabs, Google Analytics y N8N. Ver la documentación
+            completa en <a href="/docs/integrations" style={{ color: "#d1345b" }}>Integraciones</a>. Tus números de
+            WhatsApp no se conectan aquí, sino en Configuración → WhatsApp.
           </p>
         </section>
 
         <section id="email-settings" className="mb-10">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Configuración de email</h2>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Cuentas de correo</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Configura las cuentas de email conectadas, firma HTML personal, plantillas de email
-            y reglas de auto-responder. Accede desde Configuración → Email.
+            En Configuración → Correo → Cuentas de correo configuras:
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Conectar/desconectar cuentas de Gmail, Outlook o IMAP</li>
-            <li>• Configurar firma de email por usuario</li>
-            <li>• Plantillas de email reutilizables</li>
-            <li>• Auto-responder para emails entrantes</li>
-            <li>• Horarios de envío permitidos (evitar envíos fuera de horario laboral)</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Configuración SMTP</strong>: el correo desde el que salen tus envíos.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Mis firmas</strong>: puedes pegar la firma que ya usas en Gmail u Outlook.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Cuentas de correo</strong> que llenan tu bandeja de entrada: Gmail (y Google Workspace), Yahoo, iCloud, Zoho, Hostinger y cPanel.</li>
+            <li>• Reglas de asignación, para repartir los correos que llegan entre tu equipo.</li>
           </ul>
+          <Callout type="warning">
+            Gmail, Yahoo e iCloud piden una <strong>contraseña de aplicación</strong> (Zoho también, si tienes
+            verificación en dos pasos). Outlook, Hotmail y Microsoft 365 todavía no se pueden conectar.
+          </Callout>
+          <p className="mt-4" style={{ color: "var(--muted-foreground)" }}>
+            En el mismo grupo Correo están <strong style={{ color: "var(--foreground)" }}>Envío masivo</strong>{" "}
+            (para tus campañas de correo) y <strong style={{ color: "var(--foreground)" }}>Dominios</strong>{" "}
+            (solo el propietario).
+          </p>
         </section>
 
         <section id="lead-scoring" className="mb-10">
@@ -221,18 +257,21 @@ export default function SettingsPage() {
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
             Los tokens de API permiten a tus sistemas leer y escribir en FusionCRM por la API REST
             (y también sirven para el MCP). Se crean en{" "}
-            <strong style={{ color: "var(--foreground)" }}>Configuración → Desarrollador → API</strong> (solo propietarios).
+            <strong style={{ color: "var(--foreground)" }}>Configuración → Desarrollador → API</strong>. Los crean el
+            propietario y los empleados, y cada uno ve solo sus propios tokens. Los empleados no pueden darle a
+            un token acceso completo ni permiso de borrar.
           </p>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
             <li>1. <em>Crear nuevo token</em>: nombre (ej. «integracion-n8n») y descripción.</li>
             <li>2. Expiración: 30 días, 90 días, 1 año o sin expiración.</li>
-            <li>3. Permisos: usa un preset (Solo lectura, Ventas, Acceso completo) o marca uno por uno.</li>
+            <li>3. Permisos: usa un preset (Solo Lectura, Ventas, Acceso Completo o Bot de WhatsApp) o marca uno por uno.</li>
             <li>4. Copia el token: solo se muestra una vez. Revócalo desde la misma lista si se filtra.</li>
+            <li>5. Cuando esté por vencer, usa <em>Renovar token</em> en la lista (lo extiende un año) en vez de crear otro.</li>
           </ol>
           <p style={{ color: "var(--muted-foreground)" }}>
             Headers, tabla de permisos y referencia completa en{" "}
-            <a href="/docs/api" style={{ color: "#d1345b" }}>API REST</a>. La API y el MCP hacen parte
-            del módulo API del plan.
+            <a href="/docs/api" style={{ color: "#d1345b" }}>API REST</a>. La API y el MCP vienen incluidos en los
+            planes Pro y Unlimited; el plan Free no los trae.
           </p>
         </section>
 
@@ -242,12 +281,24 @@ export default function SettingsPage() {
             Lo que encuentras en Configuración → General → Seguridad:
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Cambiar contraseña:</strong> si entraste con Google y nunca creaste una, aquí la estableces.</li>
             <li>• <strong style={{ color: "var(--foreground)" }}>Verificación en dos pasos (2FA):</strong> cada usuario la activa con una app de códigos (Google Authenticator, 1Password…). El propietario puede exigirla a toda la organización: quien no la tenga configurada solo podrá activarla hasta hacerlo.</li>
             <li>• <strong style={{ color: "var(--foreground)" }}>Sesiones por dispositivo:</strong> ves desde qué navegadores y dispositivos hay sesión abierta y puedes cerrar cualquiera al instante. El propietario puede cerrar todas las sesiones de la organización.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Historial de accesos:</strong> cuándo, desde qué dispositivo y con qué método se entró a tu cuenta.</li>
             <li>• <strong style={{ color: "var(--foreground)" }}>Aviso de dispositivo nuevo:</strong> un correo cuando alguien entra desde un equipo desconocido.</li>
             <li>• <strong style={{ color: "var(--foreground)" }}>Credenciales cifradas:</strong> las claves de integraciones (WhatsApp, OpenAI, correo) se guardan cifradas en reposo.</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Habeas Data:</strong> desde la ficha de un contacto el propietario exporta todos sus datos (JSON o Excel) con consentimientos, origen y respuestas de formularios, para atender una solicitud de la Ley 1581.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Habeas Data:</strong> desde la ficha de un contacto, el propietario toca <em>Exportar datos</em> y descarga un Excel con todo lo que la plataforma tiene de esa persona (consentimientos, origen y respuestas de formularios), para atender una solicitud de la Ley 1581.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Eliminar mi cuenta</strong> (solo el propietario): borra la cuenta y todos sus datos de forma permanente.</li>
           </ul>
+        </section>
+
+        <section id="import-history" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Historial de importaciones</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            En Configuración → General → Historial ves todas las importaciones que has hecho, descargas las
+            filas que se rechazaron (con el motivo) y puedes <strong style={{ color: "var(--foreground)" }}>Revertir</strong>{" "}
+            una importación que no quieras conservar.
+          </p>
         </section>
 
         <section id="plan" className="mb-10">
@@ -262,13 +313,14 @@ export default function SettingsPage() {
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
             <li>• Ver tu plan, su uso (contactos, usuarios, cotizaciones…) y qué incluye.</li>
             <li>• Subir de plan pagando con tarjeta (Wompi); la renovación es mensual y automática.</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Asientos:</strong> cada plan incluye cierto número de usuarios; puedes comprar asientos adicionales en cualquier momento (se cobra la parte proporcional del mes) y liberarlos después. Los usuarios con rol <em>lector</em> no consumen asiento.</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Módulos:</strong> la facturación electrónica y el acceso por API/MCP se contratan aparte y se activan por organización.</li>
-            <li>• Ver el historial de pagos.</li>
+            <li>• Bajar de plan o cancelar la suscripción tú mismo.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Asientos:</strong> en Pro y Unlimited puedes agregar asientos (se cobra la parte proporcional del mes) y liberarlos después, desde Configuración → Usuarios (solo el propietario). El plan Free trae 1 usuario y no vende asientos extra: para tener más, pásate a Pro. Los usuarios con rol <em>lector</em> no consumen asiento.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Módulos:</strong> la API y el MCP vienen en Pro y Unlimited. Facturación electrónica y Envíos son módulos adicionales que se activan aparte en cualquier plan.</li>
           </ul>
           <Callout type="tip">
             Si necesitas condiciones especiales, escribe a{" "}
-            <strong style={{ color: "#d1345b" }}>ventas@fusioncol.com</strong>.
+            <strong style={{ color: "#d1345b" }}>comercial@fusioncol.com</strong> o por WhatsApp al{" "}
+            <strong style={{ color: "#d1345b" }}>+57 302 400 3914</strong>.
           </Callout>
         </section>
 

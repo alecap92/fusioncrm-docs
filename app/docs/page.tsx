@@ -3,7 +3,7 @@ import Link from "next/link";
 import {
   Users, Briefcase, GitBranch, MessageSquare, Mail, FileText,
   BarChart2, Settings, Code2, Puzzle, Zap, Star, Package, CreditCard,
-  ArrowRight, BookOpen, Send, Calendar, FolderKanban, TrendingUp, LayoutTemplate, Activity } from "lucide-react";
+  ArrowRight, BookOpen, Send, Calendar, FolderKanban, TrendingUp, LayoutTemplate, Activity, Phone, Columns3, Truck } from "lucide-react";
 
 export const metadata: Metadata = { title: "Introducción" };
 
@@ -11,15 +11,18 @@ const cards = [
   { icon: <Users size={20} />, title: "Contactos", desc: "Gestiona tu base de clientes, importa contactos y crea segmentos.", href: "/docs/contacts", color: "#3b82f6" },
   { icon: <Briefcase size={20} />, title: "Deals", desc: "Pipeline de ventas en vista Kanban con arrastrar y soltar.", href: "/docs/deals", color: "#8b5cf6" },
   { icon: <GitBranch size={20} />, title: "Pipelines", desc: "Crea y personaliza pipelines con etapas a medida.", href: "/docs/pipelines", color: "#06b6d4" },
-  { icon: <MessageSquare size={20} />, title: "Conversaciones", desc: "WhatsApp, email y chat en una sola bandeja unificada.", href: "/docs/conversations", color: "#10b981" },
+  { icon: <MessageSquare size={20} />, title: "Conversaciones", desc: "WhatsApp, Messenger e Instagram en una sola bandeja.", href: "/docs/conversations", color: "#10b981" },
+  { icon: <Phone size={20} />, title: "Líneas de WhatsApp", desc: "Conecta varios números, con su color, su pipeline y su perfil de negocio.", href: "/docs/whatsapp-lines", color: "#22c55e" },
+  { icon: <Columns3 size={20} />, title: "Pipelines de conversación", desc: "Organiza tus chats en columnas, con asignación automática por etapa.", href: "/docs/conversation-pipelines", color: "#059669" },
   { icon: <BookOpen size={20} />, title: "Templates WhatsApp", desc: "Plantillas aprobadas para mensajes masivos y automatizados.", href: "/docs/whatsapp-templates", color: "#f59e0b" },
   { icon: <Mail size={20} />, title: "Correo", desc: "Bandeja de entrada, redacción y automatización de emails.", href: "/docs/email", color: "#ec4899" },
   { icon: <Send size={20} />, title: "Campañas Masivas", desc: "Email y WhatsApp marketing a segmentos de contactos.", href: "/docs/mass-campaigns", color: "#d1345b" },
   { icon: <FileText size={20} />, title: "Cotizaciones", desc: "Genera, envía y da seguimiento a presupuestos.", href: "/docs/quotes", color: "#6366f1" },
-  { icon: <CreditCard size={20} />, title: "Facturación", desc: "Facturas electrónicas con integración DIAN Colombia.", href: "/docs/invoices", color: "#14b8a6" },
+  { icon: <CreditCard size={20} />, title: "Facturación", desc: "Facturas electrónicas DIAN Colombia (módulo adicional).", href: "/docs/invoices", color: "#14b8a6" },
+  { icon: <Truck size={20} />, title: "Envíos", desc: "Cotiza, genera y rastrea guías con Envia.com (módulo adicional).", href: "/docs/envios", color: "#ea580c" },
   { icon: <Package size={20} />, title: "Productos", desc: "Catálogo de productos y servicios con precios.", href: "/docs/products", color: "#f97316" },
   { icon: <BarChart2 size={20} />, title: "Reportes", desc: "Analytics, reportes de ventas y dashboards personalizados.", href: "/docs/reports", color: "#84cc16" },
-  { icon: <TrendingUp size={20} />, title: "Lead Scoring", desc: "Calificación automática de leads con reglas y IA.", href: "/docs/lead-scoring", color: "#a855f7" },
+  { icon: <TrendingUp size={20} />, title: "Lead Scoring", desc: "Calificación automática de leads con las reglas que tú defines.", href: "/docs/lead-scoring", color: "#a855f7" },
   { icon: <Zap size={20} />, title: "Automatizaciones", desc: "Editor visual de workflows con triggers y acciones.", href: "/docs/workflows", color: "#eab308" },
   { icon: <Calendar size={20} />, title: "Calendario", desc: "Gestión de citas, eventos y actividades.", href: "/docs/calendar", color: "#0ea5e9" },
   { icon: <FolderKanban size={20} />, title: "Proyectos", desc: "Gestión de proyectos y equipos de trabajo.", href: "/docs/projects", color: "#64748b" },
@@ -78,9 +81,9 @@ export default function DocsIndexPage() {
         <h2 className="text-xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Inicio rápido</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { step: "1", title: "Crea tu cuenta", desc: "Regístrate en FusionCRM y configura tu organización.", href: "/docs/getting-started" },
-            { step: "2", title: "Importa contactos", desc: "Sube tu base de datos de clientes en formato CSV.", href: "/docs/contacts#import" },
-            { step: "3", title: "Conecta WhatsApp", desc: "Vincula tu número de WhatsApp Business para empezar a chatear.", href: "/docs/integrations" },
+            { step: "1", title: "Crea tu cuenta", desc: "Regístrate gratis y completa los datos de tu organización.", href: "/docs/getting-started" },
+            { step: "2", title: "Importa contactos", desc: "Sube tu base de clientes en CSV o Excel.", href: "/docs/contacts#import" },
+            { step: "3", title: "Conecta WhatsApp", desc: "Conecta tu número en Configuración → WhatsApp → Conectar línea para empezar a chatear.", href: "/docs/whatsapp-lines" },
           ].map((s) => (
             <Link
               key={s.step}
