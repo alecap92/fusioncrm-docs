@@ -24,7 +24,9 @@ const navigation: NavItem[] = [
     icon: <Home size={16} />,
     children: [
       { title: "¿Qué es FusionCRM?", href: "/docs" },
-      { title: "Cómo acceder", href: "/docs/getting-started" },
+      { title: "¿Qué es un CRM?", href: "/docs/que-es-un-crm" },
+      { title: "Ruta para empezar", href: "/docs/getting-started" },
+      { title: "Cómo acceder", href: "/docs/getting-started#acceder" },
       { title: "Navegación general", href: "/docs/getting-started#navegacion" },
     ],
   },

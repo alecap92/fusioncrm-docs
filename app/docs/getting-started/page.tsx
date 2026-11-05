@@ -7,7 +7,7 @@ import DocNav from "@/components/DocNav";
 export const metadata: Metadata = { title: "Primeros Pasos" };
 
 const toc = [
-  { id: "que-es", label: "¿Qué es FusionCRM?" },
+  { id: "ruta", label: "Ruta para empezar" },
   { id: "acceder", label: "Cómo acceder" },
   { id: "registro", label: "Registro de cuenta" },
   { id: "navegacion", label: "Navegación general" },
@@ -26,34 +26,32 @@ export default function GettingStartedPage() {
           Todo lo que necesitas saber para comenzar a usar FusionCRM desde cero.
         </p>
 
-        <section id="que-es" className="mb-10">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>¿Qué es FusionCRM?</h2>
+        <section id="ruta" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Ruta para empezar</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            FusionCRM es una plataforma de gestión de relaciones con clientes (CRM) todo en uno, diseñada
-            para empresas que buscan centralizar sus operaciones de ventas, comunicación y marketing.
+            ¿Es tu primera vez con un CRM? Lee antes <a href="/docs/que-es-un-crm" style={{ color: "#d1345b" }}>¿Qué es un CRM?</a>. Si quieres
+            ver todo lo que incluye FusionCRM, está en <a href="/docs" style={{ color: "#d1345b" }}>¿Qué es FusionCRM?</a>. Aquí va el orden
+            recomendado para dejar tu cuenta lista:
           </p>
-          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Con FusionCRM puedes:
-          </p>
-          <ul className="space-y-2 mb-4 pl-4" style={{ color: "var(--muted-foreground)" }}>
+          <div className="flex flex-col gap-3 mb-4">
             {[
-              "Gestionar contactos y clientes en un directorio unificado",
-              "Llevar el seguimiento de oportunidades de venta (deals) en pipelines visuales",
-              "Atender WhatsApp, Messenger e Instagram desde una sola bandeja, y tu correo en el mismo CRM",
-              "Automatizar tareas repetitivas con workflows sin código",
-              "Generar cotizaciones e informes de ventas, y facturas electrónicas DIAN con el módulo adicional",
-              "Integrar con herramientas externas como N8N, WhatsApp Business y más",
-            ].map((item) => (
-              <li key={item} className="flex items-start gap-2">
-                <span style={{ color: "#d1345b" }}>✓</span> {item}
-              </li>
+              { n: "1", t: "Crea tu cuenta y entra", d: "Regístrate en app.fusioncol.com.", href: "#registro" },
+              { n: "2", t: "Completa los datos de tu empresa", d: "En Configuración → General → Organización: nombre, NIT, dirección y logo. Salen en tus cotizaciones y facturas.", href: "/docs/settings#organization" },
+              { n: "3", t: "Conecta tu WhatsApp", d: "En Configuración → WhatsApp, pulsa «Conectar línea». Solo el propietario puede hacerlo.", href: "/docs/whatsapp-lines" },
+              { n: "4", t: "Crea tu primera plantilla de WhatsApp", d: "La necesitas para escribirle primero a un cliente. Meta la revisa en minutos u horas, así que hazla desde el primer día.", href: "/docs/whatsapp-templates#create" },
+              { n: "5", t: "Importa tus contactos", d: "En Contactos, botón «Importar», con tu Excel o CSV.", href: "/docs/contacts#import" },
+              { n: "6", t: "Arma tu embudo de ventas", d: "Ajusta las etapas de tus negocios en Configuración → Módulos del CRM → Negocios.", href: "/docs/pipelines#create" },
+              { n: "7", t: "Invita a tu equipo", d: "En Configuración → General → Usuarios, crea a cada persona con su rol.", href: "/docs/settings#users" },
+            ].map((s) => (
+              <a key={s.n} href={s.href} className="flex items-start gap-4 p-4 rounded-lg border transition-all hover:shadow-md" style={{ borderColor: "var(--border)", textDecoration: "none" }}>
+                <span className="w-7 h-7 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0" style={{ backgroundColor: "#d1345b" }}>{s.n}</span>
+                <span>
+                  <span className="block font-semibold" style={{ color: "var(--foreground)" }}>{s.t}</span>
+                  <span className="block text-sm mt-0.5" style={{ color: "var(--muted-foreground)" }}>{s.d}</span>
+                </span>
+              </a>
             ))}
-          </ul>
-          <Callout type="tip">
-            FusionCRM está pensado para el mercado latinoamericano, con WhatsApp como canal principal de
-            comunicación. La facturación electrónica según la normativa DIAN de Colombia es un módulo
-            adicional que se activa aparte.
-          </Callout>
+          </div>
           <Callout type="note">
             WhatsApp en FusionCRM no funciona exactamente como en tu celular: para escribirle primero a un cliente necesitas una
             plantilla aprobada por Meta. Antes de empezar, lee{" "}
@@ -201,6 +199,7 @@ export default function GettingStartedPage() {
         </section>
 
         <DocNav
+          prev={{ href: "/docs/que-es-un-crm", title: "¿Qué es un CRM?" }}
           next={{ href: "/docs/contacts", title: "Contactos" }}
         />
       </article>
