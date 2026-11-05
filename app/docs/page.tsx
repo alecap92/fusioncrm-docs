@@ -96,6 +96,11 @@ export default function DocsIndexPage() {
             la conexión oficial de WhatsApp, facturación electrónica ante la DIAN, ciudades del DANE y envíos con las
             transportadoras del país.
           </p>
+          <p className="m-0">
+            ¿Nunca has usado un CRM? Empieza por{" "}
+            <a href="/docs/que-es-un-crm" style={{ color: "#d1345b" }}>¿Qué es un CRM?</a>: en cinco minutos entiendes
+            para qué sirve y por qué vale la pena.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">

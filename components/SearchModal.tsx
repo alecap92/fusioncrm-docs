@@ -5,6 +5,7 @@ import { Search, X, ArrowRight } from "lucide-react";
 
 const searchIndex = [
   { title: "¿Qué es FusionCRM?", href: "/docs", section: "Introducción", keywords: ["fusioncrm", "crm", "introduccion"] },
+  { title: "¿Qué es un CRM y por qué usarlo?", href: "/docs/que-es-un-crm", section: "Primeros Pasos", keywords: ["crm", "que es", "embudo", "pipeline", "lead", "beneficios", "conceptos"] },
   { title: "Soporte: WhatsApp y correo", href: "/docs/soporte", section: "Soporte", keywords: ["soporte", "ayuda", "contacto", "whatsapp", "correo", "problema"] },
   { title: "Cómo acceder y configurar la cuenta", href: "/docs/getting-started", section: "Primeros Pasos", keywords: ["acceder", "login", "cuenta", "configurar"] },
   { title: "Directorio de contactos", href: "/docs/contacts", section: "Contactos", keywords: ["contactos", "directorio", "personas"] },

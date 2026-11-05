@@ -30,6 +30,7 @@ const labels: Record<string, string> = {
   biblioteca: "Biblioteca",
   estrategia: "Estrategia",
   soporte: "Soporte",
+  "que-es-un-crm": "¿Qué es un CRM?",
   integrations: "Integraciones",
   companies: "Empresas",
   forms: "Formularios web",
