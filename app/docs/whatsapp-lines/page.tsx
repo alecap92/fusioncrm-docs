@@ -64,7 +64,7 @@ export default function WhatsappLinesPage() {
                   ["Nombre", "Cómo se ve en el CRM (\"Ventas\", \"Mayoristas\", \"Soporte\"…)."],
                   ["Color", "El punto que identifica sus conversaciones en el kanban y en el chat."],
                   ["Por defecto", "La línea por la que sale todo envío que no dice por cuál línea va. Hay exactamente una por organización."],
-                  ["Asignación de conversaciones nuevas", "A qué asesor o agente IA llega cada conversación nueva que entra por esa línea."],
+                  ["Asignación de conversaciones nuevas", "A qué asesor o agente IA llega cada conversación nueva que entra por esa línea. Un agente IA no toma los chats que tu equipo abre enviando una plantilla."],
                   ["Pipeline de la línea", "En qué pipeline de conversaciones nacen sus chats nuevos (vacío = el pipeline por defecto de la organización)."],
                   ["Plantillas", "Las de la cuenta de WhatsApp Business (WABA) de ese número. Cada línea tiene las suyas."],
                   ["Perfil de negocio", "Lo que el cliente ve al abrir el chat: foto, info, descripción, dirección, correo, sitios web y categoría. Se edita desde el CRM."],
@@ -88,11 +88,17 @@ export default function WhatsappLinesPage() {
           <H2>Conectar y administrar líneas</H2>
           <P>
             Todo se hace en <B>Ajustes → WhatsApp</B> (categoría General). Solo el propietario de la
-            organización puede conectar o desconectar líneas.
+            organización puede conectar, editar, marcar por defecto, cambiar el perfil o desconectar
+            líneas; el resto del equipo solo ve la tabla. La tabla muestra el estado de cada número,
+            por ejemplo "Pendiente de conectar" o un aviso si su conexión con Meta necesita atención.
           </P>
           <H3>Conectar una línea</H3>
+          <P>
+            Pulsa <B>"Conectar línea"</B> (o <B>"Terminar conexión"</B> si dejaste una a medias). Se abre la
+            ventana "Conectar línea de WhatsApp", donde eliges el método:
+          </P>
           <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• <B>Automática (recomendada):</B> botón "Conectar con Facebook". Se repite por cada número nuevo que quieras agregar.</li>
+            <li>• <B>Automática (recomendada):</B> pulsa "Conectar con Facebook" y sigue los pasos de Meta. Se repite por cada número nuevo que quieras agregar.</li>
             <li>• <B>Manual (avanzada):</B> guardas el App ID, App Secret y Verify Token de una app de Meta propia. La línea queda <em>pendiente de conectar</em> y el botón "Conectar" la completa con el número. Solo puede haber una línea pendiente a la vez.</li>
           </ul>
           <H3>Editar, marcar por defecto y desconectar</H3>

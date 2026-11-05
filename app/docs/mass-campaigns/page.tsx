@@ -36,10 +36,9 @@ export default function MassCampaignsPage() {
             <div className="p-4 rounded-lg border" style={{ borderColor: "#3b82f6", backgroundColor: "rgba(59,130,246,0.06)" }}>
               <p className="font-bold mb-2" style={{ color: "#2563eb" }}>📧 Email Masivo</p>
               <ul className="text-sm space-y-1" style={{ color: "var(--muted-foreground)" }}>
-                <li>• HTML o texto plano</li>
-                <li>• Personalización con variables</li>
+                <li>• Editor visual de bloques</li>
                 <li>• Seguimiento de aperturas y clics</li>
-                <li>• Gestión de bajas (unsubscribe)</li>
+                <li>• Enlace de baja automático</li>
                 <li>• Programación de envío</li>
               </ul>
             </div>
@@ -54,6 +53,11 @@ export default function MassCampaignsPage() {
               </ul>
             </div>
           </div>
+          <Callout type="note" title="Cupo mensual de tu plan">
+            Cada plan incluye un cupo de mensajes masivos al mes. WhatsApp: 200 en Free, 2.000 en Pro y
+            sin límite en Unlimited. Correo: 1.000 en Free, 25.000 en Pro y 100.000 en Unlimited. Si se
+            agota el cupo, el envío se bloquea hasta el siguiente mes o hasta que cambies de plan.
+          </Callout>
         </section>
 
         <section id="email-campaign" className="mb-10">
@@ -63,13 +67,12 @@ export default function MassCampaignsPage() {
           </p>
           <ol className="space-y-3 mb-6">
             {[
-              { n: "1", t: "Ve a Campañas → Email masivo", d: "Accede desde la barra lateral." },
-              { n: "2", t: "Crea nueva campaña", d: "Haz clic en \"+ Nueva campaña\" y asigna un nombre interno." },
-              { n: "3", t: "Define el asunto y el remitente", d: "El asunto es lo que verá el destinatario. Elige la cuenta de email remitente." },
-              { n: "4", t: "Diseña el contenido", d: "Usa el editor visual HTML o pega tu HTML directamente. Incluye variables como {{nombre}}." },
-              { n: "5", t: "Selecciona la audiencia", d: "Elige una lista de contactos o define filtros de segmentación." },
-              { n: "6", t: "Prueba de envío", d: "Envíate una prueba a tu email personal para verificar el diseño." },
-              { n: "7", t: "Programa o envía", d: "Envía inmediatamente o programa para una fecha y hora específica." },
+              { n: "1", t: "Ve a Comunicación → Email Marketing", d: "En el menú superior." },
+              { n: "2", t: "Crea nueva campaña", d: "Pulsa \"Nueva Campaña\" y asigna un nombre interno." },
+              { n: "3", t: "Escribe el asunto y el texto de vista previa", d: "El asunto es lo que verá el destinatario. El remitente no se elige aquí: se configura una sola vez en Ajustes → Envío masivo." },
+              { n: "4", t: "Diseña el contenido", d: "Arma el correo con el editor de bloques que arrastras: Logo, Encabezado, Texto, 2 Columnas, Imagen, Separador, Botón, Espacio, Redes Sociales y Footer." },
+              { n: "5", t: "Selecciona la lista de contactos", d: "Las campañas siempre van a una lista (ver Segmentación)." },
+              { n: "6", t: "Programa y guarda", d: "Elige fecha y hora y pulsa \"Guardar Campaña\". Para enviarla ya, usa \"Enviar ahora\" en la lista de campañas." },
             ].map((s) => (
               <li key={s.n} className="flex gap-3">
                 <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "#d1345b" }}>{s.n}</span>
@@ -80,10 +83,14 @@ export default function MassCampaignsPage() {
               </li>
             ))}
           </ol>
+          <Callout type="warning">
+            Por ahora los correos masivos no se personalizan por contacto: si escribes{" "}
+            <code style={{ color: "#d1345b" }}>{"{{nombre}}"}</code> u otra variable, llegará tal cual.
+            Tampoco hay envío de prueba; revisa bien la vista previa antes de enviar.
+          </Callout>
           <Callout type="note">
-            FusionCRM maneja automáticamente las solicitudes de baja (unsubscribe). Los contactos
-            que se den de baja no recibirán futuras campañas de email. Puedes ver la lista de bajas
-            en Campañas → Bajas.
+            FusionCRM agrega solo el enlace para darse de baja. Los contactos que se dan de baja dejan
+            de recibir campañas de correo, y lo verás en el perfil de cada uno.
           </Callout>
         </section>
 
@@ -94,12 +101,12 @@ export default function MassCampaignsPage() {
           </p>
           <ol className="space-y-3 mb-6">
             {[
-              { n: "1", t: "Ve a Campañas → WhatsApp masivo", d: "Desde la barra lateral." },
-              { n: "2", t: "Crea nueva campaña", d: "Nombre interno para identificar la campaña." },
-              { n: "3", t: "Elige \"Enviar desde\" y el template", d: "Si tienes varias líneas de WhatsApp, escoge por cuál número sale la campaña; se guarda con ella. Solo templates con estado APPROVED en esa línea están disponibles." },
-              { n: "4", t: "Define las variables", d: "Para cada variable del template, indica si se tomará del campo del contacto o es un valor fijo." },
-              { n: "5", t: "Selecciona los contactos", d: "Lista de contactos o filtros. Solo se envía a contactos con número de WhatsApp." },
-              { n: "6", t: "Envía o programa", d: "Inicia el envío inmediatamente o en un horario específico." },
+              { n: "1", t: "Ve a Comunicación → WhatsApp Masivo", d: "En el menú superior." },
+              { n: "2", t: "Pulsa \"Nueva Campaña\"", d: "Ponle nombre y, si quieres, una descripción." },
+              { n: "3", t: "Elige \"Enviar desde\" y la plantilla", d: "Si tienes varias líneas de WhatsApp, escoge por cuál número sale la campaña; se guarda con ella. Solo aparecen las plantillas aprobadas en esa línea. Si no tienes una, créala ahí mismo con \"Nueva plantilla\"." },
+              { n: "4", t: "Define las variables", d: "Para cada variable, elige un campo del contacto o un texto fijo, y un valor por si el contacto no tiene ese dato." },
+              { n: "5", t: "Elige la lista de contactos", d: "Una lista estática o dinámica. No le llega a quien no tiene celular, tiene un número fijo o inválido, pidió no ser contactado por WhatsApp o está marcado como número sin WhatsApp." },
+              { n: "6", t: "Guarda o programa", d: "Al final elige \"Guardar como borrador\" o \"Programar envío\" (con la hora de tu navegador). Para enviarla ya, pulsa \"Enviar ahora\" en la lista de campañas: antes de confirmar verás a cuántos les llegará y por qué se excluye a los demás." },
             ].map((s) => (
               <li key={s.n} className="flex gap-3">
                 <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "#25D366" }}>{s.n}</span>
@@ -110,6 +117,10 @@ export default function MassCampaignsPage() {
               </li>
             ))}
           </ol>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Una campaña programada se puede devolver a borrador con "Quitar programación". Una campaña
+            ya enviada no se vuelve a enviar: para otro envío, crea una nueva.
+          </p>
           <Callout type="note" title="Dónde caen las respuestas">
             Cada contacto sin chat abierto en esa línea recibe una conversación nueva, que nace en el
             pipeline de la línea (o en el predeterminado) en su primera columna. Si ya tenía un chat en
@@ -128,13 +139,14 @@ export default function MassCampaignsPage() {
         <section id="segmentation" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Segmentación de audiencia</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            La segmentación correcta es clave para el éxito de las campañas. FusionCRM ofrece:
+            Las campañas de correo y de WhatsApp siempre se envían a una lista de contactos: en la
+            campaña no hay filtros ni opción de "todos los contactos". Las listas se crean en{" "}
+            <strong style={{ color: "var(--foreground)" }}>Contactos → Grupos y Listas</strong> y pueden ser:
           </p>
           <div className="space-y-3 mb-4">
             {[
-              { method: "Listas estáticas", desc: "Grupos de contactos creados manualmente. Ideal para audiencias definidas y estables." },
-              { method: "Filtros dinámicos", desc: "Segmenta al momento del envío basándote en criterios como ciudad, empresa, campo personalizado, lead score." },
-              { method: "Todos los contactos", desc: "Envía a toda la base de datos. Úsalo con precaución." },
+              { method: "Listas estáticas", desc: "Eliges los contactos a mano. Ideal para audiencias definidas y estables." },
+              { method: "Listas dinámicas", desc: "Se actualizan solas según los filtros que definas (ciudad, empresa, campos personalizados, puntuación…)." },
             ].map((m) => (
               <div key={m.method} className="p-4 rounded-lg border" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
                 <p className="font-semibold text-sm" style={{ color: "var(--foreground)" }}>{m.method}</p>
@@ -147,16 +159,17 @@ export default function MassCampaignsPage() {
         <section id="metrics" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Métricas de campaña</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Después de enviar una campaña, puedes ver las siguientes métricas:
+            En las campañas de correo, la lista muestra enviados, aperturas y clics. En las de WhatsApp,
+            abre <strong style={{ color: "var(--foreground)" }}>"Resultados"</strong> de la campaña para ver, contacto por contacto:
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
             {[
-              { metric: "Enviados", desc: "Total de mensajes enviados" },
-              { metric: "Entregados", desc: "Llegaron al destinatario" },
-              { metric: "Abiertos", desc: "Email: píxel de seguimiento. WhatsApp: ticks azules" },
-              { metric: "Clics", desc: "Clicks en enlaces (solo email)" },
-              { metric: "Respuestas", desc: "Destinatarios que respondieron" },
-              { metric: "Bajas", desc: "Desuscripciones (solo email)" },
+              { metric: "Aceptados", desc: "Meta recibió el mensaje para enviarlo" },
+              { metric: "Entregados", desc: "Llegaron al teléfono" },
+              { metric: "Leídos", desc: "El contacto abrió el mensaje" },
+              { metric: "Respondieron", desc: "El contacto contestó" },
+              { metric: "Fallidos", desc: "Meta no pudo entregarlo" },
+              { metric: "Omitidos", desc: "Sin celular, número fijo o pidió no ser contactado" },
             ].map((m) => (
               <div key={m.metric} className="p-3 rounded-lg border text-center" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
                 <p className="font-bold text-sm" style={{ color: "var(--foreground)" }}>{m.metric}</p>
@@ -164,6 +177,10 @@ export default function MassCampaignsPage() {
               </div>
             ))}
           </div>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Desde la tabla de Resultados puedes usar "Marcar como número sin WhatsApp" en los números que
+            fallan, para que las próximas campañas no los intenten.
+          </p>
         </section>
 
         <section id="best-practices" className="mb-10">

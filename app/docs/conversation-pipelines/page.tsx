@@ -70,8 +70,8 @@ export default function ConversationPipelinesPage() {
         <section id="overview" className="mb-10 mt-8">
           <H2>Qué es un pipeline de conversación</H2>
           <P>
-            Cada organización nace con un pipeline <B>predeterminado</B>, con columnas como
-            "Sin leer", "En proceso" o "Cerrado". Toda conversación pertenece a exactamente un pipeline
+            Tu organización arranca con un pipeline <B>predeterminado</B> llamado "Pipeline Principal",
+            con una sola columna: "Nuevas". Agrega las demás columnas cuando las necesites. Toda conversación pertenece a exactamente un pipeline
             y está en exactamente una de sus columnas. Mientras tengas un solo pipeline, el inbox se ve
             igual que siempre; los selectores aparecen cuando creas el segundo.
           </P>
@@ -93,10 +93,10 @@ export default function ConversationPipelinesPage() {
           <H2>Crear y administrar pipelines</H2>
           <P>
             En <B>Ajustes → Conversaciones</B>, bloque "Pipelines de conversaciones". Ahí ves la lista
-            con el predeterminado marcado y puedes:
+            con el predeterminado marcado y cuántas conversaciones tiene cada uno. Puedes:
           </P>
           <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• <B>Crear</B> un pipeline nuevo con su nombre. Nace con columnas básicas que luego editas.</li>
+            <li>• <B>Crear</B> un pipeline con el botón "Nuevo pipeline". Nace con una sola columna, "Nuevas"; agrega las demás en "Administrar Columnas".</li>
             <li>• <B>Renombrar</B> uno existente.</li>
             <li>• <B>Marcar como predeterminado.</B> Siempre hay exactamente uno: para cambiarlo se marca otro, nunca se "desmarca" el actual.</li>
             <li>• <B>Eliminar</B> (ver <a href="#delete" style={{ color: "#d1345b" }}>más abajo</a>).</li>
@@ -111,17 +111,17 @@ export default function ConversationPipelinesPage() {
         <section id="columns" className="mb-10">
           <H2>Columnas de cada pipeline</H2>
           <P>
-            En el mismo bloque, elige el pipeline a editar y entra a <B>Administrar columnas</B>. Cada
-            columna (etapa) tiene:
+            Al elegir un pipeline en la lista, sus columnas aparecen abajo, en la sección{" "}
+            <B>Administrar Columnas</B>. Al editar una columna (etapa) configuras:
           </P>
           <div className="rounded-lg overflow-hidden border mb-4" style={{ borderColor: "var(--border)" }}>
             <table className="w-full text-sm">
               <tbody>
                 {[
-                  ["Nombre y color", "Cómo se ve en el tablero. Arrastra para cambiar el orden."],
-                  ["Usuario asignado", "Al entrar a esta columna, la conversación se asigna automáticamente a ese asesor (opcional)."],
-                  ["Reabrir al recibir mensaje", "Si un cliente escribe a una conversación que está en esta columna, vuelve a la primera columna (útil en \"Cerrado\")."],
-                  ["URL del webhook", "Cada vez que una conversación entra a esta columna, FusionCRM hace un POST a esa URL (ver Webhooks salientes en la API)."],
+                  ["Nombre y color", "Cómo se ve en el tablero. Arrastra las columnas para cambiar el orden. Si es la única columna del pipeline, no se puede borrar."],
+                  ["Asignación automática", "Interruptor opcional: al encenderlo eliges un usuario y las conversaciones que entren a esta columna se le asignan."],
+                  ["Mover a la primera columna al recibir mensajes", "Si un cliente escribe a una conversación que está en esta columna, vuelve a la primera columna (útil en \"Cerrado\")."],
+                  ["Automatizaciones (webhook)", "Interruptor opcional: al encenderlo escribes una URL y, cada vez que una conversación entra a esta columna, FusionCRM le hace un POST. Si el envío falla, la columna muestra el aviso \"Webhook con error\"."],
                 ].map(([k, v]) => (
                   <tr key={k}>
                     <td className="p-3 border-b font-medium whitespace-nowrap" style={{ borderColor: "var(--border)", color: "var(--foreground)" }}>{k}</td>
@@ -143,7 +143,8 @@ export default function ConversationPipelinesPage() {
           <P>
             Con dos o más pipelines, en la barra superior de Conversaciones aparece el selector
             <B> "Pipeline:"</B>, al lado del de "Línea:". El inbox muestra solo las conversaciones y las
-            columnas del pipeline elegido, y recuerda tu elección en ese navegador. Si una conversación
+            columnas del pipeline elegido, y recuerda tu elección en ese navegador. Si hay chats sin
+            leer en otro pipeline, el selector muestra un punto rojo. Si una conversación
             cambia de pipeline mientras lo miras, desaparece del tablero en tiempo real; si llega a
             tu pipeline, aparece.
           </P>
@@ -178,7 +179,7 @@ export default function ConversationPipelinesPage() {
           </ul>
           <H3>Desde el chat abierto</H3>
           <P>
-            En el panel de información del chat, junto a la etapa, está el chip <B>"Mover a otro pipeline"</B>:
+            En la barra de arriba del chat, junto a "Etapa:", está el botón <B>"Mover a otro pipeline"</B>:
             abre un modal para elegir pipeline y columna destino.
           </P>
           <P>
@@ -220,8 +221,10 @@ export default function ConversationPipelinesPage() {
         <section id="api" className="mb-10">
           <H2>API y MCP</H2>
           <P>
-            Permisos <Code>pipelines:read</Code> y <Code>pipelines:write</Code>. Un pipeline o etapa de
-            otra organización responde <Code>404</Code>, nunca se filtra en silencio.
+            Para administrar pipelines y columnas necesitas los permisos <Code>pipelines:read</Code> y{" "}
+            <Code>pipelines:write</Code>. Para listar, crear o mover conversaciones, <Code>conversations:read</Code> y{" "}
+            <Code>conversations:write</Code>. La API está disponible en los planes Pro y Unlimited. Un pipeline
+            o etapa de otra organización responde <Code>404</Code>, nunca se filtra en silencio.
           </P>
           <div className="rounded-lg overflow-hidden border mb-4" style={{ borderColor: "var(--border)" }}>
             <table className="w-full text-sm">
@@ -235,7 +238,7 @@ export default function ConversationPipelinesPage() {
               <tbody>
                 {[
                   ["Listar, crear, editar y eliminar pipelines", "GET/POST /api/conversation-pipelines · GET/PUT/DELETE /api/conversation-pipelines/{id}", "list_conversation_pipelines · get/create/update/delete_conversation_pipeline"],
-                  ["Columnas de un pipeline", "GET/POST …/{id}/stages · PUT/DELETE …/{id}/stages/{stageId} · PUT …/{id}/stages/order", "list_pipeline_stages · create/update/delete_conversation_stage · reorder_conversation_stages"],
+                  ["Columnas de un pipeline", "Vienen dentro de GET /api/conversation-pipelines/{id} · POST …/{id}/stages · PUT/DELETE …/{id}/stages/{stageId} · PUT …/{id}/stages/order", "list_pipeline_stages · create/update/delete_conversation_stage · reorder_conversation_stages"],
                   ["Mover una conversación de columna", "PUT /api/conversations/{id}/stage", "move_conversation_stage"],
                   ["Mover una conversación a otro pipeline", "PUT /api/conversations/{id}/pipeline con pipelineId e initialStageId", "change_conversation_pipeline"],
                   ["Mover todas las conversaciones de un pipeline a otro", "POST /api/conversation-pipelines/{id}/move-all con targetPipelineId y targetStageId; responde { moved }", "move_all_conversations_pipeline"],

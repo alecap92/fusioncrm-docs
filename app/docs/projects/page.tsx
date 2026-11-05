@@ -20,69 +20,86 @@ export default function ProjectsPage() {
         <Breadcrumbs />
         <h1 className="text-3xl font-bold mb-2" style={{ color: "var(--foreground)" }}>Proyectos</h1>
         <p className="text-lg mb-8" style={{ color: "var(--muted-foreground)" }}>
-          El módulo de Proyectos permite gestionar trabajos internos y entregas a clientes
-          con tareas, asignaciones y seguimiento de progreso.
+          Organiza el trabajo del equipo en proyectos y tareas, con responsables, fechas límite y
+          comentarios. Lo encuentras en{" "}
+          <strong style={{ color: "var(--foreground)" }}>Planeación → Proyectos y tareas</strong>.
         </p>
 
         <section id="overview" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Gestión de proyectos</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Los proyectos en FusionCRM son contenedores de tareas relacionadas que tienen
-            un objetivo común, una fecha límite y un equipo asignado. Son útiles para:
+            Un proyecto agrupa tareas relacionadas; cada tarea tiene su propio responsable y su fecha
+            límite. Son útiles para:
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Implementaciones o entregas a clientes</li>
+            <li>• Entregas o implementaciones para clientes</li>
             <li>• Proyectos internos del equipo</li>
-            <li>• Seguimiento de iniciativas de ventas o marketing</li>
-            <li>• Onboarding de nuevos clientes</li>
+            <li>• Iniciativas de ventas o marketing</li>
+            <li>• Onboarding de clientes nuevos</li>
           </ul>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Las tareas se ven en <strong style={{ color: "var(--foreground)" }}>vista Tablero</strong>{" "}
+            (columnas por estado, para arrastrar el trabajo de una etapa a otra) o en <strong style={{ color: "var(--foreground)" }}>vista Lista</strong>.
+          </p>
         </section>
 
         <section id="create" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Crear proyecto</h2>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. Ve a la sección Proyectos desde la barra lateral</li>
-            <li>2. Haz clic en "+ Nuevo proyecto"</li>
-            <li>3. Asigna nombre, descripción y fecha límite</li>
-            <li>4. Asocia el proyecto a un contacto o cliente (opcional)</li>
-            <li>5. Agrega miembros del equipo al proyecto</li>
-            <li>6. Comienza a crear tareas dentro del proyecto</li>
+            <li>1. Ve a <strong style={{ color: "var(--foreground)" }}>Planeación → Proyectos y tareas</strong></li>
+            <li>2. Toca <strong style={{ color: "var(--foreground)" }}>Nuevo Proyecto</strong></li>
+            <li>3. Escribe el <strong style={{ color: "var(--foreground)" }}>Nombre</strong>, una <strong style={{ color: "var(--foreground)" }}>Descripción</strong> (opcional) y elige un <strong style={{ color: "var(--foreground)" }}>Color</strong></li>
+            <li>4. Crea las tareas del proyecto con <strong style={{ color: "var(--foreground)" }}>Nueva Tarea</strong></li>
           </ol>
         </section>
 
         <section id="tasks" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Tareas de proyecto</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Cada tarea dentro de un proyecto tiene:
+            Cada tarea tiene:
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
             {[
-              "Título descriptivo", "Descripción detallada", "Asignado a (miembro)",
-              "Fecha de vencimiento", "Prioridad (alta/media/baja)", "Estado (pendiente/en progreso/hecho)",
-              "Archivos adjuntos", "Comentarios del equipo", "Subtareas",
+              "Título", "Descripción", "Proyecto",
+              "Estado: No Iniciado, En Progreso, Revisión o Completado", "Prioridad: Alta, Media o Baja", "Fecha límite",
+              "Responsable", "Etiquetas", "Comentarios con @menciones",
             ].map((f) => (
               <div key={f} className="p-2 rounded border text-sm text-center" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)", color: "var(--foreground)" }}>
                 {f}
               </div>
             ))}
           </div>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            En los comentarios puedes mencionar a un compañero con <code style={{ color: "#d1345b" }}>@</code>{" "}
+            para avisarle, y cada tarea guarda el historial de sus cambios. Cuando una tarea está por
+            vencer, su responsable recibe un aviso.
+          </p>
+          <Callout type="note">
+            Las tareas no tienen archivos adjuntos ni subtareas. Si necesitas dividir un trabajo,
+            crea varias tareas en el mismo proyecto.
+          </Callout>
+          <Callout type="tip">
+            Las automatizaciones también pueden crear tareas, por ejemplo cuando llega un formulario o
+            un negocio cambia de etapa.
+          </Callout>
         </section>
 
         <section id="team" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Equipo y asignaciones</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Los proyectos tienen un equipo asignado. Solo los miembros del equipo pueden ver
-            y editar las tareas del proyecto, a menos que sea un proyecto público.
+            Todo el equipo de tu organización ve todos los proyectos y sus tareas: no hay proyectos
+            privados ni lista de miembros por proyecto. Para repartir el trabajo, asigna un{" "}
+            <strong style={{ color: "var(--foreground)" }}>Responsable</strong> a cada tarea.
           </p>
-          <Callout type="tip">
-            Para proyectos de entrega a cliente, asocia el proyecto al contacto del cliente.
-            Esto permite ver el proyecto directamente desde el perfil del cliente.
+          <Callout type="note">
+            Hoy los proyectos no se vinculan a contactos ni a negocios, así que no aparecen en la ficha
+            del cliente.
           </Callout>
         </section>
 
         <DocNav
           prev={{ href: "/docs/calendar", title: "Calendario" }}
-          next={{ href: "/docs/settings", title: "Configuración" }}
+          next={{ href: "/docs/biblioteca", title: "Biblioteca" }}
         />
       </article>
 

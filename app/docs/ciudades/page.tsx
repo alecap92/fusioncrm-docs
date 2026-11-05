@@ -68,7 +68,7 @@ export default function CiudadesPage() {
           </p>
           <ul className="space-y-2 pl-4 mb-4" style={muted}>
             <li>• <strong style={strong}>Por API, formularios públicos y MCP la ciudad es estricta:</strong> o se resuelve sin dudas contra el catálogo, o la petición falla con los candidatos para que elijas.</li>
-            <li>• <strong style={strong}>En la app y en el importador de Excel es flexible:</strong> un texto que no se reconoce se guarda igual como ciudad <em>sin confirmar</em> (<code>city</code> con valor y <code>cityCode</code> vacío) y aparece en la lista dinámica &quot;Ciudades sin confirmar&quot;.</li>
+            <li>• <strong style={strong}>En la app y en el importador de Excel es flexible:</strong> un texto que no se reconoce se guarda igual como ciudad <em>sin confirmar</em> (<code>city</code> con valor y <code>cityCode</code> vacío) y aparece en la lista dinámica &quot;Ciudades sin confirmar&quot;, que viene creada en toda cuenta nueva.</li>
             <li>• <strong style={strong}>Solo Colombia:</strong> si el contacto tiene un <code>country</code> distinto de Colombia, <code>city</code> se guarda como texto libre sin código ni validación.</li>
             <li>• FusionCRM nunca elige un &quot;mejor candidato&quot; por ti: 66 municipios comparten nombre (La Unión, Rionegro, Armenia, Villanueva…).</li>
           </ul>
@@ -249,7 +249,9 @@ export default function CiudadesPage() {
             </li>
             <li>
               • <strong style={strong}>MCP</strong>: los tools de contactos y empresas aceptan{" "}
-              <code>cityCode</code> y devuelven los mismos candidatos; ver{" "}
+              <code>cityCode</code> y devuelven los mismos candidatos. Para buscar el código antes de crear o
+              editar, usa <code>search_municipalities</code> (municipios) y <code>list_states</code> (los 33
+              departamentos); ver{" "}
               <Link href="/docs/mcp" style={{ color: "#d1345b" }}>MCP</Link>.
             </li>
           </ul>
@@ -263,7 +265,7 @@ export default function CiudadesPage() {
 
         <DocNav
           prev={{ href: "/docs/api", title: "API REST" }}
-          next={{ href: "/docs/envios", title: "Envíos (Envia.com)" }}
+          next={{ href: "/docs/envios", title: "Envíos por API (Envia.com)" }}
         />
       </article>
 

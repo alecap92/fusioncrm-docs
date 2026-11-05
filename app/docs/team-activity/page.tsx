@@ -41,7 +41,7 @@ export default function TeamActivityPage() {
             Los conteos son <strong>acciones registradas en el CRM</strong>, no ventas. Sirven para ver ritmo
             y constancia; el resultado comercial se mira en{" "}
             <Link href="/docs/deals" style={{ color: "var(--primary)" }}>Negocios</Link> e{" "}
-            <Link href="/docs/products" style={{ color: "var(--primary)" }}>Informes</Link>.
+            <Link href="/docs/reports" style={{ color: "var(--primary)" }}>Informes</Link>.
           </Callout>
         </section>
 
@@ -113,7 +113,7 @@ export default function TeamActivityPage() {
             una acción <strong style={{ color: "var(--foreground)" }}>Informe de equipo</strong> que arma este mismo resumen y te lo envía:
           </p>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. Automatizaciones → <em>Nueva</em>. Disparador <strong style={{ color: "var(--foreground)" }}>Programado</strong>; para el informe diario, <code>0 7 * * *</code> (todos los días a las 7:00 a. m.); para el semanal, <code>0 7 * * 1</code> (lunes a las 7:00).</li>
+            <li>1. Automatizaciones → <em>Nueva Automatización</em>. Disparador <strong style={{ color: "var(--foreground)" }}>Programado</strong>; en <em>Cada cuánto se ejecuta</em> elige <em>Diario</em> a las 7:00 a. m. para el informe diario, o <em>Semanal</em> los lunes a las 7:00 para el semanal. (Solo en <em>Avanzado</em> hace falta escribir una expresión cron, por ejemplo <code>0 7 * * 1</code>.)</li>
             <li>2. Añade el paso <strong style={{ color: "var(--foreground)" }}>Informe de equipo</strong> (categoría CRM).</li>
             <li>3. Elige <em>Equipo completo</em> (totales y desglose por vendedor) o <em>Un vendedor</em>; el periodo (<em>Ayer</em> para el diario, <em>Últimos 7 días</em> para el semanal); el canal, y el destino. Opcionalmente un título.</li>
             <li>4. Publica. Con <em>Probar ahora</em> en el disparador lo recibes en el acto para ver cómo llega.</li>

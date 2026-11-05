@@ -6,7 +6,7 @@ import {
   Home, Users, Briefcase, GitBranch, MessageSquare, Mail, FileText,
   BarChart2, Settings, Code2, Puzzle, Zap, Star, Package, ShoppingCart,
   FileBarChart, Calendar, FolderKanban, ChevronDown, ChevronRight, X, Menu,
-  BookOpen, Send, CreditCard, TrendingUp, LayoutTemplate, Activity } from "lucide-react";
+  BookOpen, Send, CreditCard, TrendingUp, LayoutTemplate, Activity, Library, Target, Truck } from "lucide-react";
 
 interface NavItem {
   title: string;
@@ -32,6 +32,7 @@ const navigation: NavItem[] = [
     children: [
       { title: "Directorio de contactos", href: "/docs/contacts" },
       { title: "Crear y editar contactos", href: "/docs/contacts#crud" },
+      { title: "Pestañas de la ficha", href: "/docs/contacts#detail-tabs" },
       { title: "Ciudad y departamento", href: "/docs/contacts#city" },
       { title: "Campos personalizados", href: "/docs/contacts#custom-fields" },
       { title: "Listas y segmentos", href: "/docs/contacts#lists" },
@@ -75,11 +76,13 @@ const navigation: NavItem[] = [
     icon: <Briefcase size={16} />,
     children: [
       { title: "Vista Kanban", href: "/docs/deals" },
-      { title: "Crear y gestionar deals", href: "/docs/deals#crud" },
+      { title: "Crear y editar negocios", href: "/docs/deals#crud" },
       { title: "Etapas y movimiento", href: "/docs/deals#stages" },
       { title: "Filtros y búsqueda", href: "/docs/deals#filters" },
-      { title: "Productos en deals", href: "/docs/deals#products" },
+      { title: "Productos en negocios", href: "/docs/deals#products" },
       { title: "Requisitos por etapa", href: "/docs/deals#requirements" },
+      { title: "Fecha de cierre", href: "/docs/deals#close-dates" },
+      { title: "Actividades y próximo paso", href: "/docs/deals#activities" },
     ],
   },
   {
@@ -96,6 +99,7 @@ const navigation: NavItem[] = [
     icon: <MessageSquare size={16} />,
     children: [
       { title: "Vista general", href: "/docs/conversations" },
+      { title: "Cómo escribirle a un cliente (WhatsApp)", href: "/docs/conversations#iniciar-whatsapp" },
       { title: "Tipos de mensajes", href: "/docs/conversations#message-types" },
       { title: "WhatsApp", href: "/docs/conversations#whatsapp" },
       { title: "Respuestas rápidas", href: "/docs/conversations#quick-replies" },
@@ -124,9 +128,11 @@ const navigation: NavItem[] = [
     icon: <Mail size={16} />,
     children: [
       { title: "Bandeja de entrada", href: "/docs/email" },
+      { title: "Conectar cuenta de correo", href: "/docs/email#connect" },
+      { title: "Asignar correos al equipo", href: "/docs/email#assign" },
       { title: "Redactar correo", href: "/docs/email#compose" },
-      { title: "Respuestas programadas", href: "/docs/email#scheduled" },
-      { title: "Fragmentos / Snippets", href: "/docs/email#snippets" },
+      { title: "Correos programados", href: "/docs/email#scheduled" },
+      { title: "Fragmentos", href: "/docs/email#snippets" },
     ],
   },
   {
@@ -153,8 +159,16 @@ const navigation: NavItem[] = [
     children: [
       { title: "Facturas electrónicas", href: "/docs/invoices" },
       { title: "Crear factura", href: "/docs/invoices#create" },
-      { title: "Facturas de compra", href: "/docs/invoices#incoming" },
+      { title: "Recepción de facturas", href: "/docs/invoices#incoming" },
       { title: "Notas crédito", href: "/docs/invoices#credit-notes" },
+      { title: "Notas débito", href: "/docs/invoices#debit-notes" },
+      { title: "Cuentas por cobrar", href: "/docs/invoices#receivables" },
+      { title: "Retenciones del cliente", href: "/docs/invoices#customer-withholdings" },
+      { title: "Documentos soporte", href: "/docs/invoices#support-documents" },
+      { title: "Retenciones a proveedores", href: "/docs/invoices#withholdings-config" },
+      { title: "Certificados de retención", href: "/docs/invoices#certificates" },
+      { title: "Informes de facturación", href: "/docs/invoices#reports" },
+      { title: "Verificador CUFE", href: "/docs/invoices#verify-cufe" },
       { title: "Configuración DIAN", href: "/docs/invoices#config" },
     ],
   },
@@ -167,12 +181,27 @@ const navigation: NavItem[] = [
     ],
   },
   {
+    title: "Envíos",
+    icon: <Truck size={16} />,
+    children: [
+      { title: "Qué puedes hacer", href: "/docs/shipments" },
+      { title: "Antes de empezar", href: "/docs/shipments#setup" },
+      { title: "Cotizar y generar una guía", href: "/docs/shipments#quote" },
+      { title: "Estados del envío", href: "/docs/shipments#statuses" },
+      { title: "Rastrear, etiqueta y cancelar", href: "/docs/shipments#actions" },
+      { title: "Configuración de envíos", href: "/docs/shipments#settings" },
+      { title: "Etiquetas y rótulos", href: "/docs/shipments#labels" },
+      { title: "Errores comunes", href: "/docs/shipments#errors" },
+    ],
+  },
+  {
     title: "Reportes y Analytics",
     icon: <BarChart2 size={16} />,
     children: [
-      { title: "Dashboard analytics", href: "/docs/reports" },
-      { title: "Reportes de ventas", href: "/docs/reports#sales" },
-      { title: "Reportes personalizados", href: "/docs/reports#custom" },
+      { title: "Mis Reportes", href: "/docs/reports" },
+      { title: "Ventas de un mes", href: "/docs/reports#sales" },
+      { title: "Crear tus propios reportes", href: "/docs/reports#custom" },
+      { title: "Previsión de ventas", href: "/docs/reports#forecast" },
       { title: "Lead Scoring", href: "/docs/lead-scoring" },
     ],
   },
@@ -180,8 +209,8 @@ const navigation: NavItem[] = [
     title: "Automatizaciones",
     icon: <Zap size={16} />,
     children: [
-      { title: "Editor de workflows", href: "/docs/workflows" },
-      { title: "Tipos de trigger", href: "/docs/workflows#triggers" },
+      { title: "Automatizaciones", href: "/docs/workflows" },
+      { title: "Disparadores", href: "/docs/workflows#triggers" },
       { title: "Acciones disponibles", href: "/docs/workflows#actions" },
       { title: "Historial de ejecución", href: "/docs/workflows#history" },
     ],
@@ -202,7 +231,7 @@ const navigation: NavItem[] = [
     icon: <Calendar size={16} />,
     children: [
       { title: "Vista de calendario", href: "/docs/calendar" },
-      { title: "Eventos y tareas", href: "/docs/calendar#events" },
+      { title: "Crear eventos", href: "/docs/calendar#events" },
     ],
   },
   {
@@ -210,6 +239,25 @@ const navigation: NavItem[] = [
     icon: <FolderKanban size={16} />,
     children: [
       { title: "Gestión de proyectos", href: "/docs/projects" },
+    ],
+  },
+  {
+    title: "Biblioteca",
+    icon: <Library size={16} />,
+    children: [
+      { title: "Para qué sirve", href: "/docs/biblioteca" },
+      { title: "Subir archivos", href: "/docs/biblioteca#upload" },
+      { title: "Usar archivos en la IA", href: "/docs/biblioteca#ai" },
+    ],
+  },
+  {
+    title: "Estrategia",
+    icon: <Target size={16} />,
+    children: [
+      { title: "Para qué sirve", href: "/docs/estrategia" },
+      { title: "Funnel de Marketing", href: "/docs/estrategia#funnel" },
+      { title: "Audiencia y buyer persona", href: "/docs/estrategia#audience" },
+      { title: "Palabras Claves", href: "/docs/estrategia#keywords" },
     ],
   },
   {
@@ -221,9 +269,14 @@ const navigation: NavItem[] = [
       { title: "WhatsApp (líneas)", href: "/docs/settings#whatsapp" },
       { title: "Conversaciones (pipelines)", href: "/docs/settings#conversations" },
       { title: "Integraciones", href: "/docs/settings#integrations" },
+      { title: "Envío masivo (remitente)", href: "/docs/settings#mass-email" },
+      { title: "Dominios de correo", href: "/docs/settings#email-domains" },
       { title: "Campos personalizados", href: "/docs/settings#fields" },
       { title: "Lead Scoring config", href: "/docs/settings#lead-scoring" },
       { title: "Seguridad y 2FA", href: "/docs/settings#security" },
+      { title: "Notificaciones", href: "/docs/settings#notifications" },
+      { title: "Plantillas PDF", href: "/docs/settings#plantillas-pdf" },
+      { title: "Historial de importaciones", href: "/docs/settings#import-history" },
       { title: "Conectores MCP", href: "/docs/settings#mcp" },
       { title: "Tokens de API", href: "/docs/settings#api-keys" },
       { title: "Plan, asientos y módulos", href: "/docs/settings#plan" },
@@ -250,7 +303,7 @@ const navigation: NavItem[] = [
       { title: "Webhooks salientes", href: "/docs/api#webhooks" },
       { title: "Errores y límites", href: "/docs/api#errors" },
       { title: "Ciudades (catálogo DANE)", href: "/docs/ciudades" },
-      { title: "Envíos (Envia.com)", href: "/docs/envios" },
+      { title: "Envíos por API", href: "/docs/envios" },
     ],
   },
   {
@@ -271,7 +324,7 @@ const navigation: NavItem[] = [
       { title: "WhatsApp Business", href: "/docs/integrations" },
       { title: "N8N, Make, Zapier", href: "/docs/integrations#n8n" },
       { title: "Webhooks y datos entrantes", href: "/docs/integrations#webhooks" },
-      { title: "Social Media", href: "/docs/integrations#social" },
+      { title: "Redes sociales", href: "/docs/integrations#social" },
     ],
   },
 ];
@@ -324,17 +377,19 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
       >
         {/* Logo */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 flex-shrink-0">
-          <Link href="/docs" className="flex items-center gap-2.5">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm"
-              style={{ background: "linear-gradient(135deg, #d1345b, #1f2a48)" }}
-            >
-              F
-            </div>
-            <div>
-              <div className="text-white font-bold text-sm leading-tight">FusionCRM</div>
-              <div className="text-white/50 text-xs">Documentación</div>
-            </div>
+          <Link href="/docs" className="flex items-center gap-3" aria-label="FusionCRM Documentación">
+            {/* Logo blanco de la app: el fondo del sidebar es oscuro en ambos temas. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo-fusion-white.png"
+              alt="FusionCRM"
+              width={640}
+              height={135}
+              className="h-7 w-auto"
+            />
+            <span className="text-white/50 text-xs border-l border-white/20 pl-3 leading-tight">
+              Documentación
+            </span>
           </Link>
           <button
             onClick={onClose}

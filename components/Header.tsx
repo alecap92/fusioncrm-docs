@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Search } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import SearchModal from "./SearchModal";
@@ -34,6 +35,22 @@ export default function Header({ onMobileMenuOpen }: HeaderProps) {
         }}
       >
         <MobileMenuButton onClick={onMobileMenuOpen} />
+
+        {/* Logo: solo cuando el sidebar está oculto (en escritorio ya lo muestra el sidebar).
+            Isotipo de la app (cuadrado con fondo navy) para que se lea en tema claro y oscuro. */}
+        <Link href="/docs" className="lg:hidden flex items-center gap-2 flex-shrink-0" aria-label="FusionCRM Docs">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-fusion-icon.png"
+            alt=""
+            width={32}
+            height={32}
+            className="w-8 h-8 rounded-lg"
+          />
+          <span className="hidden sm:inline font-bold text-sm" style={{ color: "var(--foreground)" }}>
+            FusionCRM <span style={{ color: "var(--muted-foreground)" }} className="font-medium">Docs</span>
+          </span>
+        </Link>
 
         {/* Search button */}
         <button

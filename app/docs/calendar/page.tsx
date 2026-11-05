@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Callout from "@/components/Callout";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
@@ -9,8 +10,8 @@ export const metadata: Metadata = { title: "Calendario" };
 const toc = [
   { id: "overview", label: "Vista de calendario" },
   { id: "events", label: "Crear eventos" },
-  { id: "tasks", label: "Tareas y actividades" },
-  { id: "views", label: "Vistas disponibles" },
+  { id: "tasks", label: "Seguimientos y tareas" },
+  { id: "views", label: "Vistas y atajos" },
 ];
 
 export default function CalendarPage() {
@@ -20,26 +21,24 @@ export default function CalendarPage() {
         <Breadcrumbs />
         <h1 className="text-3xl font-bold mb-2" style={{ color: "var(--foreground)" }}>Calendario</h1>
         <p className="text-lg mb-8" style={{ color: "var(--muted-foreground)" }}>
-          El módulo de Calendario centraliza todas las actividades, citas y tareas del equipo
-          en una vista temporal para facilitar la planificación y el seguimiento.
+          El Calendario reúne tus reuniones, tareas y recordatorios, junto con los seguimientos que
+          programas en tus contactos y empresas. Lo encuentras en{" "}
+          <strong style={{ color: "var(--foreground)" }}>Planeación → Calendario</strong>.
         </p>
 
         <section id="overview" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Vista de calendario</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            El calendario muestra todos los eventos y actividades del CRM en vistas mensual, semanal
-            y diaria. Puedes filtrar por tipo de actividad o por miembro del equipo.
+            El calendario muestra <strong style={{ color: "var(--foreground)" }}>tu agenda</strong>: los
+            eventos que te asignaron y los que tú creaste. Puedes filtrar por tipo de evento y por
+            etiqueta, y moverte rápido entre fechas con el mini calendario lateral.
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
             {[
-              { type: "Llamadas", color: "#3b82f6" },
-              { type: "Reuniones", color: "#8b5cf6" },
-              { type: "Emails", color: "#22c55e" },
-              { type: "Tareas", color: "#f59e0b" },
-              { type: "Demos", color: "#d1345b" },
-              { type: "Citas", color: "#14b8a6" },
-              { type: "Seguimientos", color: "#f97316" },
-              { type: "Otros", color: "#6b7280" },
+              { type: "Reunión", color: "#2563EB" },
+              { type: "Tarea", color: "#7C3AED" },
+              { type: "Recordatorio", color: "#D97706" },
+              { type: "Seguimiento", color: "#059669" },
             ].map((t) => (
               <div key={t.type} className="flex items-center gap-2 p-2 rounded border text-sm" style={{ borderColor: "var(--border)" }}>
                 <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: t.color }} />
@@ -47,51 +46,87 @@ export default function CalendarPage() {
               </div>
             ))}
           </div>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Reunión, Tarea y Recordatorio son los tipos que creas desde el calendario. Los
+            Seguimientos vienen de las actividades que programas en contactos y empresas. Si le pones
+            una etiqueta a un evento, el evento toma el color de la etiqueta.
+          </p>
         </section>
 
         <section id="events" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Crear eventos</h2>
           <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>
-            Para crear un nuevo evento en el calendario:
+            Tienes tres formas de crear un evento:
           </p>
           <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Haz clic en cualquier fecha/hora del calendario para crear un evento</li>
-            <li>• O usa el botón "+ Nuevo evento" en la barra superior</li>
-            <li>• Completa: título, tipo, fecha/hora de inicio y fin</li>
-            <li>• Asocia el evento a un contacto y/o deal</li>
-            <li>• Asigna el evento a un miembro del equipo</li>
-            <li>• Agrega notas o descripción</li>
+            <li>• El botón <strong style={{ color: "var(--foreground)" }}>Agregar evento</strong>.</li>
+            <li>• Haz clic sobre un día u hora del calendario. En la creación rápida puedes escribir la fecha en el título, por ejemplo «reunión mañana 3pm», y el calendario la entiende.</li>
+            <li>• Pulsa la tecla <strong style={{ color: "var(--foreground)" }}>C</strong>.</li>
           </ul>
+          <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>
+            En el formulario completo defines:
+          </p>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Título</strong>, <strong style={{ color: "var(--foreground)" }}>Tipo</strong>, <strong style={{ color: "var(--foreground)" }}>Inicio</strong> y <strong style={{ color: "var(--foreground)" }}>Fin</strong>, y la <strong style={{ color: "var(--foreground)" }}>Zona horaria</strong>.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Repetir</strong>: todos los días, lunes a viernes, cada semana, cada 2 semanas, cada mes, cada año o una regla personalizada. Al editar un evento repetido puedes cambiar solo esa ocurrencia.</li>
+            <li>• Un recordatorio para el asesor, con la antelación que elijas.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Contacto</strong>: vincula el evento a un contacto del CRM; su correo se agrega solo a los invitados.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Asesor</strong> responsable y <strong style={{ color: "var(--foreground)" }}>Ubicación o link</strong> (oficina, Google Meet, Zoom…).</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Invitados</strong>: reciben una invitación por correo que se agrega a su calendario y se actualiza si reprogramas o cancelas.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Descripción</strong> y <strong style={{ color: "var(--foreground)" }}>Etiqueta</strong>.</li>
+          </ul>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Para reprogramar, arrastra el evento a otro día u hora.
+          </p>
           <Callout type="tip">
-            Cuando creas un evento asociado a un deal, aparece automáticamente en el historial
-            de actividades de ese deal. Mantén el registro de todas las interacciones aquí.
+            Cuando vinculas un evento a un contacto, aparece en la actividad de ese contacto como
+            «Cita». Y con el disparador <strong>Cita próxima</strong> de{" "}
+            <Link href="/docs/workflows" style={{ color: "#d1345b" }}>Automatizaciones</Link> puedes
+            escribirle al contacto un tiempo antes de la cita para recordársela.
+          </Callout>
+          <Callout type="note">
+            Hoy los eventos se vinculan a contactos, no a negocios.
           </Callout>
         </section>
 
         <section id="tasks" className="mb-10">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Tareas y actividades</h2>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Seguimientos y tareas</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Las tareas son actividades con fecha de vencimiento asignadas a un agente. Aparecen
-            en el calendario y también en el panel de actividades del deal o contacto relacionado.
+            Los seguimientos que programas en tus contactos y empresas aparecen en el calendario, y
+            puedes marcarlos como completados desde ahí con <strong style={{ color: "var(--foreground)" }}>Completar</strong>.
           </p>
-          <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Las tareas vencidas aparecen marcadas en rojo</li>
-            <li>• Puedes marcar tareas como completadas directamente desde el calendario</li>
-            <li>• Las automatizaciones pueden crear tareas automáticamente</li>
-          </ul>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            «Tarea» en el calendario es solo un tipo de evento. Las tareas de proyectos (incluidas las
+            que crean las automatizaciones) no se muestran en el calendario: se gestionan en{" "}
+            <Link href="/docs/projects" style={{ color: "#d1345b" }}>Planeación → Proyectos y tareas</Link>.
+          </p>
         </section>
 
         <section id="views" className="mb-10">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Vistas disponibles</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Vistas y atajos</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             {[
-              { view: "Vista mensual", desc: "Visión general del mes. Ideal para planificación macro y verificar disponibilidad." },
-              { view: "Vista semanal", desc: "Detalle de la semana con horarios. Mejor para gestión diaria del equipo." },
-              { view: "Vista diaria", desc: "Detalle completo del día actual con bloques de tiempo por hora." },
+              { view: "Mes", desc: "Visión general del mes. Ideal para planear y ver tu disponibilidad." },
+              { view: "Semana", desc: "La semana con horarios, para organizar el día a día." },
+              { view: "Día", desc: "El detalle del día con bloques por hora." },
+              { view: "Agenda", desc: "Tus próximos eventos en forma de lista." },
             ].map((v) => (
               <div key={v.view} className="p-4 rounded-lg border" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
                 <p className="font-semibold mb-1" style={{ color: "var(--foreground)" }}>{v.view}</p>
                 <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>{v.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+            {[
+              { key: "T", desc: "Ir a hoy" },
+              { key: "← / →", desc: "Periodo anterior / siguiente" },
+              { key: "M · W · D · A", desc: "Mes, Semana, Día, Agenda" },
+              { key: "C", desc: "Crear evento" },
+            ].map((s) => (
+              <div key={s.key} className="p-2 rounded border text-sm text-center" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
+                <p className="font-mono font-medium" style={{ color: "var(--foreground)" }}>{s.key}</p>
+                <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{s.desc}</p>
               </div>
             ))}
           </div>

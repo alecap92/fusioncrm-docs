@@ -5,12 +5,16 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Envíos (Envia.com)" };
+export const metadata: Metadata = {
+  title: "Envíos por API (Envia.com)",
+  description: "Cotiza, genera, rastrea y cancela guías de Envia.com por la API REST de FusionCRM: endpoints, permisos, idempotencia y errores.",
+};
 
 const API_BASE = "https://api.fusioncol.com/api";
 
 const toc = [
   { id: "overview", label: "Qué es" },
+  { id: "app", label: "Desde la app" },
   { id: "setup", label: "Requisitos" },
   { id: "endpoints", label: "Endpoints y permisos" },
   { id: "flow", label: "Cotizar y generar" },
@@ -33,9 +37,13 @@ const errors = [
   ["409", "SHIPMENT_NEEDS_REVIEW", "No se sabe si Envia generó la guía (timeout, red). Pudo cobrarse: revisa el panel de Envia y, si hace falta, reintenta con una clave nueva."],
   ["400", "IDEMPOTENCY_KEY_REUSED", "Esa idempotencyKey ya se usó con otro contacto."],
   ["422", "ENVIA_GENERATE_FAILED", "Envia rechazó la guía (saldo insuficiente, transportadora caída…). Queda un borrador (shipmentId) que puedes reintentar con la misma clave."],
-  ["422", "ENVIA_NOT_CONFIGURED / ORIGIN_NOT_CONFIGURED", "Falta la API key de Envia (Integraciones) o la dirección de origen (Ajustes → Envíos)."],
+  ["422", "ENVIA_NOT_CONFIGURED / ORIGIN_NOT_CONFIGURED", "Falta la API key de Envia (Integraciones) o la dirección de origen (Configuración → Envíos)."],
   ["409", "SHIPMENT_NOT_CANCELABLE / SHIPMENT_NOT_TRACKABLE", "Solo se cancela un envío en created; un draft no tiene guía que rastrear."],
   ["403", "PLAN_MODULE_REQUIRED", "El plan de la organización no tiene el módulo Envíos."],
+  ["404", "CONTACT_NOT_FOUND", "El contactId no existe en tu organización."],
+  ["404", "SHIPMENT_NOT_FOUND", "El envío no existe en tu organización."],
+  ["502", "CARRIERS_UNAVAILABLE", "No se pudo obtener el catálogo de transportadoras de Envia.com. Reintenta más tarde."],
+  ["400", "VALIDATION_ERROR", "Algún campo del cuerpo no es válido (el message dice cuál)."],
 ];
 
 const codeBox = { backgroundColor: "var(--code-bg)", border: "1px solid var(--border)" } as const;
@@ -56,11 +64,15 @@ export default function EnviosPage() {
     <div className="flex gap-8 max-w-6xl mx-auto px-6 py-10">
       <article className="flex-1 min-w-0">
         <Breadcrumbs />
-        <h1 className="text-3xl font-bold mb-2" style={strong}>Envíos (Envia.com)</h1>
+        <h1 className="text-3xl font-bold mb-2" style={strong}>Envíos por API (Envia.com)</h1>
+        <Callout type="note" title="¿Usas la app?">
+          Esta página es para integraciones por API. Si quieres cotizar y generar guías desde la ficha
+          del contacto, mira <Link href="/docs/shipments" style={{ color: "#d1345b" }}>Envíos</Link>.
+        </Callout>
         <p className="text-lg mb-8" style={muted}>
           Cotiza y genera guías de Coordinadora, Servientrega, TCC, Inter Rapidísimo y otras
-          transportadoras desde un contacto, a través de tu cuenta de Envia.com. Esta página resume
-          la API; el detalle de cada campo está en la{" "}
+          transportadoras desde un contacto, a través de tu cuenta de Envia.com, llamando a la API
+          REST de FusionCRM. El detalle de cada campo está en la{" "}
           <Link href="/docs/api#reference" style={{ color: "#d1345b" }}>referencia</Link> (sección Shipments).
         </p>
 
@@ -69,11 +81,22 @@ export default function EnviosPage() {
           <p className="mb-4" style={muted}>
             Un envío siempre sale de un contacto: el destino se toma de su dirección y ciudad, y lo
             que mandes en <code>destination</code> lo reemplaza. El origen es el que la organización
-            configuró en la app (Ajustes → Envíos); no se envía por API. Estados:{" "}
+            configuró en la app (Configuración → Envíos); no se envía por API. Estados:{" "}
             <code>draft</code> (se intentó generar y falló), <code>created</code> (guía generada, el
             único cancelable), <code>picked_up</code>, <code>in_transit</code>,{" "}
             <code>out_for_delivery</code>, <code>delivered</code> y los de excepción. El rastreo se
             actualiza solo por webhook y por una revisión periódica.
+          </p>
+        </section>
+
+        <section id="app" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={strong}>Desde la app</h2>
+          <p className="mb-4" style={muted}>
+            Lo mismo se hace sin código desde la pestaña <strong style={strong}>Envíos</strong> del
+            contacto, y la configuración (origen, entorno, formato de etiqueta, paquetes y webhook)
+            vive en Configuración → Envíos. Todo eso está explicado paso a paso en{" "}
+            <Link href="/docs/shipments" style={{ color: "#d1345b" }}>Envíos</Link>. Los envíos que
+            generes por API aparecen ahí igual.
           </p>
         </section>
 
@@ -82,7 +105,7 @@ export default function EnviosPage() {
           <ul className="space-y-2 pl-4 mb-4" style={muted}>
             <li>• El <strong style={strong}>módulo Envíos</strong> activo en el plan (sin él, 403 <code>PLAN_MODULE_REQUIRED</code>).</li>
             <li>• La <strong style={strong}>API key de Envia.com</strong> en Configuración → Integraciones, con saldo en esa cuenta.</li>
-            <li>• La <strong style={strong}>dirección de origen</strong> en Ajustes → Envíos.</li>
+            <li>• La <strong style={strong}>dirección de origen</strong> en Configuración → Envíos.</li>
             <li>• Un token con <code>shipments:read</code> para cotizar y consultar, y <code>shipments:write</code> para generar, rastrear y cancelar.</li>
           </ul>
         </section>
@@ -207,7 +230,9 @@ export default function EnviosPage() {
           <h2 className="text-2xl font-bold mb-4" style={strong}>Otros errores</h2>
           <p className="mb-4" style={muted}>
             Todos llevan <code>success: false</code>, <code>code</code> y <code>message</code>; los de
-            Envia agregan <code>error</code> normalizado (nunca la respuesta cruda del proveedor).
+            Envia agregan <code>error</code> normalizado (nunca la respuesta cruda del proveedor). Dentro
+            de <code>error.code</code> te pueden llegar, por ejemplo, <code>INSUFFICIENT_BALANCE</code> (sin
+            saldo en Envia) o <code>NO_COVERAGE</code> (la transportadora no cubre la ruta).
           </p>
           <div className="rounded-lg overflow-hidden border mb-4" style={{ borderColor: "var(--border)" }}>
             <table className="w-full text-sm">

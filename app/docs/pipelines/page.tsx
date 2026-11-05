@@ -52,8 +52,9 @@ export default function PipelinesPage() {
             ))}
           </div>
           <Callout type="note">
-            Por defecto, FusionCRM incluye un pipeline predeterminado con etapas estándar. Puedes
-            modificarlo o crear pipelines adicionales desde Configuración → Deals.
+            Tu organización arranca sin pipelines de negocios: mientras no crees uno, Oportunidades
+            muestra «No hay pipelines configurados». Crea el primero en Configuración → Módulos del
+            CRM → Negocios.
           </Callout>
         </section>
 
@@ -62,11 +63,11 @@ export default function PipelinesPage() {
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>Para crear un nuevo pipeline:</p>
           <ol className="space-y-3 mb-4">
             {[
-              { n: "1", t: "Ve a Configuración → Deals", d: "En el menú de la barra lateral, selecciona Configuración y luego el tab Deals." },
-              { n: "2", t: "Haz clic en \"+ Nuevo pipeline\"", d: "Botón disponible en la sección de gestión de pipelines." },
-              { n: "3", t: "Asigna un nombre", d: "Elige un nombre descriptivo que identifique el tipo de proceso de ventas." },
-              { n: "4", t: "Agrega las etapas", d: "Define las fases del pipeline. Mínimo 2 etapas, máximo sin límite." },
-              { n: "5", t: "Guarda el pipeline", d: "El pipeline estará disponible inmediatamente en el módulo de Deals." },
+              { n: "1", t: "Ve a Configuración → Módulos del CRM → Negocios", d: "Ahí está la gestión de pipelines de negocios." },
+              { n: "2", t: "Pulsa «Nuevo Pipeline»", d: "Se abre la configuración del pipeline nuevo." },
+              { n: "3", t: "Asigna un nombre y, si quieres, una descripción", d: "Elige un nombre que identifique el tipo de proceso de ventas." },
+              { n: "4", t: "Ajusta las etapas", d: "El pipeline nuevo trae tres etapas de ejemplo (Nuevo, En Progreso, Cerrado) que puedes renombrar, borrar o ampliar. Necesita al menos una etapa." },
+              { n: "5", t: "Guarda", d: "Pulsa «Guardar pipeline» y luego «Guardar Cambios». El pipeline queda disponible en Negocio → Oportunidades." },
             ].map((s) => (
               <li key={s.n} className="flex gap-3">
                 <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "#d1345b" }}>{s.n}</span>
@@ -97,9 +98,10 @@ export default function PipelinesPage() {
                 {[
                   ["Nombre", "Título descriptivo de la etapa (ej. \"Propuesta enviada\")"],
                   ["Color", "Color visual de la tarjeta en el Kanban"],
-                  ["Probabilidad %", "Porcentaje de éxito estimado para deals en esta etapa"],
-                  ["Tipo", "Normal, Ganado o Perdido (las dos últimas son etapas de cierre)"],
-                  ["Orden", "Posición de la etapa en el pipeline (arrastrable)"],
+                  ["Probabilidad %", "Porcentaje de éxito estimado para los negocios en esta etapa (en las etapas cerradas queda fija)"],
+                  ["Tipo", "Abierta (en curso), Ganada o Perdida (las dos últimas son etapas de cierre)"],
+                  ["Días máximos en esta etapa", "Opcional: pasado ese tope, el negocio se marca como estancado"],
+                  ["Orden", "Posición de la etapa en el pipeline; se cambia con las flechas de subir y bajar"],
                 ].map(([p, d]) => (
                   <tr key={p}>
                     <td className="p-3 border-b font-medium" style={{ borderColor: "var(--border)", color: "var(--foreground)" }}>{p}</td>
@@ -119,32 +121,37 @@ export default function PipelinesPage() {
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Editar pipeline</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
             Para editar un pipeline existente, ve a <strong style={{ color: "var(--foreground)" }}>
-            Configuración → Deals</strong>, haz clic en el ícono de edición del pipeline que deseas
-            modificar. Puedes:
+            Configuración → Módulos del CRM → Negocios</strong> y pulsa el ícono «Configurar pipeline».
+            Puedes:
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
             <li>• Renombrar el pipeline</li>
             <li>• Agregar nuevas etapas</li>
-            <li>• Reordenar etapas arrastrando</li>
-            <li>• Editar el nombre, color y probabilidad de cada etapa</li>
-            <li>• Eliminar etapas que no tengan deals activos</li>
+            <li>• Reordenar etapas con las flechas</li>
+            <li>• Editar el nombre, color, tipo, probabilidad y tope de días de cada etapa</li>
+            <li>• Definir los campos personalizados de los negocios de ese pipeline</li>
+            <li>• Configurar los <a href="/docs/deals#requirements" style={{ color: "#d1345b" }}>requisitos por etapa</a> y el checklist de cierre</li>
+            <li>• Eliminar etapas que no tengan negocios</li>
           </ul>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Los cambios se aplican al pulsar «Guardar pipeline» y luego «Guardar Cambios».
+          </p>
           <Callout type="warning">
-            No puedes eliminar una etapa que tenga deals activos. Primero mueve los deals a otra
-            etapa antes de eliminarla.
+            No puedes eliminar una etapa que tenga negocios, aunque estén ganados o perdidos.
+            Muévelos primero a otra etapa.
           </Callout>
         </section>
 
         <section id="delete" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Eliminar pipeline</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Un pipeline solo puede eliminarse si no tiene deals activos. El pipeline predeterminado
-            no puede eliminarse, pero sí puede ser renombrado y modificado.
+            Desde Configuración puedes eliminar cualquier pipeline, incluso si tiene negocios. Se
+            borran el pipeline y sus etapas, y no hay opción de archivarlo.
           </p>
           <Callout type="danger">
-            Eliminar un pipeline es permanente. Si el pipeline tiene deals en estado cerrado
-            (ganado/perdido), esos deals se perderán del historial. Considera archivar el pipeline
-            en lugar de eliminarlo.
+            Si el pipeline tiene negocios, esos negocios dejan de verse en el tablero. Antes de
+            eliminarlo, revisa que no tenga negocios que necesites (puedes exportarlos desde
+            Oportunidades). La eliminación no se puede deshacer.
           </Callout>
         </section>
 

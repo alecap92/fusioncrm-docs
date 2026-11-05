@@ -11,9 +11,9 @@ const toc = [
   { id: "acceder", label: "Cómo acceder" },
   { id: "registro", label: "Registro de cuenta" },
   { id: "navegacion", label: "Navegación general" },
-  { id: "sidebar", label: "Barra lateral" },
+  { id: "menus", label: "Menús de módulos" },
   { id: "topbar", label: "Barra superior" },
-  { id: "perfil", label: "Perfil y organización" },
+  { id: "perfil", label: "Tu cuenta y tu organización" },
 ];
 
 export default function GettingStartedPage() {
@@ -39,9 +39,9 @@ export default function GettingStartedPage() {
             {[
               "Gestionar contactos y clientes en un directorio unificado",
               "Llevar el seguimiento de oportunidades de venta (deals) en pipelines visuales",
-              "Comunicarte con clientes por WhatsApp, email y chat desde una sola bandeja",
+              "Atender WhatsApp, Messenger e Instagram desde una sola bandeja, y tu correo en el mismo CRM",
               "Automatizar tareas repetitivas con workflows sin código",
-              "Generar cotizaciones, facturas electrónicas y reportes de ventas",
+              "Generar cotizaciones e informes de ventas, y facturas electrónicas DIAN con el módulo adicional",
               "Integrar con herramientas externas como N8N, WhatsApp Business y más",
             ].map((item) => (
               <li key={item} className="flex items-start gap-2">
@@ -50,16 +50,22 @@ export default function GettingStartedPage() {
             ))}
           </ul>
           <Callout type="tip">
-            FusionCRM está optimizado para el mercado latinoamericano, con soporte para facturación
-            electrónica según normativa DIAN Colombia y WhatsApp como canal principal de comunicación.
+            FusionCRM está pensado para el mercado latinoamericano, con WhatsApp como canal principal de
+            comunicación. La facturación electrónica según la normativa DIAN de Colombia es un módulo
+            adicional que se activa aparte.
+          </Callout>
+          <Callout type="note">
+            WhatsApp en FusionCRM no funciona exactamente como en tu celular: para escribirle primero a un cliente necesitas una
+            plantilla aprobada por Meta. Antes de empezar, lee{" "}
+            <a href="/docs/conversations#iniciar-whatsapp" style={{ color: "#d1345b" }}>Cómo escribirle a un cliente por WhatsApp</a>.
           </Callout>
         </section>
 
         <section id="acceder" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Cómo acceder</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            FusionCRM es una aplicación web. Puedes acceder desde cualquier navegador moderno
-            (Chrome, Firefox, Safari, Edge) en la URL proporcionada por tu administrador.
+            FusionCRM es una aplicación web. Entras desde cualquier navegador moderno (Chrome, Firefox,
+            Safari, Edge) en la misma dirección para todos:
           </p>
           <div
             className="rounded-lg p-4 mb-4 font-mono text-sm"
@@ -69,8 +75,12 @@ export default function GettingStartedPage() {
             <span style={{ color: "#d1345b" }}>https://app.fusioncol.com</span>
           </div>
           <Callout type="note">
-            Para acceder necesitas una cuenta activa. Solicita tus credenciales al administrador de tu
-            organización o regístrate directamente en la plataforma.
+            Para entrar necesitas una cuenta activa: regístrate tú mismo o pídele al propietario de tu
+            empresa que te cree un usuario. Puedes entrar con correo y contraseña o con{" "}
+            <strong>Continuar con Google</strong>. Si olvidaste tu contraseña, usa{" "}
+            <strong>¿Olvidaste la contraseña?</strong> en la pantalla de inicio de sesión. Si tienes activada la
+            verificación en dos pasos (o tu empresa la exige), después de la contraseña te pedirá el código
+            de tu app de autenticación.
           </Callout>
         </section>
 
@@ -81,11 +91,10 @@ export default function GettingStartedPage() {
           </p>
           <ol className="space-y-4 mb-6">
             {[
-              { n: "1", title: "Visita la página de registro", desc: 'Ve a la URL de FusionCRM y haz clic en "Crear cuenta" o "Registrarse".' },
-              { n: "2", title: "Ingresa tus datos", desc: "Completa el formulario con tu nombre, correo electrónico y contraseña segura. La contraseña debe tener al menos 8 caracteres." },
-              { n: "3", title: "Configura tu organización", desc: "Ingresa el nombre de tu empresa y selecciona tu industria. Esto personaliza la experiencia en el CRM." },
-              { n: "4", title: "Verifica tu correo", desc: "Recibirás un email de verificación. Haz clic en el enlace para activar tu cuenta." },
-              { n: "5", title: "Inicia sesión", desc: "Con tu cuenta verificada, ingresa tus credenciales en la pantalla de login." },
+              { n: "1", title: "Abre la página de registro", desc: 'Entra a app.fusioncol.com y toca "Crear cuenta gratis".' },
+              { n: "2", title: "Ingresa tus datos", desc: 'Escribe tu nombre, apellido, correo, teléfono y una contraseña de al menos 8 caracteres con una mayúscula y un número. También puedes usar "Continuar con Google".' },
+              { n: "3", title: "Acepta los términos", desc: 'Marca la casilla de Términos y Condiciones, Política de Privacidad y Política de Garantía y SLA, y toca "Crear cuenta". Entras al CRM de una vez, sin correo de verificación.' },
+              { n: "4", title: "Completa los datos de tu empresa", desc: "Ve a Configuración → Organización y llena el nombre, NIT, logo y dirección de tu empresa." },
             ].map((step) => (
               <li key={step.n} className="flex gap-4">
                 <div
@@ -102,20 +111,20 @@ export default function GettingStartedPage() {
             ))}
           </ol>
           <Callout type="warning">
-            Si tu organización ya tiene una cuenta, NO crees una cuenta nueva. Pide a tu administrador
-            que te invite desde <strong>Configuración → Usuarios → Invitar usuario</strong>.
+            Si tu empresa ya usa FusionCRM, NO crees una cuenta nueva. Pídele al propietario que te cree un
+            usuario en <strong>Configuración → Usuarios → Crear Usuario</strong>; él te dará una contraseña
+            temporal que luego cambias en Configuración → Seguridad.
           </Callout>
         </section>
 
         <section id="navegacion" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Navegación general</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            La interfaz de FusionCRM está compuesta por tres zonas principales:
+            La pantalla de FusionCRM tiene dos zonas. En el celular, los menús quedan dentro del botón ☰.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             {[
-              { title: "Barra lateral izquierda", desc: "Navegación principal entre módulos (Contactos, Deals, Conversaciones, etc.)" },
-              { title: "Barra superior", desc: "Acceso rápido a búsqueda, notificaciones y perfil de usuario." },
+              { title: "Barra superior", desc: "Los menús de los módulos, la búsqueda, las notificaciones y el menú de tu organización." },
               { title: "Área de contenido", desc: "Panel central donde se muestra la información y herramientas de cada módulo." },
             ].map((z) => (
               <div
@@ -130,39 +139,36 @@ export default function GettingStartedPage() {
           </div>
         </section>
 
-        <section id="sidebar" className="mb-10">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Barra lateral</h2>
+        <section id="menus" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Menús de módulos</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            La barra lateral izquierda es tu punto de navegación principal. Contiene accesos directos
-            a todos los módulos del CRM organizados por categoría.
+            Los módulos del CRM están en cinco menús desplegables de la barra superior:
           </p>
           <table className="w-full text-sm border-collapse mb-4">
             <thead>
               <tr style={{ backgroundColor: "var(--muted)" }}>
-                <th className="text-left p-3 border font-semibold" style={{ borderColor: "var(--border)" }}>Ícono / Sección</th>
-                <th className="text-left p-3 border font-semibold" style={{ borderColor: "var(--border)" }}>Descripción</th>
+                <th className="text-left p-3 border font-semibold" style={{ borderColor: "var(--border)" }}>Menú</th>
+                <th className="text-left p-3 border font-semibold" style={{ borderColor: "var(--border)" }}>Qué encuentras</th>
               </tr>
             </thead>
             <tbody>
               {[
-                ["Deals", "Vista Kanban del pipeline de ventas"],
-                ["Contactos", "Directorio de clientes y prospectos"],
-                ["Conversaciones", "Bandeja unificada de WhatsApp y email"],
-                ["Email", "Gestión de correos electrónicos"],
-                ["Calendario", "Vista de citas y eventos"],
-                ["Cotizaciones", "Presupuestos y propuestas comerciales"],
-                ["Facturas", "Facturación electrónica DIAN"],
-                ["Reportes", "Analytics y reportes de negocio"],
-                ["Automatizaciones", "Editor de workflows"],
-                ["Configuración", "Ajustes de organización y sistema"],
-              ].map(([icon, desc]) => (
-                <tr key={icon}>
-                  <td className="p-3 border font-medium" style={{ borderColor: "var(--border)", color: "var(--foreground)" }}>{icon}</td>
+                ["Contactos", "Directorio de Contactos, Empresas, Grupos y Listas"],
+                ["Negocio", "Oportunidades (tu pipeline de ventas), Cotizaciones, Productos e Informes"],
+                ["Facturación", "Facturas, Notas crédito y débito, Cuentas por cobrar, Compras, Documentos Soporte e Informes. Solo aparece si tienes el módulo de Facturación electrónica."],
+                ["Comunicación", "WhatsApp (la bandeja de WhatsApp, Messenger e Instagram), Correo, Email Marketing, WhatsApp Masivo, Formularios, Páginas, Plantillas de WhatsApp, Fragmentos y Biblioteca"],
+                ["Planeación", "Calendario, Proyectos y tareas, Estrategia y Automatizaciones"],
+              ].map(([menu, desc]) => (
+                <tr key={menu}>
+                  <td className="p-3 border font-medium" style={{ borderColor: "var(--border)", color: "var(--foreground)" }}>{menu}</td>
                   <td className="p-3 border" style={{ borderColor: "var(--border)", color: "var(--muted-foreground)" }}>{desc}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          <p style={{ color: "var(--muted-foreground)" }}>
+            Configuración no está en estos menús: la abres desde el ícono de tu organización, arriba a la derecha.
+          </p>
         </section>
 
         <section id="topbar" className="mb-10">
@@ -171,23 +177,22 @@ export default function GettingStartedPage() {
             La barra superior contiene:
           </p>
           <ul className="space-y-2 pl-4" style={{ color: "var(--muted-foreground)" }}>
-            <li><strong style={{ color: "var(--foreground)" }}>Búsqueda global:</strong> Busca contactos, deals o conversaciones desde cualquier pantalla.</li>
-            <li><strong style={{ color: "var(--foreground)" }}>Notificaciones:</strong> Alertas de actividad, menciones y recordatorios.</li>
-            <li><strong style={{ color: "var(--foreground)" }}>Perfil de usuario:</strong> Acceso a tu perfil, cambio de contraseña y cierre de sesión.</li>
+            <li><strong style={{ color: "var(--foreground)" }}>Búsqueda global (⌘K en Mac, Ctrl+K en Windows):</strong> encuentra contactos, empresas, negocios y conversaciones desde cualquier pantalla.</li>
+            <li><strong style={{ color: "var(--foreground)" }}>Notificaciones:</strong> alertas de actividad, menciones y recordatorios.</li>
+            <li><strong style={{ color: "var(--foreground)" }}>Menú de tu organización</strong> (el ícono de la derecha): Configuración, Ayuda y primeros pasos (la guía de bienvenida), Soporte y Cerrar Sesión.</li>
           </ul>
         </section>
 
         <section id="perfil" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Perfil y organización</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Para editar tu perfil, haz clic en tu avatar en la esquina superior derecha y selecciona
-            <strong> "Mi perfil"</strong>. Desde allí puedes:
+            No hay una pantalla de "perfil": lo de tu cuenta vive en Configuración.
           </p>
           <ul className="space-y-1 pl-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Actualizar tu nombre y foto de perfil</li>
-            <li>• Cambiar tu contraseña</li>
-            <li>• Configurar notificaciones personales</li>
-            <li>• Cerrar sesión</li>
+            <li>• Cambia tu contraseña y activa la verificación en dos pasos en <strong style={{ color: "var(--foreground)" }}>Configuración → Seguridad</strong>.</li>
+            <li>• Elige qué avisos recibir (Campana, Celular o Correo) en <strong style={{ color: "var(--foreground)" }}>Configuración → Notificaciones</strong>.</li>
+            <li>• Cierra sesión desde el menú de tu organización → Cerrar Sesión.</li>
+            <li>• ¿Necesitas ayuda? En ese mismo menú, <strong style={{ color: "var(--foreground)" }}>Soporte</strong> te lleva al WhatsApp +57 302 400 3914 y al correo comercial@fusioncol.com.</li>
           </ul>
           <Callout type="tip">
             Para configurar los datos de tu organización (logo, nombre, dirección), ve a

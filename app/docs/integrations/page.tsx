@@ -12,7 +12,7 @@ const toc = [
   { id: "n8n", label: "N8N" },
   { id: "webhooks", label: "Webhooks y datos entrantes" },
   { id: "social", label: "Redes sociales" },
-  { id: "gmail", label: "Gmail y Outlook" },
+  { id: "gmail", label: "Correo (Gmail y Outlook)" },
 ];
 
 export default function IntegrationsPage() {
@@ -22,20 +22,28 @@ export default function IntegrationsPage() {
         <Breadcrumbs />
         <h1 className="text-3xl font-bold mb-2" style={{ color: "var(--foreground)" }}>Integraciones</h1>
         <p className="text-lg mb-8" style={{ color: "var(--muted-foreground)" }}>
-          FusionCRM se conecta con las herramientas más populares del ecosistema empresarial:
-          WhatsApp Business, N8N, email, redes sociales y más.
+          FusionCRM se conecta con WhatsApp Business, Facebook e Instagram, tu correo, proveedores
+          de IA, n8n y cualquier sistema que hable por API.
         </p>
 
         <section id="overview" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Integraciones disponibles</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            WhatsApp se conecta en <strong style={{ color: "var(--foreground)" }}>Configuración → WhatsApp</strong> y
+            el correo en <strong style={{ color: "var(--foreground)" }}>Configuración → Correo → Cuentas de correo</strong>. Casi todo lo demás está en{" "}
+            <strong style={{ color: "var(--foreground)" }}>Configuración → Desarrollador → Integraciones</strong>.
+          </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
             {[
               { name: "WhatsApp Business", status: "Nativo", color: "#25D366", desc: "Canal principal de mensajería" },
-              { name: "Gmail", status: "OAuth", color: "#EA4335", desc: "Email de Google Workspace" },
-              { name: "Outlook / M365", status: "OAuth", color: "#0078D4", desc: "Email de Microsoft" },
+              { name: "Meta (Facebook + Instagram)", status: "Tu app de Meta", color: "#1877F2", desc: "Mensajes directos de tu página y de Instagram" },
+              { name: "Gmail", status: "IMAP", color: "#EA4335", desc: "Con contraseña de aplicación de Google" },
+              { name: "Outlook / M365", status: "No disponible", color: "#0078D4", desc: "Por ahora no se puede conectar" },
+              { name: "OpenAI y Claude AI", status: "API key", color: "#10a37f", desc: "Tu propia clave, para los Agentes IA" },
+              { name: "ElevenLabs", status: "API key", color: "#111827", desc: "Transcribe las notas de voz entrantes" },
+              { name: "Google Analytics", status: "Google", color: "#F9AB00", desc: "Se conecta con «Conectar con Google»" },
               { name: "N8N / Make / Zapier", status: "API", color: "#EA5B0C", desc: "Por la API REST y peticiones HTTP" },
-              { name: "Facebook Messenger", status: "OAuth", color: "#1877F2", desc: "Mensajes de la página" },
-              { name: "Instagram", status: "OAuth", color: "#E4405F", desc: "Mensajes directos" },
+              { name: "Envia.com", status: "Módulo Envíos", color: "#6d28d9", desc: "Cotiza y genera guías (si tienes el módulo de Envíos)" },
               { name: "API REST", status: "Nativo", color: "#6b7280", desc: "Más de 200 operaciones con tokens por permiso" },
               { name: "MCP (IA)", status: "Nativo", color: "#1f2a48", desc: "Claude, ChatGPT, Cursor" },
               { name: "Formularios web", status: "Nativo", color: "#0f766e", desc: "Link, embed o webhook" },
@@ -43,7 +51,7 @@ export default function IntegrationsPage() {
               <div key={i.name} className="p-4 rounded-lg border" style={{ borderColor: "var(--border)" }}>
                 <div className="flex items-center justify-between mb-2">
                   <p className="font-semibold text-sm" style={{ color: "var(--foreground)" }}>{i.name}</p>
-                  <span className="text-xs px-2 py-0.5 rounded font-bold" style={{ backgroundColor: i.status === "Próximo" ? "var(--muted)" : `${i.color}20`, color: i.color }}>
+                  <span className="text-xs px-2 py-0.5 rounded font-bold" style={{ backgroundColor: i.status === "No disponible" ? "var(--muted)" : `${i.color}20`, color: i.status === "No disponible" ? "var(--muted-foreground)" : i.color }}>
                     {i.status}
                   </span>
                 </div>
@@ -69,19 +77,19 @@ export default function IntegrationsPage() {
 
           <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Requisitos para conectar WhatsApp</h3>
           <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Cuenta de empresa verificada en Meta Business Manager</li>
-            <li>• Número de teléfono no vinculado a WhatsApp personal o WhatsApp Business App</li>
-            <li>• Número con capacidad de recibir SMS o llamada para verificación</li>
+            <li>• Una cuenta de Facebook con acceso al portafolio comercial (Meta Business) de tu empresa. Si no tienes cuenta de WhatsApp Business, el asistente la crea por ti.</li>
+            <li>• Un número que no esté en uso en WhatsApp personal ni en la app WhatsApp Business.</li>
+            <li>• Que el número pueda recibir un SMS o una llamada para verificarlo.</li>
+            <li>• Ser el propietario de la cuenta en FusionCRM: solo el propietario puede conectar líneas.</li>
           </ul>
 
           <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Proceso de conexión</h3>
           <ol className="space-y-3 mb-4">
             {[
-              { n: "1", t: "Configura Meta Business Manager", d: "Crea una cuenta en business.facebook.com si no tienes una. Verifica tu empresa." },
-              { n: "2", t: "Crea una app en Meta Developers", d: "Agrega el producto WhatsApp Business a tu app." },
-              { n: "3", t: "Conecta en FusionCRM", d: "Ve a Ajustes → WhatsApp → \"Conectar con Facebook\" y sigue el proceso de autorización. Repite el paso por cada número adicional: cada uno queda como una línea." },
-              { n: "4", t: "Configura el webhook", d: "FusionCRM proporciona una URL de webhook. Agrégala en la configuración de tu app de Meta." },
-              { n: "5", t: "Prueba la conexión", d: "Envía un mensaje de prueba desde FusionCRM para verificar que funciona." },
+              { n: "1", t: "Ve a Configuración → WhatsApp → Conectar línea", d: "Se abre el asistente con dos opciones." },
+              { n: "2", t: "Elige «Automática» (Recomendada)", d: "Pulsa «Conectar con Facebook», inicia sesión, elige o crea tu cuenta de WhatsApp Business y el número. No tienes que crear apps ni copiar tokens." },
+              { n: "3", t: "Prueba la conexión", d: "Envía un mensaje de prueba desde FusionCRM para verificar que funciona." },
+              { n: "4", t: "¿Más números?", d: "Repite el proceso por cada número: cada uno queda como una línea." },
             ].map((s) => (
               <li key={s.n} className="flex gap-3">
                 <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "#25D366" }}>{s.n}</span>
@@ -92,14 +100,20 @@ export default function IntegrationsPage() {
               </li>
             ))}
           </ol>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            La opción <strong style={{ color: "var(--foreground)" }}>Manual (avanzada)</strong> es solo para quien ya
+            tiene su propia app en Meta Developers: ahí sí debes poner el App ID y el App Secret, y
+            configurar el webhook en tu app.
+          </p>
           <Callout type="tip">
             ¿Varios números? Una organización puede conectar varias líneas de WhatsApp, cada una con
             su nombre, color, plantillas y pipeline. Ver{" "}
             <a href="/docs/whatsapp-lines" style={{ color: "#d1345b" }}>Líneas de WhatsApp</a>.
           </Callout>
-          <Callout type="warning">
-            El proceso de aprobación de WhatsApp Business API puede tomar entre 1 y 5 días
-            hábiles dependiendo del estado de verificación de tu empresa en Meta.
+          <Callout type="note">
+            Puedes conectar el número sin tener el negocio verificado en Meta. Verificarlo sirve
+            para subir tus límites de envío (cuántos clientes nuevos puedes contactar al día); esa
+            verificación la hace Meta y puede tardar algunos días.
           </Callout>
         </section>
 
@@ -127,12 +141,13 @@ export default function IntegrationsPage() {
 
           <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Conectar N8N</h3>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. Crea un token en Configuración → Desarrollador → API con los permisos que necesite el flujo.</li>
+            <li>1. Crea un token en Configuración → Desarrollador → API con los permisos que necesite el flujo. La API está incluida desde el plan Pro y solo la ven los usuarios con permiso para gestionarla.</li>
             <li>2. En n8n usa el nodo <em>HTTP Request</em> contra <code style={{ color: "#d1345b" }}>https://api.fusioncol.com/api</code> con el header <code>Authorization: Bearer &lt;token&gt;</code>.</li>
             <li>3. Para que FusionCRM llame a n8n, crea una automatización con el disparador que te interese y la acción <em>Petición HTTP</em> apuntando a la URL del nodo <em>Webhook</em> de n8n; o pon esa URL como webhook de una columna del pipeline de conversaciones.</li>
+            <li>4. Si quieres que n8n reciba <strong>cada mensaje entrante de WhatsApp</strong> en tiempo real, agrega la integración <em>N8N</em> en Configuración → Desarrollador → Integraciones y pega la URL de tu nodo Webhook en <em>Webhook URL (entrada de mensajes de WhatsApp)</em>. Le llegan el mensaje, el contacto, la conversación y los mensajes anteriores.</li>
           </ol>
           <Callout type="tip">
-            No hay un nodo «FusionCRM» en n8n: con el nodo HTTP Request y la{" "}
+            No hay un nodo «FusionCRM» en n8n: con el nodo HTTP Request, la integración N8N y la{" "}
             <a href="/docs/api" style={{ color: "#d1345b" }}>referencia de la API</a> tienes todo. Si
             lo que quieres es que una IA opere el CRM, mira <a href="/docs/mcp" style={{ color: "#d1345b" }}>MCP</a>.
           </Callout>
@@ -141,8 +156,10 @@ export default function IntegrationsPage() {
         <section id="webhooks" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Webhooks y datos entrantes</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <strong style={{ color: "var(--foreground)" }}>Hacia FusionCRM</strong> hay dos puertas: la API (cualquier
-            recurso, con token) y el webhook de un <a href="/docs/forms" style={{ color: "#d1345b" }}>formulario web</a>,
+            <strong style={{ color: "var(--foreground)" }}>Hacia FusionCRM</strong> hay tres puertas: la API (cualquier
+            recurso, con token), el disparador <a href="/docs/workflows#triggers" style={{ color: "#d1345b" }}>Webhook entrante</a> de
+            las automatizaciones (cada automatización tiene su URL y puedes filtrar por un valor del
+            contenido recibido) y el webhook de un <a href="/docs/forms" style={{ color: "#d1345b" }}>formulario web</a>,
             pensado para leads: deduplica por correo o celular, guarda el origen y puede abrir un
             negocio y avisar al equipo. Cada formulario tiene su URL con una clave pública revocable:
           </p>
@@ -168,12 +185,13 @@ export default function IntegrationsPage() {
         <section id="social" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Redes sociales</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            FusionCRM se integra con Facebook e Instagram a través de la API de Meta:
+            FusionCRM recibe los mensajes directos de Facebook e Instagram en la bandeja de
+            Conversaciones, a través de la API de Meta:
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             {[
-              { platform: "Facebook Pages", features: ["Mensajes directos de Facebook", "Leads de Facebook Lead Ads", "Comentarios en posts (monitoreo)"] },
-              { platform: "Instagram Business", features: ["Mensajes directos de Instagram", "Menciones y comentarios", "Leads de Instagram Ads"] },
+              { platform: "Facebook Pages", features: ["Mensajes directos de tu página (Messenger)"] },
+              { platform: "Instagram Business", features: ["Mensajes directos de Instagram", "Menciones en historias (llegan como mensaje)"] },
             ].map((p) => (
               <div key={p.platform} className="p-4 rounded-lg border" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
                 <p className="font-semibold mb-2" style={{ color: "var(--foreground)" }}>{p.platform}</p>
@@ -187,18 +205,27 @@ export default function IntegrationsPage() {
               </div>
             ))}
           </div>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Los formularios de Lead Ads y los comentarios de publicaciones no llegan al CRM.
+          </p>
           <Callout type="note">
-            Para conectar redes sociales, ve a Configuración → Integraciones → Social Media
-            y sigue el proceso de autorización con tu cuenta de Meta Business Manager.
+            Para conectarlas ve a Configuración → Desarrollador → Integraciones y agrega{" "}
+            <strong>Meta (Facebook + Instagram)</strong>. Pega el App ID, el App Secret y un Verify
+            Token de tu propia app de Meta, guarda y pulsa Conectar para elegir tus páginas y
+            cuentas de Instagram.
           </Callout>
         </section>
 
         <section id="gmail" className="mb-10">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Gmail y Outlook</h2>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Correo (Gmail y Outlook)</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Conecta tu cuenta de Gmail o Microsoft Outlook para gestionar tu correo directamente
-            desde FusionCRM sin salir de la plataforma.
+            El correo se conecta con tu dirección y una contraseña (IMAP). Para <strong style={{ color: "var(--foreground)" }}>Gmail</strong> usa
+            una contraseña de aplicación de Google, no tu contraseña normal.
           </p>
+          <Callout type="warning">
+            Outlook, Hotmail y Microsoft 365 por ahora no se pueden conectar: Microsoft exige
+            iniciar sesión con su cuenta y el CRM todavía no tiene esa opción.
+          </Callout>
           <p style={{ color: "var(--muted-foreground)" }}>
             Ver instrucciones detalladas en{" "}
             <a href="/docs/email#connect" style={{ color: "#d1345b" }}>Correo → Conectar cuenta de email</a>.

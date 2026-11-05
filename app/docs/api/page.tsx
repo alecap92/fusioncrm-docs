@@ -29,11 +29,12 @@ const modules = [
   { path: "/forms", name: "Formularios web y sus envíos", perms: "forms:*" },
   { path: "/conversations", name: "Conversaciones y mensajes; filtros por línea (lineId) y pipeline; mover de etapa o de pipeline", perms: "conversations:*" },
   { path: "/conversation-pipelines", name: "Pipelines de conversación, sus etapas y movimiento masivo (move-all)", perms: "pipelines:read / pipelines:write" },
-  { path: "/whatsapp", name: "Envío de WhatsApp, líneas (/lines) y plantillas: listar, crear, consultar estado, borrar y subir cabecera multimedia", perms: "whatsapp:send / whatsapp:read" },
-  { path: "/campaigns", name: "Campañas masivas de WhatsApp: borradores (con lineId), preflight y resultados", perms: "contacts:read / automations:write" },
+  { path: "/whatsapp", name: "Envío de WhatsApp, líneas (/lines) y plantillas: listar, crear, consultar estado, borrar y subir cabecera multimedia", perms: "whatsapp:send" },
+  { path: "/campaigns", name: "Campañas masivas de WhatsApp: borradores (con lineId), preflight, programar o desprogramar el envío y resultados", perms: "contacts:read / automations:write" },
   { path: "/quotations", name: "Cotizaciones y su PDF", perms: "quotations:*" },
   { path: "/products", name: "Productos y variantes", perms: "products:*" },
   { path: "/invoices", name: "Facturación electrónica (DIAN)", perms: "invoices:*" },
+  { path: "/purchases", name: "Compras (requiere el módulo de facturación)", perms: "purchases:*" },
   { path: "/shipments", name: "Envíos con Envia.com (módulo Envíos)", perms: "shipments:read / shipments:write" },
   { path: "/projects", name: "Proyectos", perms: "projects:*" },
   { path: "/tasks", name: "Tareas", perms: "tasks:*" },
@@ -43,6 +44,11 @@ const modules = [
   { path: "/rag", name: "Base de conocimiento (RAG)", perms: "rag:*" },
   { path: "/agents", name: "Agentes IA", perms: "agents:*" },
   { path: "/agent-context", name: "Contexto de cliente para agentes", perms: "conversations:read / agents:write" },
+  { path: "/landing-pages", name: "Landing pages: crear, duplicar, publicar y estadísticas", perms: "forms:read / landings:write" },
+  { path: "/automations", name: "Automatizaciones (se crean y editan como borrador) y su historial de ejecuciones", perms: "automations:*" },
+  { path: "/activities", name: "Actividades del CRM", perms: "activities:*" },
+  { path: "/calendar-events", name: "Eventos del calendario", perms: "calendar:*" },
+  { path: "/import", name: "Importación de contactos e historial (con deshacer)", perms: "contacts:*" },
 ];
 
 const permissions = [
@@ -51,27 +57,43 @@ const permissions = [
   ["deals:read · deals:write · deals:delete", "Negocios"],
   ["forms:read · forms:write", "Formularios, sus respuestas y el envío server-to-server"],
   ["conversations:read · conversations:write · conversations:delete", "Conversaciones, mensajes, pipelines y etapas"],
-  ["whatsapp:send · whatsapp:read", "Enviar mensajes y plantillas; listar líneas; administrar plantillas de Meta (crear, consultar, borrar)"],
+  ["whatsapp:send", "Todo lo de WhatsApp: enviar mensajes y plantillas, listar líneas y administrar plantillas de Meta (crear, consultar, borrar). whatsapp:read existe en el catálogo pero hoy no da acceso a nada por sí solo"],
   ["pipelines:read · pipelines:write", "Pipelines de conversación y de negocios, sus etapas y el movimiento masivo"],
   ["quotations:read · quotations:write · quotations:delete", "Cotizaciones"],
-  ["products:read · products:write", "Productos"],
+  ["products:read · products:write · products:delete", "Productos y variantes"],
   ["invoices:read · invoices:write", "Facturas (requiere el módulo de facturación)"],
+  ["purchases:read · purchases:write", "Compras (requiere el módulo de facturación)"],
   ["shipments:read · shipments:write", "Envíos: read lista, consulta y cotiza (no cobra); write genera guías (cobra saldo de Envia), rastrea y cancela. Requiere el módulo Envíos"],
-  ["projects:read · projects:write · tasks:read · tasks:write", "Proyectos y tareas"],
+  ["projects:read · projects:write · projects:delete · tasks:read · tasks:write · tasks:delete", "Proyectos y tareas"],
   ["fragments:read · fragments:write · fragments:delete", "Respuestas rápidas"],
   ["library:read · library:write", "Biblioteca (solo metadatos; la subida vive en la app)"],
   ["rag:read · rag:write · rag:delete", "Base de conocimiento"],
   ["agents:read · agents:write", "Agentes IA y prueba de prompts (gasta créditos de OpenAI)"],
-  ["*", "Acceso completo"],
+  ["fields:read · fields:write", "Campos personalizados de contactos, empresas y negocios"],
+  ["templates:read · templates:write", "Plantillas de correo y de documentos PDF"],
+  ["settings:read · settings:write", "Configuración de la cuenta: organización, facturación, integraciones, cuentas de correo, lead scoring, checklists y variantes"],
+  ["users:read", "Usuarios de la organización"],
+  ["automations:read · automations:write", "Automatizaciones y campañas masivas"],
+  ["activities:read · activities:write", "Actividades"],
+  ["calendar:read · calendar:write", "Calendario"],
+  ["notifications:read · notifications:write", "Notificaciones"],
+  ["exports:read · exports:write", "Exportaciones"],
+  ["landings:write", "Crear y editar landing pages"],
+  ["*", "Acceso completo (solo el propietario puede crear tokens con este permiso)"],
 ];
 
 const errors = [
-  ["401", "API_TOKEN_MISSING / API_TOKEN_INVALID / API_TOKEN_EXPIRED", "Falta el token, es inválido, expiró o fue revocado."],
+  ["401", "API_TOKEN_MISSING / API_TOKEN_INVALID / API_TOKEN_EXPIRED", "Falta el token, está mal copiado o expiró."],
+  ["401", "API_TOKEN_NOT_FOUND", "El token fue revocado (o renovado: al renovar, el anterior deja de funcionar)."],
   ["401", "API_TOKEN_NOT_ACCEPTED", "Usó un token de API en /api/v1/*, que es la API interna de la app web. Use /api/*."],
   ["403", "INSUFFICIENT_API_PERMISSIONS", "El token no tiene el permiso de la operación (la respuesta lista requiredPermission)."],
   ["403", "ORGANIZATION_ID_MISMATCH", "El header X-Organization-Id (o el query organizationId) no coincide con la organización del token. Es opcional: sin él se usa la del token."],
-  ["403", "PLAN_MODULE_REQUIRED", "El plan de la organización no incluye el módulo API (o el de facturación, en /invoices)."],
-  ["403", "PLAN_LIMIT_REACHED", "Se alcanzó un límite del plan al crear (contactos, cotizaciones, facturas, listas, documentos RAG)."],
+  ["403", "API_ACCESS_DISABLED", "El propietario desactivó tu acceso por API en Configuración → Usuarios → Acceso por API."],
+  ["403", "ACCOUNT_SUSPENDED / ACCOUNT_RESTRICTED", "La cuenta está suspendida o en modo solo lectura (por ejemplo, por el estado del plan)."],
+  ["403", "PERMISSION_NOT_ALLOWED_FOR_ROLE", "Al crear un token: tu rol no puede pedir acceso completo (*) ni permisos de borrar."],
+  ["403", "PLAN_MODULE_REQUIRED", "El plan de la organización no incluye el módulo API (o el de facturación, en /invoices y /purchases)."],
+  ["403", "PLAN_LIMIT_REACHED", "Se alcanzó un límite del plan al crear (contactos, empresas, cotizaciones, facturas, listas, landing pages, documentos RAG)."],
+  ["429", "API_QUOTA_EXCEEDED", "Llegaste al tope por hora de tu usuario. Espera los segundos que indica el header Retry-After."],
   ["400", "—", "Datos inválidos: el cuerpo lleva success:false y error con el motivo."],
   ["400", "INVALID_CITY_CODE", "El cityCode enviado no existe en el catálogo DANE. Ver Ciudades."],
   ["422", "CITY_UNRESOLVED", "La ciudad (texto) es ambigua, está mal escrita o no existe; la respuesta trae candidates para reenviar con cityCode. Ver Ciudades."],
@@ -111,27 +133,41 @@ export default function ApiPage() {
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
             ¿Prefieres que una IA use el CRM en vez de programar contra él? Mira la página de{" "}
             <Link href="/docs/mcp" style={{ color: "#d1345b" }}>MCP</Link>: los mismos módulos expuestos
-            como herramientas para Claude, ChatGPT o Cursor.
+            como herramientas para Claude, Cursor u otros clientes compatibles.
           </p>
           <Callout type="note">
-            La API y el MCP son parte del <strong>módulo API</strong> del plan. Si tu plan no lo
-            incluye, cualquier llamada responde 403 con el código <code>PLAN_MODULE_REQUIRED</code>.
-            Puedes activarlo desde Configuración → Plan.
+            La API y el MCP están incluidos en los planes <strong>Pro</strong> y <strong>Unlimited</strong>.
+            Sin ese plan no puedes crear ni renovar tokens, y las llamadas pueden responder 403 con
+            el código <code>PLAN_MODULE_REQUIRED</code>. Cambia de plan en Configuración → Plan.
           </Callout>
         </section>
 
         <section id="auth" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Autenticación y tokens</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            La API se autentica con <strong style={{ color: "var(--foreground)" }}>tokens de API</strong>,
-            que crea el propietario de la organización en <strong style={{ color: "var(--foreground)" }}>Configuración → Desarrollador → API</strong>:
+            La API se autentica con <strong style={{ color: "var(--foreground)" }}>tokens de API</strong>.
+            Cada usuario (propietario o empleado) crea los suyos en{" "}
+            <strong style={{ color: "var(--foreground)" }}>Configuración → Desarrollador → API</strong> y ve
+            solo los propios; los roles lector y contador no pueden crear tokens:
           </p>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. Pulsa <em>Crear nuevo token</em> y ponle un nombre que diga para qué es (ej. <code>integracion-n8n</code>).</li>
-            <li>2. Elige la expiración: 30 días, 90 días, 1 año o sin expiración.</li>
-            <li>3. Marca los permisos. Hay presets (Solo lectura, Ventas, Acceso completo) o puedes marcarlos uno por uno.</li>
+            <li>1. Pulsa <em>Nuevo token</em> y ponle un nombre que diga para qué es (ej. <code>integracion-n8n</code>).</li>
+            <li>2. Elige la expiración: 30 días, 90 días, 1 año (la opción por defecto) o sin expiración.</li>
+            <li>3. Marca los permisos. Hay grupos rápidos (Solo Lectura, Ventas, Bot de WhatsApp y Acceso Completo, este último solo para el propietario) o puedes marcarlos uno por uno. Pulsa <em>Crear token</em>.</li>
             <li>4. Copia el token: <strong style={{ color: "var(--foreground)" }}>solo se muestra una vez</strong>. Desde la misma pantalla puedes revocarlo cuando quieras.</li>
           </ol>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Si un token está por vencer, usa <em>Renovar token</em>: te entrega uno nuevo por 1 año y el
+            anterior deja de funcionar de inmediato. En la misma pantalla, la pestaña{" "}
+            <em>Endpoints disponibles</em> trae ejemplos listos para copiar y verás cuántas sesiones de
+            Claude (MCP) hay conectadas.
+          </p>
+          <Callout type="note">
+            Solo el propietario puede crear tokens con acceso completo (<code>*</code>) o con permisos de
+            borrar. Desde <strong>Configuración → Usuarios → Acceso por API</strong> el propietario puede,
+            para cada usuario, apagarle la API y el MCP, permitirle borrar por API y ajustar sus topes por
+            hora (ver <a href="#errors" style={{ color: "#d1345b" }}>Errores y límites</a>).
+          </Callout>
           <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>
             Envíalo en cualquiera de los dos headers (basta uno):
           </p>
@@ -155,7 +191,7 @@ export default function ApiPage() {
   -H "Authorization: Bearer <token>"`}</pre>
           </div>
           <div className="rounded-lg p-4 mb-4" style={codeBox}>
-            <p className="text-xs font-semibold mb-2" style={{ color: "var(--muted-foreground)" }}>Ejemplo: crear un contacto (si ya existe por email o celular, responde 200 con el existente)</p>
+            <p className="text-xs font-semibold mb-2" style={{ color: "var(--muted-foreground)" }}>Ejemplo: crear un contacto (si ya existe uno con ese email o celular, se actualiza con los datos enviados y responde 200; si es nuevo, 201)</p>
             <pre className="text-sm overflow-x-auto" style={{ color: "var(--foreground)" }}>{`curl -X POST "${API_BASE}/contacts" \\
   -H "Authorization: Bearer <token>" \\
   -H "Content-Type: application/json" \\
@@ -207,7 +243,7 @@ export default function ApiPage() {
           </div>
           <ul className="space-y-2 pl-4 mb-6" style={{ color: "var(--muted-foreground)" }}>
             <li>• JSON en UTF-8 de ida y vuelta; fechas en ISO 8601.</li>
-            <li>• Listados paginados con <code>page</code> y <code>limit</code> (máximo 1000); la respuesta trae <code>pagination</code> con <code>total</code> y <code>pages</code>.</li>
+            <li>• Listados paginados con <code>page</code> y <code>limit</code> (máximo 1000 en general; algunos listados, como campañas o notificaciones, tienen un tope menor indicado en la referencia); la respuesta trae <code>pagination</code> con <code>total</code> y <code>pages</code>.</li>
             <li>• <code>search</code> es una coincidencia parcial literal, sin distinguir mayúsculas.</li>
             <li>• Los identificadores son ObjectId de 24 caracteres hexadecimales; uno mal formado responde 400.</li>
             <li>• Todo está acotado a la organización del token: un id de otra organización responde 404.</li>
@@ -263,7 +299,9 @@ export default function ApiPage() {
                 En Configuración → Conversaciones, cada columna del pipeline puede llevar una URL.
                 Cuando una conversación entra a esa etapa (desde la app, la API, el MCP o una
                 automatización) FusionCRM hace un POST con el contacto, la etapa anterior y la
-                nueva, el pipeline y quién la movió. Headers <code>X-Fusioncrm-Event</code> y{" "}
+                nueva, el pipeline, el asesor asignado y el origen del movimiento (usuario,
+                automatización o sistema). En la configuración de la etapa ves si el último envío
+                funcionó o el motivo del error. Headers <code>X-Fusioncrm-Event</code> y{" "}
                 <code>X-Fusioncrm-Organization</code>; 10 segundos de espera, sin reintentos ni firma:
                 protege la URL con un secreto en la ruta.
               </p>
@@ -317,10 +355,17 @@ export default function ApiPage() {
             </table>
           </div>
           <p style={{ color: "var(--muted-foreground)" }}>
-            Los límites que aplican son los del plan (contactos, cotizaciones, facturas, listas,
-            documentos de conocimiento), los mismos que en la app. No hay un tope de peticiones por
-            minuto para tokens de API; sé razonable con los listados y usa <code>limit</code> alto en
-            vez de muchas páginas pequeñas.
+            Aplican los límites del plan (contactos, empresas, cotizaciones, facturas, listas,
+            landing pages y documentos de conocimiento), los mismos que en la app.
+          </p>
+          <p className="mt-3" style={{ color: "var(--muted-foreground)" }}>
+            Además, cada usuario que no sea el propietario tiene un <strong style={{ color: "var(--foreground)" }}>tope por hora</strong>,
+            que aplica igual a la API y al MCP: 200 creaciones, 300 ediciones y 30 envíos (WhatsApp o
+            correo), y no puede borrar por API salvo que el propietario lo active (entonces, 20 borrados
+            por hora). Si llega al tope recibe un 429 <code>API_QUOTA_EXCEEDED</code> con el tiempo de
+            espera en <code>Retry-After</code>, y el propietario recibe un aviso. El propietario no tiene
+            topes y puede ajustar los de cada usuario en Configuración → Usuarios → Acceso por API. Las
+            lecturas no tienen tope; aun así, usa <code>limit</code> alto en vez de muchas páginas pequeñas.
           </p>
         </section>
 

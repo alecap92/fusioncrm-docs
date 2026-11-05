@@ -10,7 +10,7 @@ const toc = [
   { id: "overview", label: "Catálogo de productos" },
   { id: "create", label: "Crear producto" },
   { id: "fields", label: "Campos del producto" },
-  { id: "usage", label: "Uso en cotizaciones y deals" },
+  { id: "usage", label: "Uso en cotizaciones y facturas" },
 ];
 
 export default function ProductsPage() {
@@ -21,20 +21,21 @@ export default function ProductsPage() {
         <h1 className="text-3xl font-bold mb-2" style={{ color: "var(--foreground)" }}>Productos</h1>
         <p className="text-lg mb-8" style={{ color: "var(--muted-foreground)" }}>
           El catálogo de productos centraliza todos los bienes y servicios que comercializas,
-          con sus precios, impuestos y descripciones para usar en cotizaciones, deals y facturas.
+          con sus precios, impuestos y descripciones para usar en cotizaciones y facturas.
         </p>
 
         <section id="overview" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Catálogo de productos</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            El catálogo es la base de datos de todos tus productos y servicios. Desde aquí puedes
-            ver, crear, editar y eliminar productos. El catálogo se usa en:
+            El catálogo es la base de datos de todos tus productos y servicios. Lo encuentras en{" "}
+            <strong style={{ color: "var(--foreground)" }}>Negocio → Productos</strong>; ahí puedes ver tus
+            productos en cuadrícula o en lista, buscarlos por nombre o descripción, y crearlos,
+            editarlos o eliminarlos. El catálogo se usa al agregar ítems en:
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Cotizaciones (al agregar ítems)</li>
+            <li>• Cotizaciones</li>
             <li>• Facturas de venta</li>
-            <li>• Deals (para calcular el valor del negocio)</li>
-            <li>• Compras (como ítems comprados)</li>
+            <li>• Notas crédito</li>
           </ul>
         </section>
 
@@ -43,9 +44,9 @@ export default function ProductsPage() {
           <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>Para agregar un producto al catálogo:</p>
           <ol className="space-y-3 mb-6">
             {[
-              { n: "1", t: "Ve a Productos → Nuevo producto", d: "Botón en la esquina superior derecha del catálogo." },
-              { n: "2", t: "Completa el formulario", d: "Nombre, descripción, código, precio y configuración de impuestos." },
-              { n: "3", t: "Configura el IVA", d: "Selecciona el porcentaje de IVA que aplica a este producto: 0%, 5% o 19%." },
+              { n: "1", t: "Ve a Negocio → Productos y pulsa «Nuevo Producto»", d: "Botón en la parte superior del catálogo." },
+              { n: "2", t: "Completa el formulario", d: "Nombre del producto, descripción, código, imagen y precio." },
+              { n: "3", t: "Escribe el impuesto", d: "El porcentaje de impuesto del producto (por ejemplo 19). Si no aplica, déjalo vacío o en 0." },
               { n: "4", t: "Guarda", d: "El producto estará disponible inmediatamente en cotizaciones y facturas." },
             ].map((s) => (
               <li key={s.n} className="flex gap-3">
@@ -72,14 +73,14 @@ export default function ProductsPage() {
               </thead>
               <tbody>
                 {[
-                  ["Nombre", "Nombre del producto o servicio", "Sí"],
-                  ["Código", "Código interno o SKU", "No"],
+                  ["Nombre del producto", "Nombre del producto o servicio", "Sí"],
                   ["Descripción", "Descripción detallada", "No"],
-                  ["Precio unitario", "Precio de venta sin impuestos", "Sí"],
-                  ["IVA", "Porcentaje de IVA aplicable", "Sí"],
-                  ["Unidad de medida", "UND, KG, HR, etc.", "No"],
-                  ["Categoría", "Agrupación del producto", "No"],
-                  ["Activo", "Si aparece en búsquedas", "Sí"],
+                  ["Código", "Código interno o SKU; sale en cotizaciones y facturas", "No"],
+                  ["Imagen", "Enlace (URL) a la foto del producto", "No"],
+                  ["Precio", "Precio de venta sin impuestos", "Sí"],
+                  ["Impuesto", "Porcentaje de impuesto, cualquier valor (ej. 19)", "No"],
+                  ["Precio por cantidad", "Escalas por volumen: desde X unidades, otro precio unitario", "No"],
+                  ["Variantes", "Presentaciones del producto (ej. Color: Rojo, Azul), cada una con su precio e imagen", "No"],
                 ].map(([c, d, r]) => (
                   <tr key={c}>
                     <td className="p-3 border-b font-medium" style={{ borderColor: "var(--border)", color: "var(--foreground)" }}>{c}</td>
@@ -91,19 +92,20 @@ export default function ProductsPage() {
             </table>
           </div>
           <Callout type="tip">
-            Si tienes muchos productos, usa las categorías para organizarlos. Al agregar ítems en
-            una cotización, puedes filtrar por categoría para encontrarlos más rápido.
+            Si un producto tiene varias presentaciones (colores, tamaños), usa Variantes en lugar de
+            crear un producto por cada una. El precio por cantidad lo usan las cotizaciones
+            automáticas: aplican la escala cuyo mínimo no supere la cantidad pedida.
           </Callout>
         </section>
 
         <section id="usage" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Uso en cotizaciones y deals</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Cuando agregas un producto en una cotización o deal, FusionCRM:
+            Cuando agregas un producto en una cotización o factura, FusionCRM:
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
             <li>• Autocompleta el nombre, descripción y precio</li>
-            <li>• Aplica el IVA configurado en el producto automáticamente</li>
+            <li>• Aplica el impuesto configurado en el producto automáticamente</li>
             <li>• Permite modificar el precio para esa transacción específica sin afectar el catálogo</li>
             <li>• Calcula el subtotal y total en tiempo real</li>
           </ul>
@@ -115,7 +117,7 @@ export default function ProductsPage() {
 
         <DocNav
           prev={{ href: "/docs/invoices", title: "Facturación" }}
-          next={{ href: "/docs/reports", title: "Reportes" }}
+          next={{ href: "/docs/shipments", title: "Envíos" }}
         />
       </article>
 
