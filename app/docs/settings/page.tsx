@@ -16,6 +16,8 @@ const toc = [
   { id: "conversations", label: "Conversaciones (pipelines)" },
   { id: "integrations", label: "Integraciones" },
   { id: "email-settings", label: "Cuentas de correo" },
+  { id: "mass-email", label: "Envío masivo" },
+  { id: "email-domains", label: "Dominios" },
   { id: "lead-scoring", label: "Lead Scoring" },
   { id: "mcp", label: "Conectores MCP" },
   { id: "api-keys", label: "Tokens de API" },
@@ -220,9 +222,59 @@ export default function SettingsPage() {
             verificación en dos pasos). Outlook, Hotmail y Microsoft 365 todavía no se pueden conectar.
           </Callout>
           <p className="mt-4" style={{ color: "var(--muted-foreground)" }}>
-            En el mismo grupo Correo están <strong style={{ color: "var(--foreground)" }}>Envío masivo</strong>{" "}
-            (para tus campañas de correo) y <strong style={{ color: "var(--foreground)" }}>Dominios</strong>{" "}
+            En el mismo grupo Correo están <a href="#mass-email" style={{ color: "#d1345b" }}>Envío masivo</a>{" "}
+            (para tus campañas de correo) y <a href="#email-domains" style={{ color: "#d1345b" }}>Dominios</a>{" "}
             (solo el propietario).
+          </p>
+        </section>
+
+        <section id="mass-email" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Envío masivo (remitente de campañas)</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            En <strong style={{ color: "var(--foreground)" }}>Configuración → Correo → Envío masivo</strong> defines cómo
+            se ven tus <a href="/docs/mass-campaigns" style={{ color: "#d1345b" }}>campañas de correo</a> en la bandeja de
+            tus clientes. El envío ya viene en tu plan: no tienes que contratar nada aparte.
+          </p>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Nombre del remitente:</strong> lo primero que ve quien recibe el correo. Si lo dejas vacío, se usa el nombre de tu organización.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Correo del remitente:</strong> ahí llegan las respuestas de tus clientes (ej. ventas@tuempresa.com).</li>
+          </ul>
+          <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>
+            Guarda con <strong style={{ color: "var(--foreground)" }}>Guardar</strong>. Para que las campañas salgan
+            directamente desde ese correo, verifícalo:
+          </p>
+          <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>1. Toca <strong style={{ color: "var(--foreground)" }}>Verificar este correo</strong>. Te llega un enlace a esa bandeja.</li>
+            <li>2. Abre el correo y haz clic en el enlace.</li>
+            <li>3. Vuelve y toca <strong style={{ color: "var(--foreground)" }}>Ya hice clic — actualizar estado</strong>. El estado pasa a <em>Verificado</em>.</li>
+          </ol>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• Solo se pueden verificar correos de tu propio dominio. Con un correo gratuito (Gmail, Hotmail…) la campaña sale a tu nombre con el remitente de la plataforma y las respuestas llegan a tu correo.</li>
+            <li>• Si autenticas tu dominio en <a href="#email-domains" style={{ color: "#d1345b" }}>Dominios</a>, el correo queda cubierto sin verificarlo aparte.</li>
+            <li>• Mientras no esté verificado, las campañas salen a tu nombre con el remitente de la plataforma.</li>
+          </ul>
+        </section>
+
+        <section id="email-domains" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Dominios (autenticar tu dominio)</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            En <strong style={{ color: "var(--foreground)" }}>Configuración → Correo → Dominios</strong> (solo el
+            propietario) autenticas el dominio de tu empresa para que tus campañas salgan firmadas por
+            él, sin el «vía» de la plataforma que muestran algunos correos como Gmail. Mejora la
+            llegada a la bandeja de entrada y no necesitas ninguna cuenta externa: solo poder crear
+            registros DNS donde compraste tu dominio.
+          </p>
+          <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>1. Escribe el <strong style={{ color: "var(--foreground)" }}>Dominio de tu empresa</strong>: lo que va después de la @ en tu correo corporativo (ej. tuempresa.com).</li>
+            <li>2. Toca <strong style={{ color: "var(--foreground)" }}>Autenticar dominio</strong>. Aparecen los registros DNS que debes crear: 3 CNAME (son los que verifican el dominio), un MX y un TXT (completan la configuración del remitente).</li>
+            <li>3. Créalos en tu proveedor de dominio (Cloudflare, GoDaddy, cPanel…) exactamente como aparecen. Cada nombre y valor tiene un botón para copiarlo.</li>
+            <li>4. Toca <strong style={{ color: "var(--foreground)" }}>Verificar ahora</strong>. La detección puede tardar de minutos a horas; puedes cerrar la página y volver luego.</li>
+          </ol>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            El estado te dice en qué va: <em>Verificado</em> (tus correos ya salen firmados por tu
+            dominio), <em>Pendiente</em> (esperando ver los registros) o <em>No se encontraron los
+            registros</em> (revisa que estén creados tal cual). Con el botón «Desconectar dominio» lo
+            quitas, y tus campañas vuelven a salir con el remitente de la plataforma.
           </p>
         </section>
 

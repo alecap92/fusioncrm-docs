@@ -6,7 +6,7 @@ import {
   Home, Users, Briefcase, GitBranch, MessageSquare, Mail, FileText,
   BarChart2, Settings, Code2, Puzzle, Zap, Star, Package, ShoppingCart,
   FileBarChart, Calendar, FolderKanban, ChevronDown, ChevronRight, X, Menu,
-  BookOpen, Send, CreditCard, TrendingUp, LayoutTemplate, Activity } from "lucide-react";
+  BookOpen, Send, CreditCard, TrendingUp, LayoutTemplate, Activity, Library, Target } from "lucide-react";
 
 interface NavItem {
   title: string;
@@ -32,6 +32,7 @@ const navigation: NavItem[] = [
     children: [
       { title: "Directorio de contactos", href: "/docs/contacts" },
       { title: "Crear y editar contactos", href: "/docs/contacts#crud" },
+      { title: "Pestañas de la ficha", href: "/docs/contacts#detail-tabs" },
       { title: "Ciudad y departamento", href: "/docs/contacts#city" },
       { title: "Campos personalizados", href: "/docs/contacts#custom-fields" },
       { title: "Listas y segmentos", href: "/docs/contacts#lists" },
@@ -159,6 +160,14 @@ const navigation: NavItem[] = [
       { title: "Crear factura", href: "/docs/invoices#create" },
       { title: "Recepción de facturas", href: "/docs/invoices#incoming" },
       { title: "Notas crédito", href: "/docs/invoices#credit-notes" },
+      { title: "Notas débito", href: "/docs/invoices#debit-notes" },
+      { title: "Cuentas por cobrar", href: "/docs/invoices#receivables" },
+      { title: "Retenciones del cliente", href: "/docs/invoices#customer-withholdings" },
+      { title: "Documentos soporte", href: "/docs/invoices#support-documents" },
+      { title: "Retenciones a proveedores", href: "/docs/invoices#withholdings-config" },
+      { title: "Certificados de retención", href: "/docs/invoices#certificates" },
+      { title: "Informes de facturación", href: "/docs/invoices#reports" },
+      { title: "Verificador CUFE", href: "/docs/invoices#verify-cufe" },
       { title: "Configuración DIAN", href: "/docs/invoices#config" },
     ],
   },
@@ -218,6 +227,25 @@ const navigation: NavItem[] = [
     ],
   },
   {
+    title: "Biblioteca",
+    icon: <Library size={16} />,
+    children: [
+      { title: "Para qué sirve", href: "/docs/biblioteca" },
+      { title: "Subir archivos", href: "/docs/biblioteca#upload" },
+      { title: "Usar archivos en la IA", href: "/docs/biblioteca#ai" },
+    ],
+  },
+  {
+    title: "Estrategia",
+    icon: <Target size={16} />,
+    children: [
+      { title: "Para qué sirve", href: "/docs/estrategia" },
+      { title: "Funnel de Marketing", href: "/docs/estrategia#funnel" },
+      { title: "Audiencia y buyer persona", href: "/docs/estrategia#audience" },
+      { title: "Palabras Claves", href: "/docs/estrategia#keywords" },
+    ],
+  },
+  {
     title: "Configuración",
     icon: <Settings size={16} />,
     children: [
@@ -226,6 +254,8 @@ const navigation: NavItem[] = [
       { title: "WhatsApp (líneas)", href: "/docs/settings#whatsapp" },
       { title: "Conversaciones (pipelines)", href: "/docs/settings#conversations" },
       { title: "Integraciones", href: "/docs/settings#integrations" },
+      { title: "Envío masivo (remitente)", href: "/docs/settings#mass-email" },
+      { title: "Dominios de correo", href: "/docs/settings#email-domains" },
       { title: "Campos personalizados", href: "/docs/settings#fields" },
       { title: "Lead Scoring config", href: "/docs/settings#lead-scoring" },
       { title: "Seguridad y 2FA", href: "/docs/settings#security" },

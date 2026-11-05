@@ -14,6 +14,14 @@ const toc = [
   { id: "incoming", label: "Recepción de facturas" },
   { id: "credit-notes", label: "Notas crédito" },
   { id: "purchases", label: "Compras" },
+  { id: "debit-notes", label: "Notas débito" },
+  { id: "receivables", label: "Cuentas por cobrar" },
+  { id: "customer-withholdings", label: "Retenciones del cliente" },
+  { id: "support-documents", label: "Documentos soporte" },
+  { id: "withholdings-config", label: "Retenciones a proveedores" },
+  { id: "certificates", label: "Certificados de retención" },
+  { id: "reports", label: "Informes" },
+  { id: "verify-cufe", label: "Verificador CUFE" },
 ];
 
 export default function InvoicesPage() {
@@ -57,12 +65,12 @@ export default function InvoicesPage() {
             En el menú <strong style={{ color: "var(--foreground)" }}>Facturación</strong> también encuentras:
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Notas débito</strong>, para cobrar un valor adicional sobre una factura emitida.</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Cuentas por cobrar</strong>: lo que te deben tus clientes. Desde la lista de facturas usa «Registrar pago» para anotar pagos y abonos.</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Documentos Soporte</strong>, para compras a quien no factura electrónicamente.</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Certificados de retención</strong> y las retenciones que te practicó cada cliente en sus facturas (se configuran en Configuración → Facturación → Retenciones).</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Verificador CUFE</strong>, para consultar una factura electrónica por su CUFE.</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Informes</strong> de facturación, visibles solo para el propietario y el contador.</li>
+            <li>• <a href="#debit-notes" style={{ color: "#d1345b" }}>Notas débito</a>, para cobrar un valor adicional sobre una factura emitida.</li>
+            <li>• <a href="#receivables" style={{ color: "#d1345b" }}>Cuentas por cobrar</a>: lo que te deben tus clientes. Desde la lista de facturas usa «Registrar pago» para anotar pagos y abonos.</li>
+            <li>• <a href="#support-documents" style={{ color: "#d1345b" }}>Documentos Soporte</a>, para compras a quien no factura electrónicamente.</li>
+            <li>• <a href="#certificates" style={{ color: "#d1345b" }}>Certificados de retención</a> y las retenciones que te practicó cada cliente en sus facturas (se configuran en Configuración → Facturación → Retenciones).</li>
+            <li>• <a href="#verify-cufe" style={{ color: "#d1345b" }}>Verificador CUFE</a>, para consultar una factura electrónica por su CUFE.</li>
+            <li>• <a href="#reports" style={{ color: "#d1345b" }}>Informes</a> de facturación, visibles solo para el propietario y el contador.</li>
           </ul>
         </section>
 
@@ -212,6 +220,193 @@ export default function InvoicesPage() {
             <li>• Importa compras masivamente desde Excel/CSV con «Importar»</li>
             <li>• Genera reportes de compras por proveedor y período</li>
           </ul>
+        </section>
+
+        <section id="debit-notes" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Notas débito</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            La nota débito es lo contrario de la nota crédito: aumenta el valor de una factura ya
+            emitida, por ejemplo para cobrar intereses o un gasto que no incluiste. También se envía a
+            la DIAN.
+          </p>
+          <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>1. Ve a <strong style={{ color: "var(--foreground)" }}>Facturación → Notas débito</strong> y haz clic en <strong style={{ color: "var(--foreground)" }}>Nueva</strong>.</li>
+            <li>2. Selecciona la factura a la que aplica.</li>
+            <li>3. Elige el motivo de la lista oficial de la DIAN: <em>Intereses</em>, <em>Gastos por cobrar</em> o <em>Cambio del valor</em>.</li>
+            <li>4. Agrega las líneas con el valor adicional y emite. La numeración usa el prefijo de notas débito de tu configuración (por defecto ND).</li>
+          </ol>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Igual que la nota crédito, una vez emitida no se puede modificar ni eliminar.
+          </p>
+        </section>
+
+        <section id="receivables" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Cuentas por cobrar</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <strong style={{ color: "var(--foreground)" }}>Facturación → Cuentas por cobrar</strong> es tu cartera: toda
+            factura de venta emitida, de contado o a crédito, aparece aquí hasta que registres su pago.
+            Las de contado vencen el mismo día en que se emiten.
+          </p>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Antigüedad:</strong> arriba ves cuánto te deben y en cuántas facturas, por tramos: <em>Al día</em>, <em>1 a 30 días</em>, <em>31 a 60 días</em>, <em>61 a 90 días</em> y <em>Más de 90 días</em> de vencidas. Los tramos vencidos con saldo se resaltan en rojo.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Filtro:</strong> <em>Con saldo</em> (por defecto), <em>Solo vencidas</em>, <em>Solo abonadas</em>, <em>Solo pendientes</em>, <em>Anuladas por nota crédito</em> o <em>Todas</em>.</li>
+            <li>• La tabla muestra factura, cliente, si es de contado o crédito, fecha de vencimiento, total, saldo y estado. Clic en el número te lleva a la factura.</li>
+          </ul>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Registrar un pago o un abono</h3>
+          <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>1. En la fila de la factura, haz clic en <strong style={{ color: "var(--foreground)" }}>Registrar pago</strong> (también está en el menú de la factura en la lista de Facturas).</li>
+            <li>2. Revisa el resumen: Total, Retenido, Neto a cobrar, Abonado y Saldo.</li>
+            <li>3. Escribe la <strong style={{ color: "var(--foreground)" }}>Fecha</strong> y el <strong style={{ color: "var(--foreground)" }}>Valor</strong>, o usa <strong style={{ color: "var(--foreground)" }}>Registrar pago total</strong> para llenar el saldo completo. Elige la <strong style={{ color: "var(--foreground)" }}>Forma de pago</strong> y, si quieres, una referencia (comprobante, cuenta a la que entró) y una nota.</li>
+            <li>4. Haz clic en <strong style={{ color: "var(--foreground)" }}>Guardar pago</strong>. Si el pago cubre el saldo, la factura sale de la cartera; si es parcial, queda como abonada.</li>
+          </ol>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            En la misma ventana ves los <strong style={{ color: "var(--foreground)" }}>Abonos registrados</strong>. Si
+            anotaste uno mal, elimínalo con su botón y vuelve a registrarlo. Las facturas rechazadas,
+            anuladas o en borrador no se pueden cobrar.
+          </p>
+        </section>
+
+        <section id="customer-withholdings" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Retenciones que te aplica el cliente</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Cuando un cliente te paga una factura descontando retenciones (ReteFuente, ReteIVA,
+            ReteICA), anótalas para que la cartera cuadre con lo que realmente te consignó:
+          </p>
+          <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>1. En <strong style={{ color: "var(--foreground)" }}>Facturación → Facturas</strong>, abre el menú de la factura y elige <strong style={{ color: "var(--foreground)" }}>Aplicar retenciones</strong>.</li>
+            <li>2. Arriba ves la base sin IVA, el IVA y el total de la factura.</li>
+            <li>3. Elige el <strong style={{ color: "var(--foreground)" }}>Concepto</strong> que aplicó el cliente y toca <strong style={{ color: "var(--foreground)" }}>Agregar</strong>. El monto se sugiere con el porcentaje del concepto y lo puedes ajustar al comprobante del cliente.</li>
+            <li>4. Revisa el <strong style={{ color: "var(--foreground)" }}>Neto que consigna el cliente</strong> y toca <strong style={{ color: "var(--foreground)" }}>Aplicar</strong>.</li>
+          </ol>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            La columna <strong style={{ color: "var(--foreground)" }}>Retenciones</strong> de la lista muestra lo
+            aplicado. Para corregir, usa <strong style={{ color: "var(--foreground)" }}>Editar retenciones</strong> en el
+            mismo menú, o <strong style={{ color: "var(--foreground)" }}>Quitar retenciones</strong>. La ReteIVA no puede
+            superar el IVA, y el total retenido no puede superar la base más el IVA.
+          </p>
+        </section>
+
+        <section id="support-documents" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Documentos soporte</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Cuando le compras a alguien que no está obligado a facturar (una persona natural, un
+            pequeño proveedor), tú emites el documento soporte electrónico para poder llevar esa
+            compra como costo o gasto. Se manejan en{" "}
+            <strong style={{ color: "var(--foreground)" }}>Facturación → Documentos Soporte</strong>, y su resolución
+            se configura en la pestaña <em>Doc Soporte</em> de la <a href="#config" style={{ color: "#d1345b" }}>configuración DIAN</a>.
+          </p>
+          <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>1. Haz clic en <strong style={{ color: "var(--foreground)" }}>Nuevo Documento Soporte</strong>.</li>
+            <li>2. En <strong style={{ color: "var(--foreground)" }}>Proveedor</strong>, toca <strong style={{ color: "var(--foreground)" }}>Seleccionar</strong> y elige al proveedor de tus contactos. Si el contacto tiene empresa vinculada, puedes emitir a nombre de la persona o de la empresa.</li>
+            <li>3. Revisa el encabezado (prefijo, número, resolución DIAN, tarifa ICA y actividad económica).</li>
+            <li>4. Agrega las líneas con <strong style={{ color: "var(--foreground)" }}>Agregar línea</strong>: descripción, cantidad y valor unitario.</li>
+            <li>5. Llena <strong style={{ color: "var(--foreground)" }}>Fechas y Pago</strong> (fecha, fecha de pago y método de pago) y, si quieres, el <strong style={{ color: "var(--foreground)" }}>Concepto</strong>: la línea del estado de resultados donde cae ese gasto (honorarios, arriendo…). El concepto también se puede poner después desde la lista.</li>
+            <li>6. Haz clic en <strong style={{ color: "var(--foreground)" }}>Guardar</strong>: el documento se envía a la DIAN. Si la DIAN lo rechaza, te muestra el motivo.</li>
+          </ol>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Desde el menú de cada documento puedes <strong style={{ color: "var(--foreground)" }}>Descargar PDF</strong>,{" "}
+            <strong style={{ color: "var(--foreground)" }}>Descargar XML</strong> o <strong style={{ color: "var(--foreground)" }}>Enviar por correo</strong> al
+            proveedor. Un documento ya validado por la DIAN no se puede eliminar.
+          </p>
+        </section>
+
+        <section id="withholdings-config" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Configurar las retenciones a proveedores</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            En <strong style={{ color: "var(--foreground)" }}>Configuración → Facturación → Retenciones</strong> defines
+            las tarifas con las que FusionCRM calcula lo que le retienes a cada proveedor en tus{" "}
+            <a href="#purchases" style={{ color: "#d1345b" }}>compras</a>. Conviene llenarla con tu contador.
+          </p>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Año gravable:</strong> la configuración es por año, porque la UVT y las tarifas cambian. Así el certificado de un año pasado se sigue generando con las tarifas de ese año.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Valor de la UVT:</strong> sin este dato ninguna compra calcula retenciones (a propósito: un cero se confundiría con «no había que retener»).</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Ciudad:</strong> el municipio del ICA, que también sale en el certificado.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Qué retenciones practicas:</strong> activa ReteFuente, ReteIVA (solo si eres agente retenedor de IVA) y ReteICA (por mil, según el municipio).</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Conceptos:</strong> cada concepto (ej. «Servicios generales») tiene su porcentaje y su base mínima en UVT. Agrega los tuyos con <strong style={{ color: "var(--foreground)" }}>Agregar concepto</strong>.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Excepciones por proveedor:</strong> los proveedores con un trato especial (autorretenedor, sin ICA, no responsable de IVA o un concepto fijo), identificados por NIT. Desde aquí los ves y los quitas.</li>
+          </ul>
+          <Callout type="warning" title="Tabla en borrador">
+            Mientras la tabla del año esté en borrador, el cálculo de retenciones en lote no guarda
+            nada. Apruébala con el interruptor cuando tu contador confirme las tarifas; ahí queda como
+            «Tabla aprobada» y se puede aplicar a las compras del año.
+          </Callout>
+        </section>
+
+        <section id="certificates" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Certificados de retención</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            En <strong style={{ color: "var(--foreground)" }}>Facturación → Certificados de retención</strong> ves lo que
+            le retuviste a cada proveedor durante el año, listo para expedir sus certificados (se
+            entregan antes del 31 de marzo del año siguiente).
+          </p>
+          <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>1. Elige el <strong style={{ color: "var(--foreground)" }}>Año gravable</strong>.</li>
+            <li>2. Arriba ves el Total retenido y su desglose en ReteFuente, ReteIVA y ReteICA. La tabla lo muestra por proveedor, con el número de compras.</li>
+            <li>3. Busca al proveedor por nombre o NIT y haz clic en <strong style={{ color: "var(--foreground)" }}>Certificado</strong>: se descarga el PDF listo para enviarle.</li>
+          </ol>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Desde una compra también puedes ir directo al certificado de su proveedor con{" "}
+            <strong style={{ color: "var(--foreground)" }}>Certificado del proveedor</strong>.
+          </p>
+        </section>
+
+        <section id="reports" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Informes de facturación</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <strong style={{ color: "var(--foreground)" }}>Facturación → Informes</strong> es el cierre del periodo para
+            tu contador: ventas, compras, IVA y documentos emitidos. Solo lo ven el propietario y el
+            contador.
+          </p>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Periodo:</strong> Este mes, Mes pasado, Últimos 3 meses, Este año o Personalizado (Desde / Hasta).</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Ventas netas:</strong> facturas menos notas crédito, más notas débito, con base e IVA.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Compras:</strong> facturas de proveedores y documentos soporte.</li>
+            <li>• También ves los documentos del periodo (y si hubo rechazados), las retenciones, el recaudo del periodo, lo vencido de la cartera, los documentos por tipo y los clientes con más facturación.</li>
+            <li>• El propietario ve además el <strong style={{ color: "var(--foreground)" }}>Estado de resultados</strong>: ingresos, costos y gastos por concepto, y el resultado del mes.</li>
+          </ul>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Para exportar, elige el <strong style={{ color: "var(--foreground)" }}>Informe a exportar</strong> y toca{" "}
+            <strong style={{ color: "var(--foreground)" }}>Descargar Excel</strong>. Opciones: Resumen del periodo (todo),
+            que trae el resumen contable y una hoja por tipo de documento; Facturas de venta; Notas
+            crédito; Notas débito; Documentos soporte; Facturas de proveedores; y Estado de resultados
+            (solo el propietario).
+          </p>
+        </section>
+
+        <section id="verify-cufe" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Verificador CUFE</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Con <strong style={{ color: "var(--foreground)" }}>Facturación → Verificador CUFE</strong> le preguntas a la
+            DIAN si una factura electrónica, nota crédito o nota débito es válida. Sirve para cualquier
+            documento, no solo los tuyos: por ejemplo, para revisar la factura de un proveedor antes de
+            pagarla.
+          </p>
+          <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>1. Pega el <strong style={{ color: "var(--foreground)" }}>CUFE o CUDE</strong> (96 caracteres, números y letras de la A a la F), o toca <strong style={{ color: "var(--foreground)" }}>Subir XML/ZIP</strong> y elige el archivo que te mandó el proveedor. El archivo se lee en tu navegador y solo se envía el CUFE.</li>
+            <li>2. Haz clic en <strong style={{ color: "var(--foreground)" }}>Verificar en la DIAN</strong>.</li>
+          </ol>
+          <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>El resultado te dice una de estas cosas:</p>
+          <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Válida ante la DIAN</strong>, o <strong style={{ color: "var(--foreground)" }}>Válida, con notas crédito/débito</strong> que pueden cambiar su valor.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Rechazada por la DIAN</strong>: no tiene validez fiscal.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>La DIAN no la encuentra</strong>: revisa que el CUFE esté completo o pídele al emisor el documento correcto.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>En proceso en la DIAN</strong>: vuelve a consultar en unos minutos.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>No se pudo determinar</strong>: revisa el detalle o consúltala en el portal de la DIAN.</li>
+          </ul>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            También ves el tipo de documento, la fecha de emisión, el emisor, el adquiriente, el total,
+            su relación con tu empresa (<em>La emitiste tú</em>, <em>Es una compra tuya</em> o <em>De terceros</em>),
+            sus notas crédito o débito y los eventos RADIAN (acuse de recibo, aceptación…). Los botones{" "}
+            <strong style={{ color: "var(--foreground)" }}>Copiar CUFE</strong> y <strong style={{ color: "var(--foreground)" }}>Ver en el portal DIAN</strong> te
+            ayudan a compartirla, y si el documento ya está en el CRM, te lleva a él.
+          </p>
+          <Callout type="tip">
+            No tienes que copiar el CUFE a mano: en las listas de Facturas, Notas crédito y Recepción de
+            facturas, el menú de cada documento tiene <strong>Verificar en la DIAN</strong>.
+          </Callout>
+          <Callout type="note">
+            Para consultar la DIAN tu organización necesita tener la facturación electrónica configurada.
+          </Callout>
         </section>
 
         <DocNav

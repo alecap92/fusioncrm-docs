@@ -155,7 +155,7 @@ export default function AgentesIaPage() {
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Base de conocimiento</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
             Sube catálogos, listas de precios, políticas o preguntas frecuentes en la{" "}
-            <strong>Biblioteca</strong>, marcando la casilla <strong>«Utilizar para modelos de IA (RAG)»</strong>,
+            <Link href="/docs/biblioteca" style={{ color: "#d1345b" }}><strong>Biblioteca</strong></Link>, marcando la casilla <strong>«Utilizar para modelos de IA (RAG)»</strong>,
             y activa <strong>🧠 Habilitar uso de RAG</strong> en el agente. (Subir el contenido como
             texto solo se puede por API o MCP.) El agente busca en ellos por
             significado, no por palabra exacta, y responde citando lo que encontró. El mismo buscador

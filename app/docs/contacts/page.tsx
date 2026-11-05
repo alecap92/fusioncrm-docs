@@ -13,6 +13,7 @@ const toc = [
   { id: "create", label: "Crear contacto", depth: 3 },
   { id: "edit", label: "Editar contacto", depth: 3 },
   { id: "delete", label: "Eliminar contacto", depth: 3 },
+  { id: "detail-tabs", label: "Pestañas de la ficha" },
   { id: "city", label: "Ciudad y departamento" },
   { id: "custom-fields", label: "Campos personalizados" },
   { id: "lists", label: "Listas y segmentos" },
@@ -177,6 +178,18 @@ export default function ContactsPage() {
               <strong>no</strong> se eliminan: siguen en el sistema sin ese contacto asociado.
             </Callout>
           </div>
+        </section>
+
+        <section id="detail-tabs" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Pestañas de la ficha</h2>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Actividad:</strong> la historia completa del contacto en orden: negocios, cotizaciones, facturas, envíos de paquetes, actividades, conversaciones, citas del calendario, campañas y correos o WhatsApp enviados. Puedes buscar dentro de ella («Buscar en actividad...») y filtrar por tipo. Con <strong style={{ color: "var(--foreground)" }}>Nueva actividad</strong> registras a mano una Reunión, Llamada, Correo, Nota o WhatsApp.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Negocios</strong> y <strong style={{ color: "var(--foreground)" }}>Cotizaciones:</strong> los del contacto.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Archivos:</strong> documentos propios del contacto (un contrato firmado, el RUT, una foto). Súbelos con el botón <strong style={{ color: "var(--foreground)" }}>+</strong>; haz clic en el nombre para verlos y en la X para borrarlos.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Notas:</strong> un espacio de texto libre sobre el contacto. Escribe y toca <strong style={{ color: "var(--foreground)" }}>Guardar</strong>; si tienes cambios sin guardar, la pestaña te avisa.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Imprimir:</strong> documentos PDF rellenados con sus datos (ver <a href="/docs/settings#plantillas-pdf" style={{ color: "#d1345b" }}>Plantillas PDF</a>).</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Facturas</strong> y <strong style={{ color: "var(--foreground)" }}>Envíos:</strong> solo si tienes esos módulos (ver <a href="/docs/invoices" style={{ color: "#d1345b" }}>Facturación</a> y <a href="/docs/envios#app" style={{ color: "#d1345b" }}>Envíos</a>).</li>
+          </ul>
         </section>
 
         <section id="city" className="mb-10">
