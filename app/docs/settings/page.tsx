@@ -372,6 +372,11 @@ export default function SettingsPage() {
             Funciona muy bien para rótulos de envío: crea una etapa <code style={{ color: "#d1345b" }}>destinatario</code> con nombre, dirección,
             ciudad y teléfono, y tendrás el rótulo listo con un clic desde cada cliente.
           </Callout>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Una plantilla PDF no genera guía ni avisa a ninguna transportadora. Para cotizar, generar la
+            guía oficial e imprimir su etiqueta, usa el módulo{" "}
+            <a href="/docs/shipments" style={{ color: "#d1345b" }}>Envíos</a> (con tu cuenta de Envia.com).
+          </p>
         </section>
 
         <section id="import-history" className="mb-10">
@@ -407,7 +412,7 @@ export default function SettingsPage() {
         </section>
 
         <DocNav
-          prev={{ href: "/docs/projects", title: "Proyectos" }}
+          prev={{ href: "/docs/estrategia", title: "Estrategia" }}
           next={{ href: "/docs/team-activity", title: "Actividad del equipo" }}
         />
       </article>

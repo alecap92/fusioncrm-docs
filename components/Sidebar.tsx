@@ -6,7 +6,7 @@ import {
   Home, Users, Briefcase, GitBranch, MessageSquare, Mail, FileText,
   BarChart2, Settings, Code2, Puzzle, Zap, Star, Package, ShoppingCart,
   FileBarChart, Calendar, FolderKanban, ChevronDown, ChevronRight, X, Menu,
-  BookOpen, Send, CreditCard, TrendingUp, LayoutTemplate, Activity, Library, Target } from "lucide-react";
+  BookOpen, Send, CreditCard, TrendingUp, LayoutTemplate, Activity, Library, Target, Truck } from "lucide-react";
 
 interface NavItem {
   title: string;
@@ -99,6 +99,7 @@ const navigation: NavItem[] = [
     icon: <MessageSquare size={16} />,
     children: [
       { title: "Vista general", href: "/docs/conversations" },
+      { title: "Cómo escribirle a un cliente (WhatsApp)", href: "/docs/conversations#iniciar-whatsapp" },
       { title: "Tipos de mensajes", href: "/docs/conversations#message-types" },
       { title: "WhatsApp", href: "/docs/conversations#whatsapp" },
       { title: "Respuestas rápidas", href: "/docs/conversations#quick-replies" },
@@ -177,6 +178,20 @@ const navigation: NavItem[] = [
     children: [
       { title: "Catálogo de productos", href: "/docs/products" },
       { title: "Crear producto", href: "/docs/products#create" },
+    ],
+  },
+  {
+    title: "Envíos",
+    icon: <Truck size={16} />,
+    children: [
+      { title: "Qué puedes hacer", href: "/docs/shipments" },
+      { title: "Antes de empezar", href: "/docs/shipments#setup" },
+      { title: "Cotizar y generar una guía", href: "/docs/shipments#quote" },
+      { title: "Estados del envío", href: "/docs/shipments#statuses" },
+      { title: "Rastrear, etiqueta y cancelar", href: "/docs/shipments#actions" },
+      { title: "Configuración de envíos", href: "/docs/shipments#settings" },
+      { title: "Etiquetas y rótulos", href: "/docs/shipments#labels" },
+      { title: "Errores comunes", href: "/docs/shipments#errors" },
     ],
   },
   {
@@ -288,8 +303,7 @@ const navigation: NavItem[] = [
       { title: "Webhooks salientes", href: "/docs/api#webhooks" },
       { title: "Errores y límites", href: "/docs/api#errors" },
       { title: "Ciudades (catálogo DANE)", href: "/docs/ciudades" },
-      { title: "Envíos (Envia.com)", href: "/docs/envios" },
-      { title: "Envíos desde la app", href: "/docs/envios#app" },
+      { title: "Envíos por API", href: "/docs/envios" },
     ],
   },
   {

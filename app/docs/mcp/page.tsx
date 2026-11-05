@@ -366,7 +366,7 @@ export default function McpPage() {
         </section>
 
         <DocNav
-          prev={{ href: "/docs/envios", title: "Envíos (Envia.com)" }}
+          prev={{ href: "/docs/envios", title: "Envíos por API (Envia.com)" }}
           next={{ href: "/docs/integrations", title: "Integraciones" }}
         />
       </article>

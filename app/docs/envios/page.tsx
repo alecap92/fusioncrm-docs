@@ -5,7 +5,10 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import TableOfContents from "@/components/TableOfContents";
 import DocNav from "@/components/DocNav";
 
-export const metadata: Metadata = { title: "Envíos (Envia.com)" };
+export const metadata: Metadata = {
+  title: "Envíos por API (Envia.com)",
+  description: "Cotiza, genera, rastrea y cancela guías de Envia.com por la API REST de FusionCRM: endpoints, permisos, idempotencia y errores.",
+};
 
 const API_BASE = "https://api.fusioncol.com/api";
 
@@ -61,11 +64,15 @@ export default function EnviosPage() {
     <div className="flex gap-8 max-w-6xl mx-auto px-6 py-10">
       <article className="flex-1 min-w-0">
         <Breadcrumbs />
-        <h1 className="text-3xl font-bold mb-2" style={strong}>Envíos (Envia.com)</h1>
+        <h1 className="text-3xl font-bold mb-2" style={strong}>Envíos por API (Envia.com)</h1>
+        <Callout type="note" title="¿Usas la app?">
+          Esta página es para integraciones por API. Si quieres cotizar y generar guías desde la ficha
+          del contacto, mira <Link href="/docs/shipments" style={{ color: "#d1345b" }}>Envíos</Link>.
+        </Callout>
         <p className="text-lg mb-8" style={muted}>
           Cotiza y genera guías de Coordinadora, Servientrega, TCC, Inter Rapidísimo y otras
-          transportadoras desde un contacto, a través de tu cuenta de Envia.com. Puedes hacerlo desde
-          la app o por API; el detalle de cada campo está en la{" "}
+          transportadoras desde un contacto, a través de tu cuenta de Envia.com, llamando a la API
+          REST de FusionCRM. El detalle de cada campo está en la{" "}
           <Link href="/docs/api#reference" style={{ color: "#d1345b" }}>referencia</Link> (sección Shipments).
         </p>
 
@@ -84,11 +91,13 @@ export default function EnviosPage() {
 
         <section id="app" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={strong}>Desde la app</h2>
-          <ul className="space-y-2 pl-4 mb-4" style={muted}>
-            <li>• Abre el contacto, ve a la pestaña <strong style={strong}>Envíos</strong> y pulsa <strong style={strong}>Cotizar envío</strong>. El asistente te lleva por destino, paquete, tarifas de cada transportadora y extras (seguro, contra entrega si el servicio lo admite, recogida) hasta generar la guía.</li>
-            <li>• En el menú ⋮ de cada envío puedes <strong style={strong}>Rastrear</strong>, abrir la <strong style={strong}>Etiqueta</strong>, <strong style={strong}>Copiar número de guía</strong> o <strong style={strong}>Cancelar guía</strong>.</li>
-            <li>• En <strong style={strong}>Configuración → Envíos</strong> defines la dirección de origen, el entorno (<em>Sandbox</em> para pruebas, con tarifas simuladas y guías no reales, o <em>Producción</em>, que cobra saldo real), el formato de etiqueta (PDF para impresora normal o ZPL para térmicas), el contenido por defecto, tus paquetes predefinidos y el webhook de Envia.com para recibir el rastreo.</li>
-          </ul>
+          <p className="mb-4" style={muted}>
+            Lo mismo se hace sin código desde la pestaña <strong style={strong}>Envíos</strong> del
+            contacto, y la configuración (origen, entorno, formato de etiqueta, paquetes y webhook)
+            vive en Configuración → Envíos. Todo eso está explicado paso a paso en{" "}
+            <Link href="/docs/shipments" style={{ color: "#d1345b" }}>Envíos</Link>. Los envíos que
+            generes por API aparecen ahí igual.
+          </p>
         </section>
 
         <section id="setup" className="mb-10">

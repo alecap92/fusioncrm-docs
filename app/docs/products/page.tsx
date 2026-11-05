@@ -117,7 +117,7 @@ export default function ProductsPage() {
 
         <DocNav
           prev={{ href: "/docs/invoices", title: "Facturación" }}
-          next={{ href: "/docs/reports", title: "Reportes" }}
+          next={{ href: "/docs/shipments", title: "Envíos" }}
         />
       </article>
 

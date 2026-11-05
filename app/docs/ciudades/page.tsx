@@ -265,7 +265,7 @@ export default function CiudadesPage() {
 
         <DocNav
           prev={{ href: "/docs/api", title: "API REST" }}
-          next={{ href: "/docs/envios", title: "Envíos (Envia.com)" }}
+          next={{ href: "/docs/envios", title: "Envíos por API (Envia.com)" }}
         />
       </article>
 

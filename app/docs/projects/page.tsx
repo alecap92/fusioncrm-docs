@@ -99,7 +99,7 @@ export default function ProjectsPage() {
 
         <DocNav
           prev={{ href: "/docs/calendar", title: "Calendario" }}
-          next={{ href: "/docs/settings", title: "Configuración" }}
+          next={{ href: "/docs/biblioteca", title: "Biblioteca" }}
         />
       </article>
 

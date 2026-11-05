@@ -133,7 +133,7 @@ export default function ReportsPage() {
         </section>
 
         <DocNav
-          prev={{ href: "/docs/products", title: "Productos" }}
+          prev={{ href: "/docs/shipments", title: "Envíos" }}
           next={{ href: "/docs/lead-scoring", title: "Lead Scoring" }}
         />
       </article>
