@@ -304,7 +304,7 @@ const navigation: NavItem[] = [
       { title: "Historial de importaciones", href: "/docs/settings#import-history" },
       { title: "Conectores MCP", href: "/docs/settings#mcp" },
       { title: "Tokens de API", href: "/docs/settings#api-keys" },
-      { title: "Plan, asientos y módulos", href: "/docs/settings#plan" },
+      { title: "Plan, precios y usuarios", href: "/docs/settings#plan" },
     ],
   },
   {

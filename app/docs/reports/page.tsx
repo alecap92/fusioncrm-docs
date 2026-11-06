@@ -43,6 +43,10 @@ export default function ReportsPage() {
           <strong style={{ color: "var(--foreground)" }}>Negocio → Informes</strong>.
         </p>
 
+        <Callout type="note" title="Plan">
+          Los reportes personalizados y la previsión de ventas vienen en los planes Pro y Empresarial.
+        </Callout>
+
         <section id="overview" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Mis Reportes</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>

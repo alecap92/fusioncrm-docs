@@ -104,7 +104,7 @@ export default function GettingStartedPage() {
           </p>
           <ol className="space-y-4 mb-6">
             {[
-              { n: "1", title: "Abre la página de registro", desc: 'Entra a app.fusioncol.com y toca "Crear cuenta gratis".' },
+              { n: "1", title: "Abre la página de registro", desc: 'Entra a app.fusioncol.com y toca el enlace para crear tu cuenta. Empiezas con 14 días gratis del plan Básico, sin tarjeta y con un solo usuario.' },
               { n: "2", title: "Ingresa tus datos", desc: 'Escribe tu nombre, apellido, correo, teléfono y una contraseña de al menos 8 caracteres con una mayúscula y un número. También puedes usar "Continuar con Google".' },
               { n: "3", title: "Acepta los términos", desc: 'Marca la casilla de Términos y Condiciones, Política de Privacidad y Política de Garantía y SLA, y toca "Crear cuenta". Entras al CRM de una vez, sin correo de verificación.' },
               { n: "4", title: "Completa los datos de tu empresa", desc: "Ve a Configuración → Organización y llena el nombre, NIT, logo y dirección de tu empresa." },

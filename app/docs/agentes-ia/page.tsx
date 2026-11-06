@@ -60,6 +60,7 @@ export default function AgentesIaPage() {
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
             <li>• Vive en <strong style={{ color: "var(--foreground)" }}>Configuración → Automatización → Agentes IA</strong>.</li>
+            <li>• Viene en los planes <strong style={{ color: "var(--foreground)" }}>Pro</strong> y <strong style={{ color: "var(--foreground)" }}>Empresarial</strong>. La IA no la ponemos nosotros: conectas tu propia clave del proveedor y pagas su consumo directamente.</li>
             <li>• Tiene tres estados: <em>borrador</em>, <em>activo</em> y <em>pausado</em>. Solo el activo responde a clientes.</li>
             <li>• Para que tome las conversaciones nuevas, ve a <strong style={{ color: "var(--foreground)" }}>Configuración → WhatsApp</strong>, abre la línea (número) que debe atender y elige el agente. También puedes asignarle conversaciones a mano desde la bandeja.</li>
             <li>• Si el cliente manda varios mensajes seguidos, el agente espera unos segundos (8 por defecto) y los responde todos de una vez.</li>
@@ -178,8 +179,8 @@ export default function AgentesIaPage() {
             <Link href="/docs/mcp" style={{ color: "#d1345b" }}>MCP</Link>.
           </p>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Cada plan tiene un tope de documentos: Free 10 documentos (20 MB), Pro 100 documentos
-            (200 MB) y Unlimited sin límite.
+            Cada plan tiene un tope de documentos: Básico 10 documentos (20 MB), Pro 100 documentos
+            (200 MB) y Empresarial sin límite.
           </p>
           <Callout type="warning">
             Un documento partido a la mitad (por ejemplo una tabla de precios muy larga) puede
@@ -206,6 +207,7 @@ export default function AgentesIaPage() {
             <li>• Puedes poner hasta 30 palabras de traspaso, y el mensaje al derivar tiene máximo 400 caracteres.</li>
             <li>• Para que el agente entienda las notas de voz, conecta <strong style={{ color: "var(--foreground)" }}>ElevenLabs</strong> con tu API key en Configuración → Desarrollador → Integraciones: los audios se transcriben antes de llegar al agente.</li>
             <li>• El agente respeta la ventana de 24 horas de WhatsApp: solo responde a conversaciones con un mensaje reciente del cliente.</li>
+            <li>• Si tu plan deja de incluir agentes (por ejemplo, al bajar a Básico) o la cuenta queda en pausa por una prueba o un plan vencido, los agentes dejan de responder: los mensajes siguen entrando a la bandeja para que los atienda una persona. Tus agentes no se borran; puedes verlos, pero no crearlos, editarlos ni activarlos hasta volver a un plan que los incluya.</li>
           </ul>
         </section>
 

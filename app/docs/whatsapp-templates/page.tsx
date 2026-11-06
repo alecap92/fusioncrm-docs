@@ -306,7 +306,7 @@ export default function WhatsAppTemplatesPage() {
             Todo lo que haces en la pantalla de Templates también se puede hacer por la{" "}
             <a href="/docs/api" style={{ color: "#d1345b" }}>API REST</a> (permiso{" "}
             <code style={{ color: "#d1345b" }}>whatsapp:send</code>) o pidiéndoselo a tu IA por{" "}
-            <a href="/docs/mcp" style={{ color: "#d1345b" }}>MCP</a> (planes Pro y Unlimited):
+            <a href="/docs/mcp" style={{ color: "#d1345b" }}>MCP</a> (planes Pro y Empresarial):
           </p>
           <div className="rounded-lg overflow-hidden border mb-4" style={{ borderColor: "var(--border)" }}>
             <table className="w-full text-sm">

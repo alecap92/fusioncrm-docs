@@ -42,6 +42,10 @@ export default function CompaniesPage() {
           facturas, y el historial comercial sobrevive aunque cambie la persona que te atiende.
         </p>
 
+        <Callout type="note" title="Plan">
+          Cuántas empresas puedes tener depende de tu plan: 2.000 en Básico, 10.000 en Pro y 50.000 en Empresarial.
+        </Callout>
+
         <section id="overview" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Personas y cuentas</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>

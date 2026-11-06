@@ -40,6 +40,7 @@ const toc = [
   { id: "plantillas-pdf", label: "Plantillas PDF" },
   { id: "import-history", label: "Historial de importaciones" },
   { id: "plan", label: "Plan y facturación" },
+  { id: "audit-log", label: "Registro de auditoría", depth: 3 },
 ];
 
 const groups: { group: string; items: string; note?: string }[] = [
@@ -49,7 +50,7 @@ const groups: { group: string; items: string; note?: string }[] = [
   { group: "Correo", items: "Cuentas de correo, Envío masivo y Dominios (Dominios solo lo ve el propietario)" },
   { group: "Automatización", items: "Agentes IA" },
   { group: "Desarrollador", items: "Integraciones, API y Conectores MCP (Conectores MCP solo lo ve el propietario)" },
-  { group: "Facturación", items: "Facturación electrónica y Retenciones", note: "solo si tienes el módulo de Facturación electrónica" },
+  { group: "Facturación", items: "Facturación electrónica y Retenciones", note: "solo si tienes Contabilidad (facturación electrónica)" },
   { group: "Envíos", items: "Envíos (Envia.com)", note: "solo si tienes el módulo de Envíos" },
 ];
 
@@ -95,7 +96,8 @@ export default function SettingsPage() {
             Lo que ves depende de tu rol. El <strong>propietario</strong> ve y cambia todo. El{" "}
             <strong>empleado</strong> ve casi todas las secciones, menos Dominios y Conectores MCP, y no puede
             crear usuarios ni pagar el plan. El <strong>contador</strong> solo ve Seguridad y Notificaciones.
-            El <strong>lector</strong> puede mirar, pero no guardar cambios.
+            Además, algunas funciones (Lead Scoring, Plantillas PDF, Agentes IA, API y Conectores MCP) solo
+            se pueden usar si tu plan las incluye: vienen desde el plan Pro.
           </Callout>
         </section>
 
@@ -134,8 +136,7 @@ export default function SettingsPage() {
                 {[
                   ["Propietario", "Acceso total: usuarios, plan, exportaciones y toda la configuración. Puede haber más de uno. Ocupa un asiento."],
                   ["Empleado", "Usa todo el CRM, menos lo reservado al propietario (exportar, pagar el plan, crear usuarios). Ocupa un asiento."],
-                  ["Lector", "Solo puede mirar: no crea, no edita ni borra. No ocupa asiento."],
-                  ["Contador", "Solo contactos, empresas y facturación, y solo en la web. Necesita el módulo de Facturación electrónica. Ocupa un asiento."],
+                  ["Contador", "Solo contactos, empresas y facturación, y solo en la web. Necesita Contabilidad (facturación electrónica). Con Contabilidad, un contador no ocupa asiento."],
                 ].map(([r, p]) => (
                   <tr key={r}>
                     <td className="p-3 border-b font-medium" style={{ borderColor: "var(--border)", color: "var(--foreground)" }}>{r}</td>
@@ -153,12 +154,18 @@ export default function SettingsPage() {
           </ol>
           <Callout type="tip">
             No se envían invitaciones por correo: tú creas la cuenta y le das la contraseña. Para crear un
-            empleado necesitas un asiento libre; si no tienes, usa <strong>Agregar asiento</strong> en la misma
-            pantalla o créalo como Lector.
+            usuario necesitas un asiento libre; si no tienes, usa <strong>Agregar asiento</strong> en la misma
+            pantalla. Ya no hay usuarios de solo lectura: cada persona ocupa un asiento.
+          </Callout>
+          <Callout type="note">
+            Durante la prueba gratis de 14 días la cuenta es de un solo usuario. Si intentas crear otro,
+            verás «Elige tu plan para invitar a tu equipo»: al pagar el plan puedes sumar los asientos que
+            necesites.
           </Callout>
           <h3 className="text-lg font-semibold mb-3 mt-6" style={{ color: "var(--foreground)" }}>Más opciones en Usuarios</h3>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Arriba ves cuántos asientos usas y cuántos lectores tienes; desde ahí agregas o liberas asientos.</li>
+            <li>• Arriba ves cuántos asientos usas; desde ahí agregas o liberas asientos.</li>
+            <li>• Si tu cuenta tenía usuarios con el antiguo rol Lector, ahora aparecen como empleados, cada uno con su asiento. Si alguno ya no lo necesitas, elimínalo y libera el asiento antes de tu próxima renovación.</li>
             <li>• <strong style={{ color: "var(--foreground)" }}>Actividad del equipo</strong>: qué hizo cada persona (guía en <a href="/docs/team-activity" style={{ color: "#d1345b" }}>Actividad del equipo</a>).</li>
             <li>• <strong style={{ color: "var(--foreground)" }}>Acceso por API</strong>: el propietario ajusta, usuario por usuario, qué puede hacer cada uno por API.</li>
             <li>• Al eliminar un usuario eliges a quién pasan sus negocios, contactos y conversaciones.</li>
@@ -297,7 +304,8 @@ export default function SettingsPage() {
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Lead Scoring</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
             Configura las reglas que determinan el puntaje de cada contacto. Ver documentación
-            completa en <a href="/docs/lead-scoring" style={{ color: "#d1345b" }}>Lead Scoring</a>.
+            completa en <a href="/docs/lead-scoring" style={{ color: "#d1345b" }}>Lead Scoring</a>. Viene
+            en los planes Pro y Empresarial.
           </p>
         </section>
 
@@ -306,7 +314,8 @@ export default function SettingsPage() {
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
             En <strong style={{ color: "var(--foreground)" }}>Configuración → Desarrollador → Conectores MCP</strong> (solo
             propietarios) creas las credenciales con las que Claude, ChatGPT o Cursor se conectan al
-            servidor MCP de FusionCRM y operan el CRM con más de 200 herramientas.
+            servidor MCP de FusionCRM y operan el CRM con más de 200 herramientas. El MCP viene en los
+            planes Pro y Empresarial, igual que la API.
           </p>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
             <li>1. <em>Crear conector MCP</em> y ponle un nombre que diga desde dónde se conecta (ej. «Claude Desktop - Producción»).</li>
@@ -339,7 +348,7 @@ export default function SettingsPage() {
           <p style={{ color: "var(--muted-foreground)" }}>
             Headers, tabla de permisos y referencia completa en{" "}
             <a href="/docs/api" style={{ color: "#d1345b" }}>API REST</a>. La API y el MCP vienen incluidos en los
-            planes Pro y Unlimited; el plan Free no los trae.
+            planes Pro y Empresarial; el Básico no los trae.
           </p>
         </section>
 
@@ -367,6 +376,8 @@ export default function SettingsPage() {
             rótulos de envío, contratos, formatos, autorizaciones… Se crean en{" "}
             <strong style={{ color: "var(--foreground)" }}>Configuración → Documentos → Plantillas PDF</strong> y cualquier persona de tu organización
             las usa desde la pestaña <strong style={{ color: "var(--foreground)" }}>Imprimir</strong> de la ficha del contacto.
+            Crear y usar plantillas propias viene en los planes Pro y Empresarial (y en Contabilidad, para
+            imprimir facturas); el PDF de cotizaciones y facturas funciona en todos los planes.
           </p>
           <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Crear una plantilla</h3>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
@@ -406,19 +417,122 @@ export default function SettingsPage() {
         <section id="plan" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Plan y facturación</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Hay tres planes: <strong style={{ color: "var(--foreground)" }}>Free</strong>,{" "}
+            Hay tres planes del CRM: <strong style={{ color: "var(--foreground)" }}>Básico</strong>,{" "}
             <strong style={{ color: "var(--foreground)" }}>Pro</strong> y{" "}
-            <strong style={{ color: "var(--foreground)" }}>Unlimited</strong>. Los precios y límites vigentes
-            están siempre en <a href="https://www.fusioncol.com/precios" style={{ color: "#d1345b" }}>fusioncol.com/precios</a>.
-            Desde Configuración → General → Plan puedes:
+            <strong style={{ color: "var(--foreground)" }}>Empresarial</strong>. Se cobran{" "}
+            <strong style={{ color: "var(--foreground)" }}>por usuario</strong>, mes a mes o por año (el anual
+            trae 2 meses gratis), y todos los precios incluyen IVA: lo que ves es lo que pagas. Aparte está{" "}
+            <strong style={{ color: "var(--foreground)" }}>Contabilidad</strong>, para la facturación
+            electrónica. Los precios vigentes están siempre en{" "}
+            <a href="https://www.fusioncol.com/precios" style={{ color: "#d1345b" }}>fusioncol.com/precios</a>.
+          </p>
+          <div className="rounded-lg overflow-x-auto border mb-6" style={{ borderColor: "var(--border)" }}>
+            <table className="w-full text-sm">
+              <thead style={{ backgroundColor: "var(--muted)" }}>
+                <tr>
+                  {["", "Básico", "Pro", "Empresarial"].map((h) => (
+                    <th key={h} className="text-left p-3 border-b font-semibold" style={{ borderColor: "var(--border)" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ["Por usuario al mes", "$49.900", "$79.900", "$129.900"],
+                  ["Por usuario al año", "$499.000", "$799.000", "$1.299.000"],
+                  ["Prueba gratis", "14 días, 1 usuario", "—", "—"],
+                  ["Líneas de WhatsApp", "1", "2", "5"],
+                  ["Contactos", "2.000", "10.000", "50.000"],
+                  ["Empresas", "2.000", "10.000", "50.000"],
+                  ["Listas de contactos", "5", "10", "50"],
+                  ["Correos de marketing al mes", "1.000", "10.000", "50.000"],
+                  ["Cotizaciones y conversaciones", "Sin tope", "Sin tope", "Sin tope"],
+                  ["Formularios web", "1", "3", "20"],
+                  ["Landing pages", "1, con la marca de FusionCol", "5, sin marca", "20, sin marca"],
+                  ["Automatizaciones activas", "2", "5", "30"],
+                  ["Base de conocimiento de la IA", "10 documentos (20 MB)", "100 documentos (200 MB)", "Sin tope"],
+                  ["Campañas masivas de WhatsApp", "No", "Sí", "Sí"],
+                  ["Recompra automática", "No", "Sí", "Sí"],
+                  ["Agentes IA con tu propia clave", "No", "Sí", "Sí"],
+                  ["Lead scoring", "No", "Sí", "Sí"],
+                  ["Reportes personalizados y pronóstico", "No", "Sí", "Sí"],
+                  ["Actividad del equipo", "No", "Sí", "Sí"],
+                  ["Plantillas PDF propias", "No", "Sí", "Sí"],
+                  ["API y MCP", "No", "Sí", "Sí"],
+                  ["Envíos (Envia.com)", "No", "Incluido", "Incluido"],
+                  ["Registro de auditoría", "No", "No", "Sí"],
+                  ["Soporte", "Correo", "WhatsApp", "WhatsApp prioritario"],
+                ].map(([k, ...v]) => (
+                  <tr key={k}>
+                    <td className="p-3 border-b font-medium" style={{ borderColor: "var(--border)", color: "var(--foreground)" }}>{k}</td>
+                    {v.map((x, i) => (
+                      <td key={i} className="p-3 border-b" style={{ borderColor: "var(--border)", color: "var(--muted-foreground)" }}>{x}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            La bandeja de WhatsApp, Instagram y Facebook, contactos, empresas, negocios, embudos,
+            cotizaciones, respuestas rápidas, biblioteca, calendario, tareas y la app móvil vienen en
+            los tres planes. Desde Configuración → General → Plan (solo el propietario) puedes:
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Ver tu plan, su uso (contactos, usuarios, cotizaciones…) y qué incluye.</li>
-            <li>• Subir de plan pagando con tarjeta (Wompi); la renovación es mensual y automática.</li>
-            <li>• Bajar de plan o cancelar la suscripción tú mismo.</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Asientos:</strong> en Pro y Unlimited puedes agregar asientos (se cobra la parte proporcional del mes) y liberarlos después, desde Configuración → Usuarios (solo el propietario). El plan Free trae 1 usuario y no vende asientos extra: para tener más, pásate a Pro. Los usuarios con rol <em>lector</em> no consumen asiento.</li>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Módulos:</strong> la API y el MCP vienen en Pro y Unlimited. Facturación electrónica y Envíos son módulos adicionales que se activan aparte en cualquier plan.</li>
+            <li>• Ver tu plan, su uso (contactos, empresas, líneas, automatizaciones…) y qué incluye.</li>
+            <li>• Pagar con tarjeta (Wompi), mensual o anual. Antes de pagar ves el total exacto, con los usuarios y Contabilidad si la sumas. La renovación es automática.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Subir de plan:</strong> aplica de inmediato. Solo pagas la diferencia por los días que le quedan a tu periodo, y tu fecha de renovación no cambia.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Bajar de plan o pasar de anual a mensual:</strong> queda programado y aplica en tu próxima renovación; hasta entonces sigues con lo que pagaste. Puedes deshacer el cambio antes de esa fecha. No hay reembolsos.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Usuarios:</strong> el precio del plan incluye un usuario y cada usuario adicional cuesta lo mismo. Agregas o liberas asientos en Configuración → Usuarios; un asiento nuevo se cobra por los días que quedan del periodo y uno liberado deja de cobrarse en la siguiente renovación.</li>
+            <li>• Cancelar la suscripción: tu plan sigue activo hasta el final del periodo pagado.</li>
           </ul>
+
+          <h3 className="text-lg font-semibold mb-3 mt-6" style={{ color: "var(--foreground)" }}>Prueba gratis de 14 días</h3>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Al crear tu cuenta empiezas con el plan Básico gratis por 14 días, sin tarjeta y con un solo
+            usuario. Un aviso te muestra cuántos días quedan y te escribimos por correo antes de que
+            termine. Si al terminar no has elegido un plan, la cuenta queda en pausa: puedes entrar, ver
+            y exportar tus datos y pagar, pero no crear ni enviar nada. Los mensajes de tus clientes
+            siguen llegando a la bandeja y no se borra nada al vencer. Una cuenta que nunca paga entra
+            después al proceso de inactividad, que avisa antes de borrar.
+          </p>
+
+          <h3 className="text-lg font-semibold mb-3 mt-6" style={{ color: "var(--foreground)" }}>Si un pago falla o el plan vence</h3>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Si el cobro de la renovación falla, reintentamos durante 7 días y te avisamos. Pasado ese
+            plazo sin pago, la cuenta queda en pausa igual que una prueba vencida: lees, exportas y
+            pagas, y al pagar vuelve a funcionar completa de inmediato.
+          </p>
+
+          <h3 className="text-lg font-semibold mb-3 mt-6" style={{ color: "var(--foreground)" }}>Contabilidad (facturación electrónica)</h3>
+          <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• $79.900 al mes o $799.000 al año, con documentos ilimitados, certificado de firma digital incluido y la habilitación ante la DIAN sin costo.</li>
+            <li>• La sumas encima de cualquier plan del CRM, con la misma fecha de renovación, o la contratas sola si solo necesitas facturar (sin el CRM: contactos, empresas, productos, facturación y compras).</li>
+            <li>• Incluye al dueño y a un contador sin costo adicional.</li>
+            <li>• El pago mensual tiene una permanencia mínima de 3 meses: si cancelas antes, la cancelación aplica al cumplirse ese plazo.</li>
+          </ul>
+
+          <h3 className="text-lg font-semibold mb-3 mt-6" style={{ color: "var(--foreground)" }}>Precio fundador</h3>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Los primeros 100 clientes que pagan conservan el precio con el que entraron, también si
+            después suben de plan. El precio se mantiene mientras la suscripción no venza sin renovarse.
+          </p>
+
+          <h3 className="text-lg font-semibold mb-3 mt-6" style={{ color: "var(--foreground)" }}>Cuando algo no está en tu plan</h3>
+          <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• Si una función no viene en tu plan, la app te lo dice y te muestra en qué plan está. Por API o MCP la respuesta es 403 <code>PLAN_MODULE_REQUIRED</code> con el campo <code>module</code> (por ejemplo <code>waCampaigns</code> o <code>aiAgents</code>).</li>
+            <li>• Si llegas a un tope (contactos, empresas, líneas, formularios, landing pages, automatizaciones activas…), no puedes crear más hasta liberar espacio o subir de plan. Por API la respuesta es 403 <code>PLAN_LIMIT_REACHED</code>.</li>
+            <li>• Si bajas de plan no se borra nada: sigues viendo tus campañas, reportes, agentes y páginas. Lo que el plan nuevo ya no incluye deja de poder crearse o ejecutarse al empezar el periodo nuevo.</li>
+            <li>• Si quedas por encima de un tope de automatizaciones, formularios, líneas o landing pages, la cuenta sigue funcionando: no puedes activar más, y a los 30 días se pausan solas las automatizaciones más nuevas que sobren (con aviso). Tus líneas nunca se desconectan y los mensajes siempre entran.</li>
+          </ul>
+
+          <h3 id="audit-log" className="text-lg font-semibold mb-3 mt-6" style={{ color: "var(--foreground)" }}>Registro de auditoría (Empresarial)</h3>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            En el plan Empresarial el propietario puede consultar quién hizo qué en la cuenta: crear,
+            editar y borrar contactos, empresas, negocios y cotizaciones; cambios de etapa; envíos de
+            cotizaciones y mensajes; inicios de sesión, cambios de contraseña y de 2FA. Cada registro trae
+            la fecha, el usuario y, cuando aplica, la IP y el navegador. Es de solo lectura. También está por API con <code>GET /api/audit-log</code> (ver{" "}
+            <a href="/docs/api#audit-log" style={{ color: "#d1345b" }}>API REST</a>).
+          </p>
           <Callout type="tip">
             Si necesitas condiciones especiales, escribe a{" "}
             <strong style={{ color: "#d1345b" }}>comercial@fusioncol.com</strong> o por WhatsApp al{" "}

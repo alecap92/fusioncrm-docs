@@ -49,12 +49,14 @@ export default function InvoicesPage() {
           FusionCRM incluye un módulo de facturación electrónica con integración directa a la DIAN
           (Colombia), permitiendo emitir facturas de venta, notas crédito y gestionar compras.
         </p>
-        <Callout type="note" title="Módulo adicional">
-          La facturación electrónica no viene incluida en los planes: es un módulo que se contrata aparte y se activa
-          para tu organización. Incluye facturas, notas crédito y débito, compras, recepción de
-          facturas, documentos soporte y cuentas por cobrar. Si no ves el menú Facturación, pide su activación en{" "}
-          <strong style={{ color: "#d1345b" }}>comercial@fusioncol.com</strong>. Más detalle en{" "}
-          <a href="/docs/settings#plan" style={{ color: "#d1345b" }}>Plan, asientos y módulos</a>.
+        <Callout type="note" title="Contabilidad">
+          La facturación electrónica viene en <strong>Contabilidad</strong>: $79.900 al mes o $799.000 al año,
+          con documentos ilimitados, certificado de firma digital incluido y habilitación ante la DIAN sin
+          costo. La sumas a cualquier plan del CRM desde Configuración → Plan, o la contratas sola si solo
+          necesitas facturar. Incluye facturas, notas crédito y débito, compras, recepción de
+          facturas, documentos soporte, retenciones y cuentas por cobrar, y un usuario contador sin costo.
+          Más detalle en{" "}
+          <a href="/docs/settings#plan" style={{ color: "#d1345b" }}>Plan y facturación</a>.
         </Callout>
 
         <section id="overview" className="mb-10">

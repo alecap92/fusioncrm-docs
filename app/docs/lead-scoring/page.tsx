@@ -40,6 +40,10 @@ export default function LeadScoringPage() {
           tu equipo sepa a quién darle prioridad.
         </p>
 
+        <Callout type="note" title="Plan">
+          Lead Scoring viene en los planes Pro y Empresarial. Si bajas a Básico, tus reglas y los puntajes que ya tienen tus contactos se conservan, pero no puedes crear ni editar reglas ni recalcular.
+        </Callout>
+
         <section id="overview" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>¿Qué es Lead Scoring?</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>

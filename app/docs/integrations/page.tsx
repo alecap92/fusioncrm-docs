@@ -156,7 +156,7 @@ export default function IntegrationsPage() {
 
           <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Conectar N8N</h3>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>1. Crea un token en Configuración → Desarrollador → API con los permisos que necesite el flujo. La API está incluida desde el plan Pro y solo la ven los usuarios con permiso para gestionarla.</li>
+            <li>1. Crea un token en Configuración → Desarrollador → API con los permisos que necesite el flujo. La API está incluida en los planes Pro y Empresarial y solo la ven los usuarios con permiso para gestionarla.</li>
             <li>2. En n8n usa el nodo <em>HTTP Request</em> contra <code style={{ color: "#d1345b" }}>https://api.fusioncol.com/api</code> con el header <code>Authorization: Bearer &lt;token&gt;</code>.</li>
             <li>3. Para que FusionCRM llame a n8n, crea una automatización con el disparador que te interese y la acción <em>Petición HTTP</em> apuntando a la URL del nodo <em>Webhook</em> de n8n; o pon esa URL como webhook de una columna del pipeline de conversaciones.</li>
             <li>4. Si quieres que n8n reciba <strong>cada mensaje entrante de WhatsApp</strong> en tiempo real, agrega la integración <em>N8N</em> en Configuración → Desarrollador → Integraciones y pega la URL de tu nodo Webhook en <em>Webhook URL (entrada de mensajes de WhatsApp)</em>. Le llegan el mensaje, el contacto, la conversación y los mensajes anteriores.</li>

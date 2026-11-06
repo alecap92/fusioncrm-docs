@@ -33,6 +33,7 @@ const toc = [
   { id: "base-url", label: "URL base y convenciones" },
   { id: "reference", label: "Referencia de endpoints" },
   { id: "webhooks", label: "Webhooks salientes" },
+  { id: "audit-log", label: "Registro de auditoría" },
   { id: "errors", label: "Errores y límites del plan" },
 ];
 
@@ -64,6 +65,7 @@ const modules = [
   { path: "/activities", name: "Actividades del CRM", perms: "activities:*" },
   { path: "/calendar-events", name: "Eventos del calendario", perms: "calendar:*" },
   { path: "/import", name: "Importación de contactos e historial (con deshacer)", perms: "contacts:*" },
+  { path: "/audit-log", name: "Registro de auditoría de la cuenta, solo lectura (plan Empresarial; el token debe ser de un propietario)", perms: "settings:read" },
 ];
 
 const permissions = [
@@ -106,8 +108,9 @@ const errors = [
   ["403", "API_ACCESS_DISABLED", "El propietario desactivó tu acceso por API en Configuración → Usuarios → Acceso por API."],
   ["403", "ACCOUNT_SUSPENDED / ACCOUNT_RESTRICTED", "La cuenta está suspendida o en modo solo lectura (por ejemplo, por el estado del plan)."],
   ["403", "PERMISSION_NOT_ALLOWED_FOR_ROLE", "Al crear un token: tu rol no puede pedir acceso completo (*) ni permisos de borrar."],
-  ["403", "PLAN_MODULE_REQUIRED", "El plan de la organización no incluye el módulo API (o el de facturación, en /invoices y /purchases)."],
-  ["403", "PLAN_LIMIT_REACHED", "Se alcanzó un límite del plan al crear (contactos, empresas, cotizaciones, facturas, listas, landing pages, documentos RAG)."],
+  ["403", "PLAN_MODULE_REQUIRED", "El plan no incluye la función que pide la operación. El campo module dice cuál (por ejemplo api, waCampaigns, aiAgents, leadScoring, advancedReports, teamActivity, pdfDocuments, auditLog, invoices, envios o crm); si la operación acepta varias, también llega modules con la lista."],
+  ["403", "PLAN_LIMIT_REACHED", "Se alcanzó un tope del plan al crear o activar (contactos, empresas, listas, formularios activos, landing pages, automatizaciones activas, documentos RAG). details trae el uso y el tope."],
+  ["403", "TRIAL_SINGLE_USER", "Al crear un usuario durante la prueba gratis (o con la prueba vencida): la prueba es de un solo usuario. Elige un plan para sumar a tu equipo."],
   ["429", "API_QUOTA_EXCEEDED", "Llegaste al tope por hora de tu usuario. Espera los segundos que indica el header Retry-After."],
   ["400", "—", "Datos inválidos: el cuerpo lleva success:false y error con el motivo."],
   ["400", "INVALID_CITY_CODE", "El cityCode enviado no existe en el catálogo DANE. Ver Ciudades."],
@@ -151,9 +154,10 @@ export default function ApiPage() {
             como herramientas para Claude, Cursor u otros clientes compatibles.
           </p>
           <Callout type="note">
-            La API y el MCP están incluidos en los planes <strong>Pro</strong> y <strong>Unlimited</strong>.
-            Sin ese plan no puedes crear ni renovar tokens, y las llamadas pueden responder 403 con
-            el código <code>PLAN_MODULE_REQUIRED</code>. Cambia de plan en Configuración → Plan.
+            La API y el MCP están incluidos en los planes <strong>Pro</strong> y <strong>Empresarial</strong>.
+            Con el Básico (o durante la prueba gratis) no puedes crear ni renovar tokens, y las llamadas
+            responden 403 con el código <code>PLAN_MODULE_REQUIRED</code> y <code>{'module: "api"'}</code>.
+            Cambia de plan en Configuración → Plan.
           </Callout>
         </section>
 
@@ -163,7 +167,7 @@ export default function ApiPage() {
             La API se autentica con <strong style={{ color: "var(--foreground)" }}>tokens de API</strong>.
             Cada usuario (propietario o empleado) crea los suyos en{" "}
             <strong style={{ color: "var(--foreground)" }}>Configuración → Desarrollador → API</strong> y ve
-            solo los propios; los roles lector y contador no pueden crear tokens:
+            solo los propios; el rol contador no puede crear tokens:
           </p>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
             <li>1. Pulsa <em>Nuevo token</em> y ponle un nombre que diga para qué es (ej. <code>integracion-n8n</code>).</li>
@@ -343,6 +347,20 @@ export default function ApiPage() {
           </Callout>
         </section>
 
+        <section id="audit-log" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Registro de auditoría</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            En el plan <strong>Empresarial</strong>, <code>GET /api/audit-log</code> devuelve quién hizo qué en la
+            cuenta, del más reciente al más antiguo. Es de solo lectura, pide <code>settings:read</code> y el
+            token tiene que ser de un propietario.
+          </p>
+          <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• Filtros: <code>type</code> (uno o varios separados por coma, por ejemplo <code>CONTACT_UPDATE,DEAL_STAGE_CHANGE</code>), <code>userId</code>, <code>contactId</code>, <code>companyId</code>, <code>from</code> y <code>to</code> (ISO 8601).</li>
+            <li>• Paginación: <code>page</code> y <code>limit</code> (de 1 a 100, 50 por defecto).</li>
+            <li>• Cada registro trae <code>type</code>, <code>timestamp</code>, el usuario, el contacto o la empresa que tocó, <code>data</code> y, cuando aplica, la IP, el navegador y los cambios.</li>
+          </ul>
+        </section>
+
         <section id="errors" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Errores y límites del plan</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
@@ -370,8 +388,13 @@ export default function ApiPage() {
             </table>
           </div>
           <p style={{ color: "var(--muted-foreground)" }}>
-            Aplican los límites del plan (contactos, empresas, cotizaciones, facturas, listas,
-            landing pages y documentos de conocimiento), los mismos que en la app.
+            Aplican los mismos topes y funciones del plan que en la app (contactos, empresas, listas,
+            formularios, landing pages, documentos de conocimiento; campañas de WhatsApp, agentes IA,
+            lead scoring, reportes personalizados y plantillas PDF desde el plan Pro). Leer, borrar y
+            desprogramar nunca se bloquean por el plan: si bajas de plan, sigues consultando lo que ya
+            tenías. Si <code>create_contact</code> (o <code>POST /contacts</code> con empresa) no tiene cupo de
+            empresas, el contacto se crea sin empresa y la respuesta trae{" "}
+            <code>{'warnings: ["COMPANY_PLAN_LIMIT_REACHED"]'}</code>.
           </p>
           <p className="mt-3" style={{ color: "var(--muted-foreground)" }}>
             Además, cada usuario que no sea el propietario tiene un <strong style={{ color: "var(--foreground)" }}>tope por hora</strong>,
@@ -381,6 +404,13 @@ export default function ApiPage() {
             espera en <code>Retry-After</code>, y el propietario recibe un aviso. El propietario no tiene
             topes y puede ajustar los de cada usuario en Configuración → Usuarios → Acceso por API. Las
             lecturas no tienen tope; aun así, usa <code>limit</code> alto en vez de muchas páginas pequeñas.
+          </p>
+          <p className="mt-3" style={{ color: "var(--muted-foreground)" }}>
+            Si la cuenta queda en pausa porque la prueba gratis o el plan vencieron, la API sigue leyendo
+            y exportando, pero las escrituras y los envíos responden 403 <code>ACCOUNT_RESTRICTED</code> hasta
+            que el propietario pague. El plan y los pagos no se manejan por la API pública: se hacen en la
+            app (Configuración → Plan), que calcula cada cobro en el servidor con{" "}
+            <code>POST /api/v1/plans/quote</code> con la sesión del propietario.
           </p>
         </section>
 

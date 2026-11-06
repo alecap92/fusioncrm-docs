@@ -61,6 +61,10 @@ export default function WhatsappLinesPage() {
           es una <B>línea</B>, con su nombre, su color, sus plantillas y su propio pipeline.
         </p>
 
+        <Callout type="note" title="Líneas por plan">
+          Puedes conectar 1 línea en Básico, 2 en Pro y 5 en Empresarial. Reconectar un número que ya tenías no cuenta como línea nueva. Si bajas de plan con más líneas de las que permite, ninguna se desconecta y los mensajes siguen entrando; solo no puedes conectar otra.
+        </Callout>
+
         <section id="overview" className="mb-10">
           <H2>Qué es una línea</H2>
           <P>

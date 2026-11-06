@@ -147,7 +147,7 @@ export default function DocsIndexPage() {
         <h2 className="text-xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Inicio rápido</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { step: "1", title: "Crea tu cuenta", desc: "Regístrate gratis y completa los datos de tu organización.", href: "/docs/getting-started" },
+            { step: "1", title: "Crea tu cuenta", desc: "Empieza con 14 días gratis del plan Básico, sin tarjeta, y completa los datos de tu organización.", href: "/docs/getting-started" },
             { step: "2", title: "Importa contactos", desc: "Sube tu base de clientes en CSV o Excel.", href: "/docs/contacts#import" },
             { step: "3", title: "Conecta WhatsApp", desc: "Conecta tu número en Configuración → WhatsApp → Conectar línea para empezar a chatear.", href: "/docs/whatsapp-lines" },
           ].map((s) => (
