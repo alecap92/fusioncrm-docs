@@ -110,7 +110,6 @@ const errors = [
   ["403", "PERMISSION_NOT_ALLOWED_FOR_ROLE", "Al crear un token: tu rol no puede pedir acceso completo (*) ni permisos de borrar."],
   ["403", "PLAN_MODULE_REQUIRED", "El plan no incluye la función que pide la operación. El campo module dice cuál (por ejemplo api, waCampaigns, aiAgents, leadScoring, advancedReports, teamActivity, pdfDocuments, auditLog, invoices, envios o crm); si la operación acepta varias, también llega modules con la lista."],
   ["403", "PLAN_LIMIT_REACHED", "Se alcanzó un tope del plan al crear o activar (contactos, empresas, listas, formularios activos, landing pages, automatizaciones activas, documentos RAG). details trae el uso y el tope."],
-  ["403", "TRIAL_SINGLE_USER", "Al crear un usuario durante la prueba gratis (o con la prueba vencida): la prueba es de un solo usuario. Elige un plan para sumar a tu equipo."],
   ["429", "API_QUOTA_EXCEEDED", "Llegaste al tope por hora de tu usuario. Espera los segundos que indica el header Retry-After."],
   ["400", "—", "Datos inválidos: el cuerpo lleva success:false y error con el motivo."],
   ["400", "INVALID_CITY_CODE", "El cityCode enviado no existe en el catálogo DANE. Ver Ciudades."],
@@ -390,9 +389,10 @@ export default function ApiPage() {
           <p style={{ color: "var(--muted-foreground)" }}>
             Aplican los mismos topes y funciones del plan que en la app (contactos, empresas, listas,
             formularios, landing pages, documentos de conocimiento; campañas de WhatsApp, agentes IA,
-            lead scoring, reportes personalizados y plantillas PDF desde el plan Pro). Leer, borrar y
-            desprogramar nunca se bloquean por el plan: si bajas de plan, sigues consultando lo que ya
-            tenías. Si <code>create_contact</code> (o <code>POST /contacts</code> con empresa) no tiene cupo de
+            lead scoring, reportes personalizados y plantillas PDF desde el plan Pro). Mientras tu plan
+            incluya la API (Pro o Empresarial), leer, borrar y desprogramar no se bloquean por las funciones
+            del plan. Si bajas a Básico, la API y el MCP dejan de responder, también para leer; tus datos
+            siguen en la app. Si <code>create_contact</code> (o <code>POST /contacts</code> con empresa) no tiene cupo de
             empresas, el contacto se crea sin empresa y la respuesta trae{" "}
             <code>{'warnings: ["COMPANY_PLAN_LIMIT_REACHED"]'}</code>.
           </p>

@@ -449,7 +449,7 @@ export default function SettingsPage() {
                   ["Formularios web", "1", "3", "20"],
                   ["Landing pages", "1, con la marca de FusionCol", "5, sin marca", "20, sin marca"],
                   ["Automatizaciones activas", "2", "5", "30"],
-                  ["Base de conocimiento de la IA", "10 documentos (20 MB)", "100 documentos (200 MB)", "Sin tope"],
+                  ["Base de conocimiento de los agentes IA", "—", "100 documentos (200 MB)", "Sin tope"],
                   ["Campañas masivas de WhatsApp", "No", "Sí", "Sí"],
                   ["Recompra automática", "No", "Sí", "Sí"],
                   ["Agentes IA con tu propia clave", "No", "Sí", "Sí"],
@@ -507,7 +507,7 @@ export default function SettingsPage() {
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
             <li>• $79.900 al mes o $799.000 al año, con documentos ilimitados, certificado de firma digital incluido y la habilitación ante la DIAN sin costo.</li>
             <li>• La sumas encima de cualquier plan del CRM, con la misma fecha de renovación, o la contratas sola si solo necesitas facturar (sin el CRM: contactos, empresas, productos, facturación y compras).</li>
-            <li>• Incluye al dueño y a un contador sin costo adicional.</li>
+            <li>• Sola, incluye al dueño y un contador; encima de un plan del CRM, suma un contador que no ocupa asiento.</li>
             <li>• El pago mensual tiene una permanencia mínima de 3 meses: si cancelas antes, la cancelación aplica al cumplirse ese plazo.</li>
           </ul>
 

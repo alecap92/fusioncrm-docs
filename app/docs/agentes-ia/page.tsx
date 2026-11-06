@@ -179,8 +179,8 @@ export default function AgentesIaPage() {
             <Link href="/docs/mcp" style={{ color: "#d1345b" }}>MCP</Link>.
           </p>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Cada plan tiene un tope de documentos: Básico 10 documentos (20 MB), Pro 100 documentos
-            (200 MB) y Empresarial sin límite.
+            La base de conocimiento la usan los agentes, que vienen desde el plan Pro: Pro admite 100
+            documentos (200 MB) y Empresarial no tiene límite.
           </p>
           <Callout type="warning">
             Un documento partido a la mitad (por ejemplo una tabla de precios muy larga) puede
