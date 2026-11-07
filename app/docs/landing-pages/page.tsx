@@ -167,7 +167,8 @@ export default function LandingPagesPage() {
         <section id="plans" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Planes, dominio y datos personales</h2>
           <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• <strong style={{ color: "var(--foreground)" }}>Free:</strong> 1 página, con el crédito «Página creada con FusionCRM» en el pie. <strong style={{ color: "var(--foreground)" }}>Pro:</strong> 5 páginas y el crédito se puede quitar. <strong style={{ color: "var(--foreground)" }}>Unlimited:</strong> sin tope.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Básico:</strong> 1 página, con el crédito «Página creada con FusionCRM» en el pie. <strong style={{ color: "var(--foreground)" }}>Pro:</strong> 5 páginas y el crédito se puede quitar. <strong style={{ color: "var(--foreground)" }}>Empresarial:</strong> 20 páginas, también sin crédito.</li>
+            <li>• Si bajas a un plan con menos páginas, las que ya tienes siguen publicadas, pero no puedes crear ni publicar más hasta quedar dentro del tope. Si el plan nuevo no permite quitar el crédito, este vuelve a aparecer en tus páginas y formularios.</li>
             <li>• <strong style={{ color: "var(--foreground)" }}>Dominio propio</strong> (<code>promos.tuempresa.com</code>): próximamente. En Compartir hay un botón «Avísenme» para que sepamos a quién le urge.</li>
             <li>• Toda página lleva en el pie un enlace a la política de tratamiento de datos: la tuya si la configuras, o la de FusionCRM señalándote como Responsable si no. También un enlace para reportar la página.</li>
             <li>• La IP del visitante nunca se guarda en claro; el log de eventos se borra a los 90 días, el resumen diario se conserva.</li>

@@ -57,8 +57,10 @@ export default function FormsPage() {
             <li>• Reemplazo de flujos de Zapier/n8n «formulario → CRM»: el receptor ya deduplica y enruta.</li>
           </ul>
           <p style={{ color: "var(--muted-foreground)" }}>
-            Los formularios viven en el menú <strong style={{ color: "var(--foreground)" }}>Formularios</strong> de la app
-            y son ilimitados en todos los planes.
+            Los formularios viven en el menú <strong style={{ color: "var(--foreground)" }}>Formularios</strong> de la app.
+            Cuántos formularios activos puedes tener depende de tu plan: 1 en Básico, 3 en Pro y 20 en
+            Empresarial. Los que pausas no cuentan. Si bajas a un plan con menos, los que ya tienes siguen
+            recibiendo respuestas, pero no puedes crear ni activar más hasta quedar dentro del tope.
           </p>
         </section>
 
@@ -144,7 +146,7 @@ Content-Type: application/json
             Desde un servidor también puedes usar la <Link href="/docs/api" style={{ color: "#d1345b" }}>API</Link> con un
             token (<code>POST /forms/&#123;id&#125;/submit</code>) o el tool <code>submit_form</code> del{" "}
             <Link href="/docs/mcp" style={{ color: "#d1345b" }}>MCP</Link>. La API y el MCP hacen parte de los planes
-            Pro e Ilimitado; el link, el código para tu web y el webhook funcionan en todos los planes.
+            Pro y Empresarial; el link, el código para tu web y el webhook funcionan en todos los planes.
           </p>
         </section>
 

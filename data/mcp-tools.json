@@ -13,6 +13,7 @@
     "src/mcp/tools/company-properties.ts",
     "src/mcp/tools/contact-properties.ts",
     "src/mcp/tools/conversation-pipelines.ts",
+    "src/mcp/tools/conversation-read.ts",
     "src/mcp/tools/deal-checklists.ts",
     "src/mcp/tools/deal-fields.ts",
     "src/mcp/tools/deal-pipelines.ts",
@@ -36,7 +37,7 @@
     "src/mcp/tools/users.ts",
     "src/mcp/tools/whatsapp-templates.ts"
   ],
-  "toolCount": 234,
+  "toolCount": 237,
   "tools": [
     {
       "name": "add_contacts_to_list",
@@ -735,7 +736,7 @@
     },
     {
       "name": "create_campaign_draft",
-      "description": "Crea el BORRADOR de una campaña masiva de WhatsApp (la de /mass-whatsapp): nombre, lista de contactos de la organización, plantilla aprobada en Meta (nombre, idioma, de dónde sale cada variable {{n}} y la imagen/video de cabecera si la plantilla la lleva) y, opcionalmente, la LÍNEA (número) por la que sale. Sin lineId la campaña sale por la línea por defecto de la organización; si la org tiene varias líneas, elige el id con list_whatsapp_lines (la plantilla tiene que existir en la WABA de ESA línea: list_whatsapp_templates con el mismo lineId). Queda en estado 'planeacion' y SIN fecha de envío: NO envía ningún mensaje, NO la programa y NO la ejecuta — eso lo hace una persona desde la app con 'Enviar ahora'. No verifica la plantilla al crear: get_campaign_preflight dice si existe y está aprobada en la línea, y a cuántos les llegaría. Requiere automations:write.",
+      "description": "Crea el BORRADOR de una campaña masiva de WhatsApp (la de /mass-whatsapp): nombre, lista de contactos de la organización, plantilla aprobada en Meta (nombre, idioma, de dónde sale cada variable {{n}} y la imagen/video de cabecera si la plantilla la lleva) y, opcionalmente, la LÍNEA (número) por la que sale. Sin lineId la campaña sale por la línea por defecto de la organización; si la org tiene varias líneas, elige el id con list_whatsapp_lines (la plantilla tiene que existir en la WABA de ESA línea: list_whatsapp_templates con el mismo lineId). Queda como BORRADOR (estado 'planeacion', sin fecha de envío): NO envía ningún mensaje ni la ejecuta. Para que salga sola a una hora, después usa schedule_campaign (programa en_curso + fecha); para enviarla YA, una persona lo hace desde la app con 'Enviar ahora'. No verifica la plantilla al crear: get_campaign_preflight dice si existe y está aprobada en la línea, y a cuántos les llegaría. Requiere automations:write.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -948,6 +949,10 @@
           },
           "source": {
             "description": "Origen del lead, ej. 'whatsapp', 'referido', 'feria'",
+            "type": "string"
+          },
+          "lifeCycle": {
+            "description": "Etapa del ciclo de vida (opciones de la org, ej. Lead, Cliente, Descalificado). Sin ella nace Lead: a un proveedor o descalificado pásala para que no entre en campañas.",
             "type": "string"
           },
           "companyType": {
@@ -1298,6 +1303,10 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
+          "contactId": {
+            "description": "ID del contacto a asociar (atajo de contact:{id}). Si no existe en la organización el negocio NO se crea (404).",
+            "type": "string"
+          },
           "companyId": {
             "description": "ID de la empresa (Company) a asociar al deal. Opcional: si se omite se hereda la del contacto principal.",
             "type": "string"
@@ -1851,7 +1860,7 @@
                 ]
               },
               "showBranding": {
-                "description": "Mostrar 'Hecho con FusionCRM' (en plan Free siempre queda true)",
+                "description": "Mostrar 'Hecho con FusionCRM' (si tu plan no permite quitar la marca, siempre queda true)",
                 "type": "boolean"
               }
             }
@@ -2736,7 +2745,7 @@
     },
     {
       "name": "create_static_contact_list",
-      "description": "Crear una lista ESTÁTICA de contactos. Existen tres modos:\n\n1. Lista vacía: pasar solo name (y opcionalmente description). Se puede poblar después con add_contacts_to_list.\n2. Por IDs directos: pasar contactIds (array de IDs de contacto). Máximo 2000 contactos.\n3. Por filtros de propiedades: pasar filters para buscar y capturar los contactos que coincidan en el momento de creación.\n   Los filtros son snapshots — el grupo no cambia automáticamente después (para eso usar create_dynamic_contact_list).\n\nEstructura de un filtro: { key: 'city', operator: 'contains', value: 'Bogotá' }\nOperadores soportados: contains, equals, 'starts with', 'ends with', 'is empty', 'is not empty', greater_than, less_than.\nClaves de ejemplo: firstName, lastName, email, mobile, company, city, country, source, companyType, leadScore.\nLímite: 5000 coincidencias al filtrar (usar filtros más específicos si se supera).",
+      "description": "Crear una lista ESTÁTICA de contactos. Existen tres modos:\n\n1. Lista vacía: pasar solo name (y opcionalmente description). Se puede poblar después con add_contacts_to_list.\n2. Por IDs directos: pasar contactIds (array de IDs de contacto). Máximo 2000 contactos.\n3. Por filtros de propiedades: pasar filters para buscar y capturar los contactos que coincidan en el momento de creación.\n   Los filtros son snapshots — el grupo no cambia automáticamente después (para eso usar create_dynamic_contact_list).\n\nEstructura de un filtro: { key: 'city', operator: 'contains', value: 'Bogotá' }\nOperadores soportados: contains, equals, 'starts with', 'ends with', 'is empty', 'is not empty', greater_than, less_than.\nClaves: cualquier propiedad del contacto, incluidas las custom de la org (ver list_contact_properties), p. ej. firstName, email, mobile, city, companyType, campaign; además leadScore y hasDeals.\nequals es coincidencia exacta (distingue mayúsculas); contains no.\nLos filtros se combinan con Y. No mezclar contactIds y filters en la misma llamada (400).\nLímite: 2000 contactos. Si los filtros coinciden con más, o con ninguno, responde 400 y NO crea la lista.\nLa respuesta trae contactCount y los filtros usados en sourceFilters (filters queda vacío: la lista no se recalcula).",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -3935,7 +3944,7 @@
     },
     {
       "name": "get_campaign_preflight",
-      "description": "Antes de enviar: calcula, con la lista TAL COMO ESTÁ HOY, a cuántos contactos les llegaría la campaña de WhatsApp y cuántos quedan fuera por motivo (no_mobile = sin celular, landline = número fijo, invalid_phone = formato inválido, opted_out = pidió no ser contactado, whatsapp_invalid = marcado sin WhatsApp), con hasta 10 ejemplos (teléfono enmascarado). Es la misma selección que usa el envío real. Además comprueba la plantilla en la WABA de la línea por la que saldría (lineId de la campaña o la por defecto): template.found, template.status (APPROVED es la única que envía; not_found = no existe en esa línea; unknown = no se pudo consultar, con template.error) y template.line. Solo lectura: NO envía nada ni modifica contactos. Responde 409 si la campaña no tiene lista o la lista ya no existe. Requiere contacts:read.",
+      "description": "Antes de enviar: calcula, con la lista TAL COMO ESTÁ HOY, a cuántos contactos les llegaría la campaña de WhatsApp y cuántos quedan fuera por motivo (no_mobile = sin celular, landline = número fijo, invalid_phone = formato inválido, opted_out = pidió no ser contactado, whatsapp_invalid = marcado sin WhatsApp), con hasta 10 ejemplos (teléfono enmascarado). Es la misma selección que usa el envío real. Además comprueba la plantilla en la WABA de la línea por la que saldría (lineId de la campaña o la por defecto): template.found, template.status (APPROVED es la única que envía; not_found = no existe en esa línea; unknown = no se pudo consultar, con template.error) y template.line. Solo lectura: NO envía nada ni modifica contactos. Responde 409 si la campaña no tiene lista o la lista ya no existe. Es la misma verificación que hace schedule_campaign antes de programar. Requiere contacts:read.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -6981,7 +6990,7 @@
     },
     {
       "name": "list_whatsapp_campaigns",
-      "description": "Listar las campañas masivas de WhatsApp de la organización (las de /mass-whatsapp), más recientes primero, con un resumen por contacto único según el ÚLTIMO estado que reportó Meta: accepted (Meta aceptó el envío — NO significa entregado), delivered, read, failed y lastSentAt. Para el detalle (quién respondió, motivo de cada fallo, excluidos) usa get_campaign_stats con el id.",
+      "description": "Listar las campañas masivas de WhatsApp de la organización (las de /mass-whatsapp), más recientes primero, con un resumen por contacto único según el ÚLTIMO estado que reportó Meta: accepted (Meta aceptó el envío — NO significa entregado), delivered, read, failed y lastSentAt. Cada una trae `schedule.status`: draft (borrador, no sale sola), scheduled (programada: sale sola en `schedule.startDateLocal`, hora de Colombia), sending (la hora ya llegó: saliendo), sent (terminada), never (en_curso sin fecha: nunca va a salir) o failed (no salió por una regla del plan: `schedule.failureCode`, p. ej. PLAN_LIMIT_REACHED). Para el detalle (quién respondió, motivo de cada fallo, excluidos) usa get_campaign_stats con el id; para programar o desprogramar, schedule_campaign / unschedule_campaign.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -7021,6 +7030,46 @@
         }
       },
       "group": "whatsapp"
+    },
+    {
+      "name": "mark_conversations_read",
+      "description": "Marcar conversaciones como leídas (o como no leídas con read:false), en lote (POST /api/conversations/mark-read, permiso conversations:write).\nMismo efecto que abrirlas en la web: los mensajes entrantes quedan leídos, el contador de no leídos en cero y se quita la marca manual de no leída. Si la organización tiene encendidas las confirmaciones de lectura, el cliente ve los chulos azules en WhatsApp. read:false solo pone la marca manual de no leída (no toca los mensajes).\nSelección: conversationIds (lista de ids, máx. 500) y/o un filtro pipelineId, stageId, lineId (se combinan con Y). Hace falta al menos uno: no hay 'marcar toda la organización'. pipelineId/stageId salen de list_conversation_pipelines y list_pipeline_stages; lineId de list_whatsapp_lines.\nCon filtro solo toca las que cambian (las sin leer, o las no marcadas si read:false), las más recientes primero, hasta limit (default y máx. 500). La respuesta trae matched, updated, conversationIds y remaining: si remaining > 0, vuelve a llamar con los mismos filtros.\nEjemplo: tras una campaña, marcar leídas todas las de la etapa 'Respondió bot': {stageId: \"…\"}.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "conversationIds": {
+            "description": "Ids (ObjectId) de las conversaciones, máx. 500",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "pipelineId": {
+            "description": "Solo conversaciones de este pipeline de conversaciones",
+            "type": "string"
+          },
+          "stageId": {
+            "description": "Solo conversaciones en esta etapa",
+            "type": "string"
+          },
+          "lineId": {
+            "description": "Solo conversaciones de esta línea de WhatsApp",
+            "type": "string"
+          },
+          "read": {
+            "description": "true (default) = marcar leídas; false = marcar no leídas",
+            "type": "boolean"
+          },
+          "limit": {
+            "description": "Máximo de conversaciones en esta llamada (default 500)",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          }
+        }
+      },
+      "group": "conversations"
     },
     {
       "name": "mark_notifications_read",
@@ -7523,6 +7572,30 @@
         ]
       },
       "group": "pipelines"
+    },
+    {
+      "name": "schedule_campaign",
+      "description": "PROGRAMA el envío de una campaña masiva de WhatsApp para una fecha y hora futuras: la deja en estado 'en_curso' con esa startDate y el cron del servidor la envía solo en el primer minuto después de esa hora (sin intervención humana). Antes de programar corre el mismo preflight del envío y se niega (409) si la plantilla no existe o no está APPROVED en la WABA de la línea de la campaña (TEMPLATE_NOT_APPROVED), si ningún contacto de la lista la recibiría (NO_RECIPIENTS) o si la campaña ya salió / está saliendo (CAMPAIGN_ALREADY_SENT / CAMPAIGN_RUNNING). La fecha: ISO 8601 con zona ('2026-11-04T14:30:00-05:00') o SIN zona ('2026-11-04T14:30'), que se interpreta como hora de Colombia (America/Bogota), nunca como UTC; debe ser futura (400 PAST_DATE) y a menos de un año; solo fecha sin hora es inválida. Responde a cuántos contactos les va a llegar (willSend) y cuántos quedan fuera. Reprogramar una campaña ya programada solo mueve la fecha. NO envía nada en el momento: para enviar YA, una persona usa 'Enviar ahora' en la app. Requiere automations:write.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Id de la campaña (de list_whatsapp_campaigns o create_campaign_draft)"
+          },
+          "startDate": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Cuándo sale: '2026-11-04T14:30' (hora de Colombia) o ISO 8601 con zona '2026-11-04T14:30:00-05:00'. Futura y con hora"
+          }
+        },
+        "required": [
+          "id",
+          "startDate"
+        ]
+      },
+      "group": "campaigns"
     },
     {
       "name": "search_contact_by_phone",
@@ -8084,6 +8157,24 @@
         ]
       },
       "group": "landings"
+    },
+    {
+      "name": "unschedule_campaign",
+      "description": "QUITA la programación de una campaña masiva de WhatsApp que todavía no ha salido: vuelve a borrador ('planeacion', sin fecha) y el cron deja de tenerla en cuenta. Solo funciona mientras la fecha programada no haya llegado; si ya llegó o la campaña ya envió mensajes responde 409 (CAMPAIGN_RUNNING / CAMPAIGN_ALREADY_SENT) y no cambia nada — un envío en curso no se puede detener desde aquí. Si la campaña ya era un borrador responde 409 NOT_SCHEDULED. Requiere automations:write.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Id de la campaña programada"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "campaigns"
     },
     {
       "name": "update_activity",
@@ -8655,7 +8746,7 @@
     },
     {
       "name": "update_campaign_draft",
-      "description": "Edita el borrador de una campaña masiva de WhatsApp: nombre, descripción, lista de contactos, línea de WhatsApp por la que sale (lineId de list_whatsapp_lines; null vuelve a la línea por defecto) o la plantilla (nombre, idioma, variables, cabecera). Solo funciona si la campaña NUNCA se ha ejecutado y no se está ejecutando: si ya salió, está en cola o su fecha programada ya llegó responde 409 y no cambia nada (crea otra con create_campaign_draft). NO envía, NO programa y NO cambia el estado ni la fecha de la campaña. En template solo se cambian los campos enviados; variableMapping o headerMediaUrl en null los quitan. Requiere automations:write.",
+      "description": "Edita el borrador de una campaña masiva de WhatsApp: nombre, descripción, lista de contactos, línea de WhatsApp por la que sale (lineId de list_whatsapp_lines; null vuelve a la línea por defecto) o la plantilla (nombre, idioma, variables, cabecera). Solo funciona si la campaña NUNCA se ha ejecutado y no se está ejecutando: si ya salió, está en cola o su fecha programada ya llegó responde 409 y no cambia nada (crea otra con create_campaign_draft). Una campaña PROGRAMADA con fecha futura sí se puede editar (sigue programada). NO envía y NO cambia el estado ni la fecha: para eso están schedule_campaign y unschedule_campaign. En template solo se cambian los campos enviados; variableMapping o headerMediaUrl en null los quitan. Requiere automations:write.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -10672,6 +10763,28 @@
           },
           "notes": {
             "type": "string"
+          },
+          "dimensions": {
+            "description": "Dimensiones en cm; null las borra",
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "width": {
+                    "type": "number"
+                  },
+                  "height": {
+                    "type": "number"
+                  },
+                  "length": {
+                    "type": "number"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [

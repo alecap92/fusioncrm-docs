@@ -51,7 +51,7 @@ const errors = [
   ["422", "ENVIA_GENERATE_FAILED", "Envia rechazó la guía (saldo insuficiente, transportadora caída…). Queda un borrador (shipmentId) que puedes reintentar con la misma clave."],
   ["422", "ENVIA_NOT_CONFIGURED / ORIGIN_NOT_CONFIGURED", "Falta la API key de Envia (Integraciones) o la dirección de origen (Configuración → Envíos)."],
   ["409", "SHIPMENT_NOT_CANCELABLE / SHIPMENT_NOT_TRACKABLE", "Solo se cancela un envío en created; un draft no tiene guía que rastrear."],
-  ["403", "PLAN_MODULE_REQUIRED", "El plan de la organización no tiene el módulo Envíos."],
+  ["403", "PLAN_MODULE_REQUIRED", "El plan de la organización no incluye Envíos (module: envios). Viene en los planes Pro y Empresarial."],
   ["404", "CONTACT_NOT_FOUND", "El contactId no existe en tu organización."],
   ["404", "SHIPMENT_NOT_FOUND", "El envío no existe en tu organización."],
   ["502", "CARRIERS_UNAVAILABLE", "No se pudo obtener el catálogo de transportadoras de Envia.com. Reintenta más tarde."],
@@ -115,7 +115,7 @@ export default function EnviosPage() {
         <section id="setup" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={strong}>Requisitos</h2>
           <ul className="space-y-2 pl-4 mb-4" style={muted}>
-            <li>• El <strong style={strong}>módulo Envíos</strong> activo en el plan (sin él, 403 <code>PLAN_MODULE_REQUIRED</code>).</li>
+            <li>• <strong style={strong}>Envíos</strong> incluido en tu plan: viene en Pro y Empresarial (sin él, 403 <code>PLAN_MODULE_REQUIRED</code>).</li>
             <li>• La <strong style={strong}>API key de Envia.com</strong> en Configuración → Integraciones, con saldo en esa cuenta.</li>
             <li>• La <strong style={strong}>dirección de origen</strong> en Configuración → Envíos.</li>
             <li>• Un token con <code>shipments:read</code> para cotizar y consultar, y <code>shipments:write</code> para generar, rastrear y cancelar.</li>

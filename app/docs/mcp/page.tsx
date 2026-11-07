@@ -104,7 +104,9 @@ const problems = [
   ["403", "INSUFFICIENT_API_PERMISSIONS", "Al token le falta el permiso de esa herramienta. Llega dentro de la respuesta de la herramienta.", "La respuesta indica requiredPermission: crea un token con ese permiso."],
   ["403", "API_ACCESS_DISABLED", "El propietario apagó tu acceso por API y MCP.", "Pídele que lo active en Configuración → Usuarios → Acceso por API."],
   ["403", "ORGANIZATION_ID_MISMATCH", "Enviaste X-Organization-Id (u organizationId) de una organización distinta a la del token.", "Quita el header o usa el token de esa organización."],
-  ["403", "PLAN_MODULE_REQUIRED", "El plan de la organización no incluye la API (es de los planes Pro y Unlimited).", "Cambia de plan en Configuración → Plan."],
+  ["403", "PLAN_MODULE_REQUIRED", "El plan no incluye lo que pidió la herramienta. module dice qué falta: api (el MCP mismo, de los planes Pro y Empresarial) o una función como waCampaigns, aiAgents, leadScoring, pdfDocuments o auditLog.", "Cambia de plan en Configuración → Plan. Mientras tu plan incluya el MCP (Pro o Empresarial), las herramientas de lectura siguen funcionando; si bajas a Básico, el MCP deja de responder, también para leer, y tus datos siguen en la app."],
+  ["403", "PLAN_LIMIT_REACHED", "Llegaste a un tope del plan al crear (contactos, empresas, listas, formularios, landing pages…). details trae el uso y el tope.", "Libera espacio o sube de plan."],
+  ["403", "ACCOUNT_RESTRICTED", "La cuenta está en pausa porque la prueba gratis o el plan vencieron: se puede leer, pero no crear ni enviar.", "El propietario paga el plan en Configuración → Plan."],
   ["429", "API_QUOTA_EXCEEDED", "Llegaste al tope de acciones por hora de tu usuario (creaciones, ediciones o envíos).", "Espera a la siguiente hora o pídele al propietario que suba tu tope en Configuración → Usuarios → Acceso por API."],
 ];
 
@@ -295,12 +297,12 @@ export default function McpPage() {
         <section id="security" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Permisos y seguridad</h2>
           <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
-            <li>• Con inicio de sesión OAuth, la IA actúa con los permisos de quien autorizó, según su rol: el propietario puede todo; un empleado puede todo menos borrar (salvo que el propietario se lo active) y tiene un tope de acciones por hora; un lector solo consulta; un contador trabaja solo con contactos, empresas, facturación y compras (y puede consultar productos y cotizaciones).</li>
+            <li>• Con inicio de sesión OAuth, la IA actúa con los permisos de quien autorizó, según su rol: el propietario puede todo; un empleado puede todo menos borrar (salvo que el propietario se lo active) y tiene un tope de acciones por hora; un contador trabaja solo con contactos, empresas, facturación y compras (y puede consultar productos y cotizaciones).</li>
             <li>• Con un token de API, la IA ve todas las herramientas, pero solo puede usar las que permita el token: si intenta, por ejemplo, enviar un WhatsApp sin el permiso <code>whatsapp:send</code>, recibe un error de permiso y no se envía nada.</li>
             <li>• Todo queda acotado a tu organización: no hay forma de leer datos de otra.</li>
             <li>• Los usuarios que no son propietarios tienen topes por hora (200 creaciones, 300 ediciones y 30 envíos de WhatsApp o correo), los mismos de la <Link href="/docs/api#errors" style={{ color: "#d1345b" }}>API REST</Link>. El propietario puede apagarle la API y el MCP a un usuario, o ajustar sus topes, en Configuración → Usuarios → Acceso por API.</li>
             <li>• Revocar un token de API corta el acceso al instante. Revocar un conector MCP impide conexiones nuevas, pero un cliente que ya estaba conectado puede seguir funcionando: para cortarlo del todo, desconéctalo también en tu cliente (por ejemplo en Claude → Conectores) o apágale el acceso por API a ese usuario.</li>
-            <li>• MCP hace parte del módulo API del plan, igual que la API REST.</li>
+            <li>• MCP hace parte del módulo API, incluido en los planes Pro y Empresarial, igual que la API REST. Las herramientas respetan además las funciones del plan: por ejemplo, crear o programar campañas de WhatsApp, activar agentes IA o editar reglas de lead scoring piden un plan que las incluya.</li>
             <li>• El header <code>X-Organization-Id</code> (o el query <code>organizationId</code>) es opcional: sin él se usa la organización del token. Si lo envías y no coincide, la respuesta es 403 <code>ORGANIZATION_ID_MISMATCH</code> (en MCP llega como error JSON-RPC con ese código en <code>data.code</code>).</li>
           </ul>
           <Callout type="warning">
