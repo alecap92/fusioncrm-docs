@@ -421,7 +421,7 @@ export default function SettingsPage() {
             <strong style={{ color: "var(--foreground)" }}>Pro</strong> y{" "}
             <strong style={{ color: "var(--foreground)" }}>Empresarial</strong>. Se cobran{" "}
             <strong style={{ color: "var(--foreground)" }}>por usuario</strong>, mes a mes o por año (el anual
-            trae 2 meses gratis), y todos los precios incluyen IVA: lo que ves es lo que pagas. Aparte está{" "}
+            se paga como 10 meses y usas 12), y todos los precios incluyen IVA: lo que ves es lo que pagas. Aparte está{" "}
             <strong style={{ color: "var(--foreground)" }}>Contabilidad</strong>, para la facturación
             electrónica. Los precios vigentes están siempre en{" "}
             <a href="https://www.fusioncol.com/precios" style={{ color: "#d1345b" }}>fusioncol.com/precios</a>.
@@ -437,8 +437,8 @@ export default function SettingsPage() {
               </thead>
               <tbody>
                 {[
-                  ["Por usuario al mes", "$49.900", "$79.900", "$129.900"],
-                  ["Por usuario al año", "$499.000", "$799.000", "$1.299.000"],
+                  ["Por usuario al mes", "$59.900", "$99.900", "$159.900"],
+                  ["Por usuario al año", "$599.000", "$999.000", "$1.599.000"],
                   ["Prueba gratis", "14 días, 1 usuario", "—", "—"],
                   ["Líneas de WhatsApp", "1", "2", "5"],
                   ["Contactos", "2.000", "10.000", "50.000"],
@@ -479,11 +479,11 @@ export default function SettingsPage() {
           </p>
           <ul className="space-y-1 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
             <li>• Ver tu plan, su uso (contactos, empresas, líneas, automatizaciones…) y qué incluye.</li>
-            <li>• Pagar con tarjeta (Wompi), mensual o anual. Antes de pagar ves el total exacto, con los usuarios y Contabilidad si la sumas. La renovación es automática.</li>
+            <li>• Pagar con tarjeta (Wompi), mensual o anual. Antes de pagar ves el total exacto, con los usuarios y Contabilidad si la sumas. La renovación es automática: cada periodo se cobra a la tarjeta que guardaste al pagar, hasta que canceles.</li>
             <li>• <strong style={{ color: "var(--foreground)" }}>Subir de plan:</strong> aplica de inmediato. Solo pagas la diferencia por los días que le quedan a tu periodo, y tu fecha de renovación no cambia.</li>
             <li>• <strong style={{ color: "var(--foreground)" }}>Bajar de plan o pasar de anual a mensual:</strong> queda programado y aplica en tu próxima renovación; hasta entonces sigues con lo que pagaste. Puedes deshacer el cambio antes de esa fecha. No hay reembolsos.</li>
             <li>• <strong style={{ color: "var(--foreground)" }}>Usuarios:</strong> el precio del plan incluye un usuario y cada usuario adicional cuesta lo mismo. Agregas o liberas asientos en Configuración → Usuarios; un asiento nuevo se cobra por los días que quedan del periodo y uno liberado deja de cobrarse en la siguiente renovación.</li>
-            <li>• Cancelar la suscripción: tu plan sigue activo hasta el final del periodo pagado.</li>
+            <li>• Cancelar la suscripción: tu plan sigue activo hasta el final del periodo pagado y no se renueva. Si tienes Contabilidad mensual dentro de su permanencia, mira la sección de Contabilidad.</li>
           </ul>
 
           <h3 className="text-lg font-semibold mb-3 mt-6" style={{ color: "var(--foreground)" }}>Prueba gratis de 14 días</h3>
@@ -508,13 +508,16 @@ export default function SettingsPage() {
             <li>• $79.900 al mes o $799.000 al año, con documentos ilimitados, certificado de firma digital incluido y la habilitación ante la DIAN sin costo.</li>
             <li>• La sumas encima de cualquier plan del CRM, con la misma fecha de renovación, o la contratas sola si solo necesitas facturar (sin el CRM: contactos, empresas, productos, facturación y compras).</li>
             <li>• Sola, incluye al dueño y un contador; encima de un plan del CRM, suma un contador que no ocupa asiento.</li>
-            <li>• El pago mensual tiene una permanencia mínima de 3 meses: si cancelas antes, la cancelación aplica al cumplirse ese plazo.</li>
+            <li>• El pago mensual tiene una permanencia mínima de 3 meses desde que la contratas, sola o encima de un plan: si cancelas antes, la cancelación aplica al cumplirse ese plazo y hasta entonces se sigue cobrando. El pago anual no tiene permanencia aparte.</li>
+            <li>• Si cancelas tu plan del CRM antes de cumplir los 3 meses de Contabilidad, el plan termina al final de su periodo, pero Contabilidad se sigue cobrando hasta cumplir la permanencia. Mientras tanto tu cuenta solo usa Contabilidad (contactos, empresas, productos, facturación y compras). Al cumplirse, termina.</li>
           </ul>
 
-          <h3 className="text-lg font-semibold mb-3 mt-6" style={{ color: "var(--foreground)" }}>Precio fundador</h3>
+          <h3 className="text-lg font-semibold mb-3 mt-6" style={{ color: "var(--foreground)" }}>Configuración asistida</h3>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Los primeros 100 clientes que pagan conservan el precio con el que entraron, también si
-            después suben de plan. El precio se mantiene mientras la suscripción no venza sin renovarse.
+            Puedes configurar todo tú mismo sin costo. Si prefieres que te ayudemos (conectar WhatsApp,
+            importar contactos, armar embudos y automatizaciones o capacitar a tu equipo), la configuración
+            asistida cuesta <strong style={{ color: "var(--foreground)" }}>$100.000 por hora, IVA incluido</strong>.
+            La habilitación ante la DIAN de Contabilidad no tiene costo.
           </p>
 
           <h3 className="text-lg font-semibold mb-3 mt-6" style={{ color: "var(--foreground)" }}>Cuando algo no está en tu plan</h3>
