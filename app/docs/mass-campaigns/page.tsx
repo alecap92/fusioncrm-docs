@@ -68,10 +68,13 @@ export default function MassCampaignsPage() {
               </ul>
             </div>
           </div>
-          <Callout type="note" title="Cupo mensual de tu plan">
-            Cada plan incluye un cupo de mensajes masivos al mes. WhatsApp: 200 en Free, 2.000 en Pro y
-            sin límite en Unlimited. Correo: 1.000 en Free, 25.000 en Pro y 100.000 en Unlimited. Si se
-            agota el cupo, el envío se bloquea hasta el siguiente mes o hasta que cambies de plan.
+          <Callout type="note" title="Qué incluye cada plan">
+            Las campañas masivas de WhatsApp vienen en los planes Pro y Empresarial, sin cupo mensual del
+            plan (los topes de envío los pone Meta según la calidad de tu número). El plan Básico no puede
+            crear, programar ni enviar campañas de WhatsApp; si bajas a Básico, tus campañas anteriores y
+            sus resultados se siguen viendo. Correo masivo: 1.000 al mes en Básico, 10.000 en Pro y 50.000
+            en Empresarial; si se agota, el envío se bloquea hasta el siguiente mes o hasta que subas de
+            plan. Los correos de cotizaciones y las invitaciones del calendario no gastan ese cupo.
           </Callout>
         </section>
 

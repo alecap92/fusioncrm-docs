@@ -44,6 +44,10 @@ export default function TeamActivityPage() {
           informe cada mañana a tu correo.
         </p>
 
+        <Callout type="note" title="Plan">
+          Actividad del equipo y el informe diario por correo vienen en los planes Pro y Empresarial.
+        </Callout>
+
         <section id="overview" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Para qué sirve</h2>
           <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>

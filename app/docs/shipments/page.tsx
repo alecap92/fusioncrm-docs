@@ -116,11 +116,11 @@ export default function ShipmentsPage() {
             <li>• <strong style={fg}>Rastrear</strong> el paquete y avisarle al cliente con el número de guía.</li>
             <li>• <strong style={fg}>Tener el historial</strong> de envíos de cada cliente en su ficha, y verlos también en su pestaña <strong style={fg}>Actividad</strong>.</li>
           </ul>
-          <Callout type="note" title="Módulo adicional">
-            Envíos es un módulo que se activa aparte de tu plan, igual que Facturación. Si tu plan no lo
-            tiene, no verás la pestaña Envíos en los contactos ni la sección Configuración → Envíos.
-            Para agregarlo mira{" "}
-            <Link href="/docs/settings#plan" style={link}>Plan, asientos y módulos</Link>. El rol
+          <Callout type="note" title="Incluido en Pro y Empresarial">
+            Envíos viene incluido, sin costo aparte, en los planes Pro y Empresarial. Las guías se pagan
+            con el saldo de tu propia cuenta de Envia.com. Con el plan Básico no verás la pestaña Envíos
+            en los contactos ni la sección Configuración → Envíos. Compara los planes en{" "}
+            <Link href="/docs/settings#plan" style={link}>Plan y facturación</Link>. El rol
             Contador no ve Envíos.
           </Callout>
         </section>

@@ -238,7 +238,7 @@ export default function ConversationPipelinesPage() {
           <P>
             Para administrar pipelines y columnas necesitas los permisos <Code>pipelines:read</Code> y{" "}
             <Code>pipelines:write</Code>. Para listar, crear o mover conversaciones, <Code>conversations:read</Code> y{" "}
-            <Code>conversations:write</Code>. La API está disponible en los planes Pro y Unlimited. Un pipeline
+            <Code>conversations:write</Code>. La API está disponible en los planes Pro y Empresarial. Un pipeline
             o etapa de otra organización responde <Code>404</Code>, nunca se filtra en silencio.
           </P>
           <div className="rounded-lg overflow-hidden border mb-4" style={{ borderColor: "var(--border)" }}>

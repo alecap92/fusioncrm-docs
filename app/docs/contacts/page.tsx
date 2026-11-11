@@ -64,8 +64,10 @@ export default function ContactsPage() {
           </ul>
           <Callout type="note">
             Todos los usuarios de tu organización ven todos los contactos. Lo que cada persona puede
-            hacer depende de su rol (propietario, empleado, lector o contador), que asignas en
-            Configuración → Usuarios. El número de contactos que puedes tener depende de tu plan.
+            hacer depende de su rol (propietario, empleado o contador), que asignas en
+            Configuración → Usuarios. El número de contactos que puedes tener depende de tu plan: 2.000 en
+            Básico, 10.000 en Pro y 50.000 en Empresarial. Al importar, los que no caben se informan aparte
+            y no se crean.
           </Callout>
           <Callout type="note">
             Al guardar un contacto (a mano, por importación, formulario o API) los valores se

@@ -46,6 +46,10 @@ export default function WorkflowsPage() {
           que tú definas, sin escribir código.
         </p>
 
+        <Callout type="note" title="Automatizaciones por plan">
+          Puedes tener 2 automatizaciones activas en Básico, 5 en Pro y 30 en Empresarial; los borradores y las pausadas no cuentan. El disparador «Le toca recomprar» (recompra automática) y la acción de informe del equipo vienen desde el plan Pro. Si bajas de plan y te sobran automatizaciones, siguen funcionando un tiempo: no puedes activar más y a los 30 días se pausan solas las más nuevas que sobren, con aviso.
+        </Callout>
+
         <section id="overview" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={fg}>¿Qué es una automatización?</h2>
           <p className="mb-4" style={muted}>

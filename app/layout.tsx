@@ -70,7 +70,15 @@ const jsonLd = {
       description:
         "CRM para negocios que venden por WhatsApp: bandeja compartida, embudo de ventas, cotizaciones, factura electrónica DIAN, envíos y automatizaciones.",
       publisher: { "@id": "https://fusioncol.com/#organization" },
-      offers: { "@type": "Offer", price: "0", priceCurrency: "COP", description: "Plan Free disponible" },
+      offers: {
+        "@type": "AggregateOffer",
+        priceCurrency: "COP",
+        lowPrice: "59900",
+        highPrice: "159900",
+        offerCount: 3,
+        description:
+          "Planes Básico, Pro y Empresarial por usuario al mes, IVA incluido. Prueba gratis de 14 días del plan Básico, sin tarjeta.",
+      },
     },
   ],
 };
