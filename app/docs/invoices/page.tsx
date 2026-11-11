@@ -55,7 +55,7 @@ export default function InvoicesPage() {
           costo. La sumas a cualquier plan del CRM desde Configuración → Plan, o la contratas sola si solo
           necesitas facturar. Incluye facturas, notas crédito y débito, compras, recepción de
           facturas, documentos soporte, retenciones y cuentas por cobrar, y un usuario contador sin costo.
-          Más detalle en{" "}
+          El pago mensual tiene una permanencia mínima de 3 meses, sola o encima de un plan. Más detalle en{" "}
           <a href="/docs/settings#plan" style={{ color: "#d1345b" }}>Plan y facturación</a>.
         </Callout>
 
