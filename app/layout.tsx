@@ -73,8 +73,8 @@ const jsonLd = {
       offers: {
         "@type": "AggregateOffer",
         priceCurrency: "COP",
-        lowPrice: "49900",
-        highPrice: "129900",
+        lowPrice: "59900",
+        highPrice: "159900",
         offerCount: 3,
         description:
           "Planes Básico, Pro y Empresarial por usuario al mes, IVA incluido. Prueba gratis de 14 días del plan Básico, sin tarjeta.",
