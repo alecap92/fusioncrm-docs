@@ -255,6 +255,7 @@ export default function ConversationPipelinesPage() {
                   ["Listar, crear, editar y eliminar pipelines", "GET/POST /api/conversation-pipelines · GET/PUT/DELETE /api/conversation-pipelines/{id}", "list_conversation_pipelines · get/create/update/delete_conversation_pipeline"],
                   ["Columnas de un pipeline", "Vienen dentro de GET /api/conversation-pipelines/{id} · POST …/{id}/stages · PUT/DELETE …/{id}/stages/{stageId} · PUT …/{id}/stages/order", "list_pipeline_stages · create/update/delete_conversation_stage · reorder_conversation_stages"],
                   ["Mover una conversación de columna", "PUT /api/conversations/{id}/stage", "move_conversation_stage"],
+                  ["Mover varias conversaciones de columna en lote", "POST /api/conversations/move-stage con stageId (destino) y conversationIds y/o fromStageId (columna de origen); hasta 500 por llamada, responde { matched, updated, remaining }", "move_conversations_stage"],
                   ["Mover una conversación a otro pipeline", "PUT /api/conversations/{id}/pipeline con pipelineId e initialStageId", "change_conversation_pipeline"],
                   ["Mover todas las conversaciones de un pipeline a otro", "POST /api/conversation-pipelines/{id}/move-all con targetPipelineId y targetStageId; responde { moved }", "move_all_conversations_pipeline"],
                   ["Listar conversaciones de un pipeline", "?pipeline= en GET /api/conversations", "list_conversations"],
