@@ -120,6 +120,21 @@ export default function WhatsappLinesPage() {
             <li>• <B>Automática (recomendada):</B> pulsa "Conectar con Facebook" y sigue los pasos de Meta. Se repite por cada número nuevo que quieras agregar.</li>
             <li>• <B>Manual (avanzada):</B> guardas el App ID, App Secret y Verify Token de una app de Meta propia. La línea queda <em>pendiente de conectar</em> y el botón "Conectar" la completa con el número. Solo puede haber una línea pendiente a la vez.</li>
           </ul>
+          <P>
+            La primera vez, la ventana muestra una casilla para aceptar la{" "}
+            <a href="https://www.fusioncol.com/uso-aceptable" target="_blank" rel="noopener noreferrer" style={{ color: "#d1345b" }}>Política de Uso Aceptable y Mensajería</a>.
+            Sin marcarla no se puede conectar. También puedes aceptarla al final de esta misma pantalla de
+            ajustes, en "Política de uso aceptable y mensajería". Se acepta una vez por cada versión.
+          </P>
+          <H3>Estado "Restringida por Meta" o "Calidad baja"</H3>
+          <P>
+            Si Meta restringe o deshabilita tu cuenta de WhatsApp, la línea aparece como <B>"Restringida por
+            Meta"</B> y el propietario recibe una notificación. Si Meta marca el número por baja calidad
+            (muchos bloqueos o reportes), aparece <B>"Calidad baja"</B>. En ambos casos el motivo y la
+            solución están en el administrador de WhatsApp de Meta: FusionCRM no puede levantar la sanción.
+            Corrige la causa antes de volver a enviar; conectar un número nuevo para esquivarla está
+            prohibido por la política.
+          </P>
           <H3>Editar, marcar por defecto y desconectar</H3>
           <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
             <li>• <B>Perfil de WhatsApp (icono de persona):</B> la foto, la descripción y los datos que ven tus clientes. Ver <Link href="#profile" style={{ color: "#d1345b" }}>Perfil de negocio del número</Link>.</li>
