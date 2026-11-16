@@ -147,10 +147,20 @@ export default function MassCampaignsPage() {
             Por API o MCP, el borrador acepta <code style={{ color: "#d1345b" }}>lineId</code> y el preflight
             dice si la plantilla existe y está aprobada en esa línea.
           </Callout>
-          <Callout type="warning">
-            Los mensajes masivos de WhatsApp pueden afectar la calificación de calidad de tu número
-            si los destinatarios los reportan como spam. Asegúrate de enviar solo a contactos que
-            hayan dado su consentimiento.
+          <Callout type="warning" title="Solo a quien lo autorizó">
+            Antes del primer envío, el propietario de la cuenta debe aceptar la{" "}
+            <a href="https://www.fusioncol.com/uso-aceptable" target="_blank" rel="noopener noreferrer" style={{ color: "#d1345b" }}>Política de Uso Aceptable y Mensajería</a>:
+            aparece una casilla al pulsar "Enviar ahora" o al programar, y también se puede aceptar en
+            Ajustes → WhatsApp. Se acepta una vez por cada versión de la política. Si quien envía no es el
+            propietario, verá un aviso para pedírselo. Por API o MCP, programar una campaña sin esa
+            aceptación responde <code style={{ color: "#d1345b" }}>MESSAGING_POLICY_REQUIRED</code>.
+          </Callout>
+          <Callout type="danger" title="Si Meta sanciona tu número">
+            Los envíos masivos a personas que no los pidieron hacen que los destinatarios te bloqueen o
+            reporten, y Meta restringe o deshabilita el número. Si Meta rechaza una campaña por incumplir
+            sus políticas, FusionCRM la detiene. Conectar otro número para seguir enviando está prohibido
+            y puede llevar a la suspensión de tu cuenta. Envía solo a contactos que dieron su
+            autorización y respeta a quien pidió no ser contactado.
           </Callout>
         </section>
 
