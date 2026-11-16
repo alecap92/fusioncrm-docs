@@ -14,6 +14,7 @@
     "src/mcp/tools/contact-properties.ts",
     "src/mcp/tools/conversation-pipelines.ts",
     "src/mcp/tools/conversation-read.ts",
+    "src/mcp/tools/conversation-stage-batch.ts",
     "src/mcp/tools/deal-checklists.ts",
     "src/mcp/tools/deal-fields.ts",
     "src/mcp/tools/deal-pipelines.ts",
@@ -37,7 +38,7 @@
     "src/mcp/tools/users.ts",
     "src/mcp/tools/whatsapp-templates.ts"
   ],
-  "toolCount": 237,
+  "toolCount": 238,
   "tools": [
     {
       "name": "add_contacts_to_list",
@@ -1188,13 +1189,9 @@
                 },
                 "assignToTeam": {
                   "description": "userId de un empleado de la organización.",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "webhookEnabled": {
@@ -1203,13 +1200,9 @@
                 },
                 "webhookUrl": {
                   "description": "URL https del webhook de la etapa.",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "reopenOnNewMessage": {
@@ -1261,13 +1254,9 @@
           },
           "assignToTeam": {
             "description": "userId de un empleado de la organización.",
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "webhookEnabled": {
@@ -1276,13 +1265,9 @@
           },
           "webhookUrl": {
             "description": "URL https.",
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "reopenOnNewMessage": {
@@ -1323,19 +1308,11 @@
                       "type": "string"
                     },
                     "value": {
-                      "anyOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        },
-                        {
-                          "type": "boolean"
-                        },
-                        {
-                          "type": "null"
-                        }
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean",
+                        "null"
                       ]
                     }
                   },
@@ -1351,13 +1328,9 @@
           },
           "assignedTo": {
             "description": "userId del dueño del negocio (empleado de la organización; ver list_users); null lo deja sin dueño",
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           }
         },
@@ -1407,13 +1380,9 @@
           },
           "requiredForStage": {
             "description": "_id de la etapa (del mismo pipeline) para la que es requisito; null = ninguna",
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "enforcement": {
@@ -2446,16 +2415,10 @@
                     {
                       "type": "array",
                       "items": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          },
-                          {
-                            "type": "boolean"
-                          }
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean"
                         ]
                       }
                     },
@@ -2466,16 +2429,10 @@
                           "type": "string"
                         },
                         "value": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "boolean"
-                            }
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
                           ]
                         }
                       },
@@ -3528,15 +3485,11 @@
         "type": "object",
         "properties": {
           "number": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              }
-            ],
-            "description": "Número de cotización"
+            "description": "Número de cotización",
+            "type": [
+              "string",
+              "number"
+            ]
           }
         },
         "required": [
@@ -3629,27 +3582,17 @@
                 },
                 "value": {
                   "description": "Valor principal del filtro",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "boolean"
-                    }
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean"
                   ]
                 },
                 "valueTo": {
                   "description": "Valor superior para condición between",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "number"
-                    }
+                  "type": [
+                    "string",
+                    "number"
                   ]
                 }
               },
@@ -3698,13 +3641,9 @@
           },
           "timezone": {
             "description": "Zona de messagesFrom/messagesTo: offset en horas (-5) o IANA. Default: la de la organización.",
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "string"
-              }
+            "type": [
+              "number",
+              "string"
             ]
           },
           "detail": {
@@ -3823,19 +3762,11 @@
               "type": "string"
             },
             "additionalProperties": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
               ]
             },
             "description": "Valores por campo: { \"cliente.firstName\": \"Ana\", \"cliente.address?\": \"Cra 1 #2-3\" }."
@@ -4077,13 +4008,9 @@
           },
           "timezone": {
             "description": "Zona de messagesFrom/messagesTo: offset en horas (-5) o IANA. Default: la de la organización.",
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "string"
-              }
+            "type": [
+              "number",
+              "string"
             ]
           },
           "detail": {
@@ -4838,19 +4765,11 @@
                 "type": "string"
               },
               "additionalProperties": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  }
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
                 ]
               }
             },
@@ -4901,15 +4820,11 @@
             "description": "ID del contacto"
           },
           "companyId": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "ID de la empresa; null o \"\" desvincula"
+            "description": "ID de la empresa; null o \"\" desvincula",
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -5619,13 +5534,9 @@
           },
           "timezone": {
             "description": "Offset UTC en horas (-5) o zona IANA (America/Bogota). Para dateFrom/dateTo el default es 0; para messagesFrom/messagesTo, la zona de la organización.",
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "string"
-              }
+            "type": [
+              "number",
+              "string"
             ]
           },
           "source": {
@@ -7146,6 +7057,49 @@
       "group": "conversations"
     },
     {
+      "name": "move_conversations_stage",
+      "description": "Mover VARIAS conversaciones a una etapa, en lote (POST /api/conversations/move-stage, permiso conversations:write). Para una sola usa move_conversation_stage.\nstageId es la etapa DESTINO y fija el pipeline: solo se mueven conversaciones que ya están en ese pipeline (para cambiar de pipeline usa change_conversation_pipeline o move_all_conversations_pipeline).\nSelección: conversationIds (lista de ids, máx. 500) y/o fromStageId (todas las de esa etapa de origen, del mismo pipeline). Hace falta al menos uno. lineId solo acota (conversaciones de esa línea de WhatsApp). stageId/fromStageId salen de list_pipeline_stages; lineId de list_whatsapp_lines.\nCada conversación movida deja su registro en el historial de etapas y, si la etapa destino tiene autoasignación, queda asignada a ese equipo. El webhook de la etapa destino NO se dispara salvo fireWebhooks:true (cuidado: uno por conversación). No dispara automatizaciones.\nSolo toca las que cambian (las que no están ya en la etapa destino), las más recientes primero, hasta limit (default y máx. 500). La respuesta es corta: stage, pipeline, matched, updated, conversationIds y remaining: si remaining > 0, vuelve a llamar con los mismos parámetros. Con conversationIds, un id de otro pipeline, de otra organización o que ya estaba en la etapa simplemente no aparece en matched.\nCupo por hora de un empleado: cuenta como ediciones, una por id; por fromStageId cuenta su limit (500 si no lo pasas), así que un empleado debe pasar un limit que le quepa.\nEjemplo: tras una campaña, pasar todo 'Lead' a 'Perdido': {stageId: \"<Perdido>\", fromStageId: \"<Lead>\"}. Confirma con el usuario antes de mover una etapa entera.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "stageId": {
+            "type": "string",
+            "description": "ObjectId de la etapa DESTINO"
+          },
+          "conversationIds": {
+            "description": "Ids (ObjectId) de las conversaciones a mover, máx. 500",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fromStageId": {
+            "description": "Etapa de ORIGEN: mueve todas las conversaciones que están en ella (mismo pipeline que stageId)",
+            "type": "string"
+          },
+          "lineId": {
+            "description": "Acota a las conversaciones de esta línea de WhatsApp",
+            "type": "string"
+          },
+          "fireWebhooks": {
+            "description": "true = disparar el webhook de la etapa destino por cada conversación (default false)",
+            "type": "boolean"
+          },
+          "limit": {
+            "description": "Máximo de conversaciones en esta llamada (default 500)",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          }
+        },
+        "required": [
+          "stageId"
+        ]
+      },
+      "group": "conversations"
+    },
+    {
       "name": "publish_landing_page",
       "description": "PUBLICA una landing page: queda PÚBLICA EN INTERNET en su publicUrl (forms.fusioncol.com/p/<slug>) para cualquiera que tenga el enlace, indexable por buscadores salvo seo.indexable=false, y empieza a recibir visitas y leads reales. Confirma con el usuario antes de publicar. Exige al menos una sección activa y, si hay bloque form, un formulario activo de la organización; si no cumple responde 400 con el motivo. Requiere landings:write.",
       "inputSchema": {
@@ -7641,13 +7595,9 @@
           },
           "timezone": {
             "description": "Zona de messagesFrom/messagesTo: offset en horas (-5) o IANA. Default: la de la organización.",
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "string"
-              }
+            "type": [
+              "number",
+              "string"
             ]
           },
           "detail": {
@@ -8225,44 +8175,28 @@
             ]
           },
           "contactId": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "companyId": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "advisorId": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "reminder": {
             "description": "Fecha-hora ISO 8601, o null para quitarlo",
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           }
         },
@@ -8684,23 +8618,15 @@
             "type": "boolean"
           },
           "assignedTo": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "contactId": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "reminderEnabled": {
@@ -8717,13 +8643,9 @@
             }
           },
           "recurrenceRule": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "externalId": {
@@ -8779,13 +8701,9 @@
           },
           "lineId": {
             "description": "Otra línea de WhatsApp de la organización (id de list_whatsapp_lines); null la quita y la campaña vuelve a salir por la línea por defecto",
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "template": {
@@ -8840,13 +8758,9 @@
               },
               "headerMediaUrl": {
                 "description": "URL https de la cabecera; null la quita",
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
+                "type": [
+                  "string",
+                  "null"
                 ]
               }
             }
@@ -9014,13 +8928,9 @@
           },
           "companyId": {
             "description": "_id de la empresa; null o '' desvincula",
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "source": {
@@ -9072,24 +8982,16 @@
           },
           "whatsappUserId": {
             "description": "BSUID de WhatsApp ('CO.298…'); null o '' lo quita. Nunca lo pongas en mobile.",
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "whatsappUsername": {
             "description": "Alias de WhatsApp ('@claudiahoyos'); se guarda sin @ y en minúsculas; null o '' lo quita. Solo se guarda: NO enlaza conversaciones ni asigna BSUID.",
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           }
         },
@@ -9329,13 +9231,9 @@
             "type": "boolean"
           },
           "assignToTeam": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "webhookEnabled": {
@@ -9343,13 +9241,9 @@
           },
           "webhookUrl": {
             "description": "URL https, o null para quitarla.",
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "reopenOnNewMessage": {
@@ -9392,13 +9286,9 @@
           },
           "companyId": {
             "description": "Empresa a asociar al deal; null o \"\" desasocia",
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "customFields": {
@@ -9413,19 +9303,11 @@
                       "type": "string"
                     },
                     "value": {
-                      "anyOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        },
-                        {
-                          "type": "boolean"
-                        },
-                        {
-                          "type": "null"
-                        }
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean",
+                        "null"
                       ]
                     }
                   },
@@ -9441,13 +9323,9 @@
           },
           "assignedTo": {
             "description": "userId del dueño del negocio (empleado de la organización; ver list_users); null lo deja sin dueño",
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           }
         },
@@ -9513,13 +9391,9 @@
                 },
                 "requiredForStage": {
                   "description": "Id de la etapa de este pipeline que exige el ítem (null = informativo)",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "enforcement": {
@@ -9586,13 +9460,9 @@
           },
           "requiredForStage": {
             "description": "_id de etapa del pipeline, o null para quitar el requisito",
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "enforcement": {
@@ -9666,23 +9536,15 @@
             "type": "string"
           },
           "isWon": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "boolean",
+              "null"
             ]
           },
           "isLost": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "boolean",
+              "null"
             ]
           },
           "probability": {
@@ -9739,13 +9601,9 @@
                   "type": "string"
                 },
                 "amount": {
-                  "anyOf": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "string"
-                    }
+                  "type": [
+                    "number",
+                    "string"
                   ]
                 },
                 "pipeline": {
@@ -9754,13 +9612,9 @@
                 },
                 "status": {
                   "description": "_id de la etapa (del pipeline del negocio); null la quita",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "closingDate": {
@@ -9777,19 +9631,11 @@
                         "description": "id, key o nombre del campo"
                       },
                       "value": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          },
-                          {
-                            "type": "boolean"
-                          },
-                          {
-                            "type": "null"
-                          }
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean",
+                          "null"
                         ]
                       }
                     },
@@ -9818,24 +9664,16 @@
                   ]
                 },
                 "companyId": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "assignedTo": {
                   "description": "userId del dueño; null lo quita",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 }
               },
@@ -10039,24 +9877,16 @@
           },
           "listId": {
             "description": "Lista estática donde se agrega el contacto; null la quita",
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "ownerId": {
             "description": "Usuario dueño de los contactos creados; null lo quita",
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "deal": {
@@ -10140,13 +9970,9 @@
           },
           "imageLibraryId": {
             "description": "ID de una imagen de la biblioteca para enviarla con el fragmento; null la quita. Solo formato \"text\" y texto de máximo 1.024 caracteres.",
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           }
         },
@@ -10179,13 +10005,9 @@
           },
           "formId": {
             "description": "Id de formulario de la organización; null lo desasocia",
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "sections": {
@@ -10951,13 +10773,9 @@
             "type": "string"
           },
           "supplierId": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "supplierName": {
@@ -11185,16 +11003,10 @@
                     {
                       "type": "array",
                       "items": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          },
-                          {
-                            "type": "boolean"
-                          }
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean"
                         ]
                       }
                     },
@@ -11205,16 +11017,10 @@
                           "type": "string"
                         },
                         "value": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "boolean"
-                            }
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
                           ]
                         }
                       },
