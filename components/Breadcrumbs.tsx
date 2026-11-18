@@ -15,6 +15,7 @@ const labels: Record<string, string> = {
   "mass-campaigns": "Campañas Masivas",
   quotes: "Cotizaciones",
   invoices: "Facturación",
+  "alta-dian": "Alta en la DIAN",
   products: "Productos",
   reports: "Reportes",
   "lead-scoring": "Lead Scoring",
