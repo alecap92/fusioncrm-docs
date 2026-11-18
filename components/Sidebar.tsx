@@ -163,6 +163,7 @@ const navigation: NavItem[] = [
       { title: "Importar desde otro software", href: "/docs/contabilidad#importar" },
       { title: "Libros", href: "/docs/contabilidad#libros" },
       { title: "Quién puede hacer qué", href: "/docs/contabilidad#roles" },
+      { title: "En construcción: lo que viene", href: "/docs/contabilidad#en-construccion" },
       { title: "Lo que todavía no hay", href: "/docs/contabilidad#pendiente" },
     ],
   },

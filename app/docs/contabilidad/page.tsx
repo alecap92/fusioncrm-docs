@@ -34,6 +34,14 @@ const toc = [
   { id: "importar", label: "Importar desde otro software" },
   { id: "libros", label: "Libros" },
   { id: "roles", label: "Quién puede hacer qué" },
+  { id: "en-construccion", label: "En construcción: lo que viene" },
+  { id: "conciliacion", label: "Conciliación bancaria" },
+  { id: "transferencias", label: "Transferencias entre cuentas" },
+  { id: "cierre-anual", label: "Cierre del año" },
+  { id: "estados-financieros", label: "Balance y estado de resultados" },
+  { id: "diario-y-mayor", label: "Libro diario y mayor" },
+  { id: "pdf-contables", label: "PDF de los comprobantes" },
+  { id: "egreso-iva-y-compras", label: "Egreso con IVA y compras" },
   { id: "pendiente", label: "Lo que todavía no hay" },
 ];
 
@@ -74,6 +82,15 @@ function Steps({ items }: { items: ReactNode[] }) {
         <li key={i}>{i + 1}. {item}</li>
       ))}
     </ol>
+  );
+}
+
+function EnConstruccion() {
+  return (
+    <Callout type="warning" title="En construcción">
+      Esto <strong>todavía no está disponible en la app</strong>. El motor ya está construido y probado; faltan las
+      pantallas, que llegan en la siguiente entrega. Lo que sigue explica qué hace y cómo se va a usar.
+    </Callout>
   );
 }
 
@@ -280,6 +297,10 @@ export default function ContabilidadPage() {
           <P>
             Con <B>Quitar la fecha de cierre</B>, los comprobantes de esos días vuelven a actualizarse solos y los
             ajustes que se hicieron por el cierre se deshacen.
+          </P>
+          <P>
+            Está en construcción el <a href="#cierre-anual" style={link}>cierre del año</a>, y con él la fecha de
+            cierre gana más controles.
           </P>
 
           <H3 id="opciones">Opciones</H3>
@@ -731,18 +752,445 @@ export default function ContabilidadPage() {
           </P>
         </section>
 
-        <section id="pendiente" className="mb-10">
-          <H2>Lo que todavía no hay</H2>
-          <P>Para que no lo busques, esto todavía no existe en la contabilidad de FusionCRM:</P>
-          <Bullets
-            items={[
-              <><B>Conciliación con el extracto del banco.</B> No se cruza el extracto contra los recibos y egresos.</>,
-              <><B>Cierre anual.</B> Hay fecha de cierre de período, pero no el cierre contable de fin de año.</>,
-              <><B>Balance general y estado de resultados contables.</B> Los libros que hay son el balance de prueba y los auxiliares. El estado de resultados de <a href="/docs/invoices#reports" style={link}>Informes</a> es un informe de gestión, no sale de los libros.</>,
-              <><B>Retenciones dentro del recibo de caja.</B> Las retenciones del cliente se anotan en la factura con «Aplicar retenciones», no en el recibo.</>,
-              <><B>Cruzar un anticipo contra una factura posterior.</B> El anticipo queda registrado, pero todavía no se puede aplicar después a una factura desde el recibo.</>,
+        <section id="en-construccion" className="mb-10">
+          <H2>En construcción: lo que viene</H2>
+          <Callout type="warning" title="Todavía no está disponible en la app">
+            Lo que sigue, hasta el final de esta parte, <strong>ya está construido y probado por dentro, pero aún no
+            tiene pantallas</strong>: hoy no lo vas a encontrar en ningún menú. Las pantallas llegan en la siguiente
+            entrega. Aquí se explica qué hace cada cosa y cómo se va a usar, para que tú y tu contador sepan qué
+            esperar. Los detalles de cada pantalla se documentarán cuando existan.
+          </Callout>
+          <Table
+            head={["Qué viene", "Para qué sirve"]}
+            rows={[
+              [<a key="a" href="#conciliacion" style={link}>Conciliación bancaria con extracto</a>, "Cruzar el extracto del banco contra lo que tienes registrado en esa cuenta."],
+              [<a key="a" href="#transferencias" style={link}>Transferencias entre cuentas de dinero</a>, "Pasar plata de la caja al banco, o de un banco a otro, con su propio comprobante."],
+              [<a key="a" href="#cierre-anual" style={link}>Cierre del año y fecha de cierre</a>, "Cerrar el año contable y llevar el resultado al patrimonio; cerrar cada mes con más controles."],
+              [<a key="a" href="#estados-financieros" style={link}>Balance general y estado de resultados</a>, "Los dos estados financieros, sacados de los libros, con comparativo, Excel y PDF."],
+              [<a key="a" href="#diario-y-mayor" style={link}>Libro diario y mayor y balances</a>, "Los dos libros que faltaban junto al balance de prueba y los auxiliares."],
+              [<a key="a" href="#pdf-contables" style={link}>PDF de los comprobantes</a>, "El comprobante contable en PDF, y el recibo y el egreso en versión para el cliente o con cuentas."],
+              [<a key="a" href="#egreso-iva-y-compras" style={link}>Egreso con IVA y controles en compras</a>, "IVA descontable en un gasto sin factura de compra, aviso de compra repetida y más protección a las compras pagadas."],
             ]}
           />
+          <P>
+            Todo esto usa la misma contabilidad que ya se explica arriba y se activa igual:{" "}
+            <a href="#activar" style={link}>empresa por empresa y a pedido</a>.
+          </P>
+        </section>
+
+        <section id="conciliacion" className="mb-10">
+          <H2>Conciliación bancaria con extracto</H2>
+          <EnConstruccion />
+          <P>
+            Conciliar es comparar el extracto del banco con lo que tienes registrado en esa cuenta, movimiento por
+            movimiento. La conciliación <B>no mueve plata ni cambia ningún comprobante</B>: solo deja dicho qué línea
+            del extracto corresponde a qué movimiento de tus libros, y qué quedó sin pareja.
+          </P>
+
+          <H3>El archivo del extracto</H3>
+          <P>
+            Se sube el archivo que descargas del banco, para uno de tus <a href="#bancos-y-caja" style={link}>bancos</a>{" "}
+            y un período.
+          </P>
+          <Table
+            head={["Límite", "Valor"]}
+            rows={[
+              ["Formato", "Excel .xlsx o CSV (separado por coma, punto y coma o tabulador)."],
+              ["Tamaño", "Máximo 600 KB."],
+              ["Movimientos", "Máximo 2.000 por extracto."],
+              ["Período", "Máximo 366 días. Si no lo indicas, va de la primera a la última fecha del archivo."],
+            ]}
+          />
+          <P>
+            Con el <B>formato genérico</B> sirve el archivo de cualquier banco: las columnas se reconocen por su
+            título, sin importar tildes ni mayúsculas. La fila de títulos debe estar entre las primeras 20 filas.
+          </P>
+          <Table
+            head={["Dato", "Títulos que se reconocen", "¿Obligatorio?"]}
+            rows={[
+              ["Fecha", "Fecha, Fecha movimiento, Date", "Sí"],
+              ["Descripción", "Descripción, Concepto, Detalle", "No"],
+              ["Referencia", "Referencia, Documento, Ref", "No"],
+              ["Valor", "Una columna con signo (Valor, Monto, Importe), o dos columnas: Débito y Crédito, Egresos e Ingresos, o Retiros y Depósitos", "Sí"],
+              ["Saldo", "Saldo", "No, pero ayuda a revisar el archivo"],
+            ]}
+          />
+          <Bullets
+            items={[
+              <><B>Signo del valor:</B> positivo es plata que entra al banco; negativo, plata que sale.</>,
+              <><B>Fechas que se leen:</B> 2025-06-30, 30/06/2025, 30-06-2025, 2025/06/30, 20250630 y las fechas propias de Excel.</>,
+              <><B>Valores que se leen:</B> 1.234.567,89 · 1,234,567.89 · -1234567.89 · (1.234,56) como negativo, con o sin el signo $.</>,
+              "Una fecha o un valor que se pueda leer de dos maneras no se adivina: esa fila se marca como error.",
+              "Si las columnas de tu banco tienen otros títulos, se puede indicar cuál columna es cada dato.",
+              <><B>Plantilla de Bancolombia:</B> para el archivo de movimientos con las columnas FECHA, DESCRIPCIÓN, SUCURSAL, DCTO., VALOR y SALDO. Si tu archivo viene con otra forma, sirve el formato genérico.</>,
+            ]}
+          />
+          <P>
+            Primero se <B>revisa</B> el archivo, sin guardar nada: ves cuántos movimientos trae, cuánto entró, cuánto
+            salió y el saldo final. Si una sola fila está mala, el extracto no se guarda y recibes el informe fila por
+            fila para corregirlo. También puede haber avisos que no impiden seguir, por ejemplo que el período se
+            cruza con otro extracto de la misma cuenta o que el saldo de una fila no cuadra con la anterior.
+          </P>
+
+          <H3>Cruzar los movimientos</H3>
+          <Bullets
+            items={[
+              "Al abrir el extracto ves, de un lado, las líneas del banco y, del otro, los movimientos de tus libros en esa cuenta: recibos, egresos, transferencias y comprobantes manuales.",
+              <><B>Sugerencias:</B> para cada línea del banco se propone el movimiento que tiene el mismo valor y una fecha cercana (hasta tres días antes o después).</>,
+              <><B>Nada se concilia solo.</B> Una sugerencia es solo eso: el cruce queda hecho cuando una persona lo confirma.</>,
+              "Una línea del banco se puede cruzar con uno o con varios movimientos de libros, siempre que sumen exactamente su valor.",
+              "Un movimiento de libros solo puede estar en un cruce. Un cruce se puede deshacer mientras la conciliación esté abierta.",
+              "Si después anulas o cambias un comprobante que ya estaba cruzado, ese cruce queda marcado como roto para que lo revises.",
+            ]}
+          />
+
+          <H3>El saldo inicial, en la primera conciliación</H3>
+          <P>
+            La primera vez que concilias una cuenta, el banco ya traía un saldo de antes. Para que la conciliación
+            llegue a cero:
+          </P>
+          <Steps
+            items={[
+              "Al subir el extracto, indica el saldo inicial que dice el banco. Va desde el comienzo: si se te olvida, hay que descartar el extracto y subirlo otra vez.",
+              <>Cruza ese saldo contra lo que tenías registrado en esa cuenta antes del período: normalmente, tus <a href="#saldos-iniciales" style={link}>saldos iniciales</a>. Debe sumar exactamente lo mismo.</>,
+            ]}
+          />
+          <P>
+            En las conciliaciones siguientes no hace falta: el saldo inicial es lo que ya quedó conciliado en las
+            anteriores.
+          </P>
+
+          <H3>Lo que está en el banco y falta en tus libros</H3>
+          <P>
+            El banco cobra cosas que tú no registraste: la comisión, el 4×1000, o te abona intereses. La conciliación
+            te da una pista de qué puede ser cada línea, pero no registra nada por ti. Lo que falta se registra con un{" "}
+            <a href="#recibos-y-egresos" style={link}>comprobante de egreso</a> (lo que te cobraron) o con un recibo de
+            caja (lo que te abonaron), y después se cruza como cualquier otro movimiento.
+          </P>
+          <P>
+            Si el mes ya está cerrado, ese egreso se registra con fecha del período abierto. Se puede cruzar con el
+            extracto si su fecha es hasta 31 días después del final del período, y el informe lo muestra aparte.
+          </P>
+
+          <H3>Qué significa «conciliado»</H3>
+          <P>El resumen de la conciliación muestra:</P>
+          <Table
+            head={["Renglón", "Qué es"]}
+            rows={[
+              ["Saldo en libros", "Lo que dice tu contabilidad para esa cuenta al final del período."],
+              ["En libros y no en banco", "Lo que registraste y el banco todavía no muestra. Por ejemplo, un cheque que no han cobrado."],
+              ["En banco y no en libros", "Líneas del extracto sin cruzar, o con el cruce roto."],
+              ["Saldo en banco", "El saldo final del extracto."],
+              ["Diferencia", "Lo que queda sin explicar. Debe ser cero."],
+            ]}
+          />
+          <P>Una conciliación está <B>conciliada</B> cuando se cumplen las tres cosas:</P>
+          <Bullets
+            items={[
+              "La diferencia es cero.",
+              "No queda ninguna línea del extracto sin cruzar.",
+              "Ningún cruce está roto.",
+            ]}
+          />
+          <P>
+            Lo que está en libros y no en banco <B>no</B> impide que esté conciliada: un cheque sin cobrar es normal en
+            una conciliación terminada, y queda en su lista.
+          </P>
+
+          <H3>Cerrar, reabrir e informe en PDF</H3>
+          <Bullets
+            items={[
+              <><B>Cerrar:</B> al terminar se cierra la conciliación y ya no se le cambian los cruces. Se puede cerrar con diferencia o con líneas pendientes, pero queda dicho con todas las letras.</>,
+              <><B>Reabrir:</B> pide escribir el motivo, que queda guardado.</>,
+              "Cerrar y reabrir es del propietario y del contador.",
+              "Un extracto que subiste por error se puede descartar mientras esté abierto.",
+              <><B>Informe en PDF:</B> trae la cuenta, el período, el resumen renglón por renglón, el saldo inicial, la lista de lo que está en libros y no en banco, la de lo que está en banco y no en libros, y los espacios de firma «Elaboró» y «Revisó». Si se cerró con diferencia o con pendientes, el informe lo dice en una banda visible.</>,
+            ]}
+          />
+        </section>
+
+        <section id="transferencias" className="mb-10">
+          <H2>Transferencias entre cuentas de dinero</H2>
+          <EnConstruccion />
+          <P>
+            Una transferencia es pasar plata entre dos de tus <a href="#bancos-y-caja" style={link}>bancos o cajas</a>:
+            consignar en el banco el efectivo de la caja, o mover plata de un banco a otro. No es un ingreso ni un
+            gasto: la plata solo cambia de lugar.
+          </P>
+          <Bullets
+            items={[
+              "Se indica de qué cuenta sale, a cuál entra, la fecha y el valor. Si quieres, también la referencia y una nota.",
+              "Las dos cuentas deben estar activas y ser distintas. La fecha no puede ser futura ni caer en un período cerrado.",
+              <>Queda con su propio comprobante, <B>Transferencia entre cuentas (TR)</B>, con numeración propia. Aparece en los libros de las dos cuentas y en la conciliación de cada una.</>,
+              "Se anula escribiendo el motivo. Conserva su número.",
+              "Una transferencia con fecha en un período cerrado o en un año cerrado no se anula. Para corregirla se registra otra en el período abierto, o se cambia antes la fecha de cierre.",
+              "Si anulas una transferencia que ya estaba cruzada en una conciliación, ese cruce queda marcado como roto.",
+            ]}
+          />
+          <P>
+            Mientras llegan las pantallas, un movimiento entre cuentas se registra con un{" "}
+            <a href="#comprobante-manual" style={link}>comprobante manual</a>.
+          </P>
+        </section>
+
+        <section id="cierre-anual" className="mb-10">
+          <H2>Cierre del año y fecha de cierre</H2>
+          <EnConstruccion />
+          <P>
+            El año contable es el año calendario. Cerrarlo es dejar en cero las cuentas de ingresos, costos y gastos
+            y llevar el resultado del año al patrimonio, para que el año siguiente empiece limpio.
+          </P>
+
+          <H3>Qué hace el cierre</H3>
+          <Bullets
+            items={[
+              <>Genera un <B>comprobante de cierre (CI)</B> con fecha 31 de diciembre, que cancela el saldo de cada cuenta de ingresos, costos y gastos, cuenta por cuenta y tercero por tercero.</>,
+              <>Si el año dio <B>utilidad</B>, la lleva a la cuenta <B>360505</B> (utilidad del ejercicio). Si dio <B>pérdida</B>, a la <B>361005</B> (pérdida del ejercicio).</>,
+              "Deja la fecha de cierre en el 31 de diciembre de ese año, si estaba antes.",
+              "No genera un comprobante de apertura: las cuentas de balance (activo, pasivo y patrimonio) siguen con su saldo, y los ingresos, costos y gastos arrancan en cero el 1 de enero.",
+              "Si el año no tuvo ingresos, costos ni gastos, se cierra sin comprobante.",
+            ]}
+          />
+
+          <H3>Primero la simulación</H3>
+          <P>
+            Antes de cerrar se hace una <B>simulación</B>, que no cambia nada. Muestra si el año dio utilidad o pérdida
+            y de cuánto, y el comprobante de cierre tal como va a quedar, línea por línea. El cierre de verdad solo se
+            hace al confirmarlo después de revisar.
+          </P>
+          <P>Para poder cerrar un año:</P>
+          <Bullets
+            items={[
+              "El año ya terminó.",
+              "Los años anteriores que tengan movimientos ya están cerrados.",
+              "No hay documentos pendientes de entrar a la contabilidad ni con alertas.",
+              "El balance de prueba cuadra.",
+            ]}
+          />
+          <P>Si falta algo, el cierre no se hace y te dice qué falta.</P>
+
+          <H3>Qué queda bloqueado</H3>
+          <P>En un año cerrado:</P>
+          <Bullets
+            items={[
+              "No se registran comprobantes manuales, recibos de caja, egresos ni transferencias con fecha en ese año.",
+              "No se anulan los recibos, egresos, transferencias ni comprobantes manuales de ese año.",
+              "El comprobante de cierre no se anula por separado: solo se deshace reabriendo el año.",
+              "La fecha de cierre no se puede bajar del 31 de diciembre de ese año, ni quitar.",
+              "Si después corriges o anulas una factura o una compra de ese año, la diferencia se registra con un ajuste en el primer día abierto. Ese ajuste cuenta para el año siguiente; el año cerrado no se mueve.",
+            ]}
+          />
+
+          <H3>Reabrir un año</H3>
+          <Bullets
+            items={[
+              "Solo se reabre el último año cerrado.",
+              <>Pide escribir el <B>motivo</B>. Queda guardado quién lo reabrió, cuándo y por qué.</>,
+              "Al reabrir se anula el comprobante de cierre y la fecha de cierre vuelve a donde estaba antes del cierre.",
+              "Al cerrarlo otra vez se genera un comprobante de cierre nuevo, con número nuevo: el anterior no se reusa.",
+              "Cerrar y reabrir un año es del propietario y del contador.",
+            ]}
+          />
+
+          <H3 id="fecha-de-cierre">La fecha de cierre: cerrar un mes</H3>
+          <P>
+            Cerrar un mes es mover la <a href="#periodos" style={link}>fecha de cierre</a> al último día de ese mes. La
+            fecha de cierre ya existe hoy; con esta entrega gana tres controles:
+          </P>
+          <Bullets
+            items={[
+              <><B>No deja cerrar con el balance descuadrado:</B> para subir la fecha, el balance de prueba debe cuadrar hasta ese día. Si no cuadra, te muestra los totales para que lo revises.</>,
+              <><B>Pide el motivo al bajarla:</B> para mover la fecha hacia atrás o quitarla hay que escribir por qué. El motivo queda en el historial.</>,
+              <><B>Respeta los años cerrados:</B> la fecha no baja más allá del último año cerrado. Para eso, primero se reabre el año.</>,
+            ]}
+          />
+        </section>
+
+        <section id="estados-financieros" className="mb-10">
+          <H2>Balance general y estado de resultados</H2>
+          <EnConstruccion />
+          <P>
+            Son los dos estados financieros, calculados de los mismos comprobantes que el balance de prueba. No se
+            digitan ni se guardan: se arman cada vez que los consultas, con lo que haya en los libros.
+          </P>
+
+          <H3>Balance general</H3>
+          <Bullets
+            items={[
+              "Muestra, a la fecha que elijas, el activo, el pasivo y el patrimonio, con sus grupos y cuentas.",
+              <>Mientras el año no esté cerrado, el patrimonio trae la fila <B>«Resultado del ejercicio»</B>: lo que llevan los ingresos menos los costos y gastos del año. Después del cierre, ese valor ya está dentro de la cuenta de utilidad o de pérdida. El total es el mismo.</>,
+              "Dice si cuadra: activo igual a pasivo más patrimonio. Si no cuadra, muestra la diferencia.",
+              <><B>Comparativo:</B> puedes compararlo con otra fecha. Cada cifra muestra el valor de las dos fechas y el cambio.</>,
+            ]}
+          />
+
+          <H3>Estado de resultados</H3>
+          <P>Muestra el período que elijas, en este orden:</P>
+          <Table
+            head={["Renglón", "Qué es"]}
+            rows={[
+              ["Ingresos operacionales", "Lo que vendiste."],
+              ["Devoluciones en ventas", "Se restan de los ingresos."],
+              [<B key="b">Ingresos netos</B>, "Ingresos menos devoluciones."],
+              ["Costo de ventas", "Lo que costó lo que vendiste."],
+              [<B key="b">Utilidad bruta</B>, "Ingresos netos menos costo de ventas."],
+              ["Gastos de administración y gastos de ventas", "Los gastos de operar el negocio."],
+              [<B key="b">Utilidad operacional</B>, "Utilidad bruta menos esos gastos."],
+              ["Ingresos y gastos no operacionales", "Lo que no es del negocio principal. Por ejemplo, intereses o gastos bancarios."],
+              [<B key="b">Utilidad antes de impuestos</B>, "Utilidad operacional más los ingresos y menos los gastos no operacionales."],
+              ["Impuesto de renta", "Lo que esté registrado en su cuenta. No se calcula solo."],
+              [<B key="b">Utilidad neta</B>, "El resultado del período."],
+            ]}
+          />
+          <Bullets
+            items={[
+              <><B>Comparativo:</B> si no eliges otra cosa, se compara con el período inmediatamente anterior del mismo largo. Puedes elegir otro período o quitar la comparación.</>,
+              "Cerrar el año no cambia el estado de resultados de ese año: el comprobante de cierre no se cuenta.",
+              "La utilidad neta del año es la misma cifra que el «Resultado del ejercicio» del balance al 31 de diciembre y la que el cierre lleva al patrimonio.",
+            ]}
+          />
+
+          <H3>Detalle, Excel y PDF</H3>
+          <Bullets
+            items={[
+              "Los dos se pueden ver más resumidos o más detallados, y cada cuenta lleva a su auxiliar.",
+              <><B>Excel:</B> los dos se descargan con el nombre y el NIT de la empresa, el período y la fecha en que se generaron.</>,
+              <><B>PDF con firmas:</B> los dos traen al final los espacios para la firma del <B>Representante legal</B> y del <B>Contador público</B>. Los nombres no se imprimen: los espacios van en blanco para firmar. Los valores negativos van entre paréntesis.</>,
+              "Si el balance no cuadra, el PDF lo dice en una banda visible, con la diferencia.",
+            ]}
+          />
+
+          <H3>En qué se diferencian de los informes de siempre</H3>
+          <Table
+            head={["", "Informes de facturación (los de hoy)", "Estados financieros contables (lo que viene)"]}
+            rows={[
+              ["Dónde", <><a key="a" href="/docs/invoices#reports" style={link}>Facturación → Informes</a></>, "Con los libros de contabilidad."],
+              ["De dónde salen", "De tus facturas, notas y compras del período.", "De los libros: todos los comprobantes, incluidos los manuales, los saldos iniciales, los recibos y los egresos."],
+              ["Para qué", "Ver cómo va el negocio y entregarle el período a tu contador.", "Tener el balance general y el estado de resultados de la contabilidad."],
+              ["Balance general", "No tiene.", "Sí."],
+              ["Necesita la contabilidad activada", "No.", "Sí."],
+            ]}
+          />
+          <P>
+            Las cifras de los dos pueden no coincidir, y es normal: el informe de gestión no ve los comprobantes
+            manuales ni los saldos iniciales. Los informes de siempre no cambian ni desaparecen.
+          </P>
+        </section>
+
+        <section id="diario-y-mayor" className="mb-10">
+          <H2>Libro diario y mayor y balances</H2>
+          <EnConstruccion />
+          <P>
+            Se suman a los <a href="#libros" style={link}>libros que ya hay</a> (el balance de prueba y los auxiliares).
+          </P>
+          <Table
+            head={["Libro", "Qué muestra"]}
+            rows={[
+              ["Libro diario", "Todos los comprobantes del período, en orden, cada uno con sus líneas (cuenta, tercero, descripción, débito y crédito). Trae el subtotal de cada día y el total del período, y dice si cuadra. Se puede ver un solo tipo de comprobante."],
+              ["Mayor y balances", "Cada cuenta mayor (cuatro dígitos), agrupada por clase, con tres datos: el saldo anterior, el movimiento del período y el saldo nuevo. Trae totales por clase y el total general."],
+            ]}
+          />
+          <Bullets
+            items={[
+              "Los dos se descargan en Excel.",
+              "El libro diario consulta máximo 366 días seguidos, como los auxiliares.",
+              "Los comprobantes anulados no salen.",
+            ]}
+          />
+        </section>
+
+        <section id="pdf-contables" className="mb-10">
+          <H2>PDF de los comprobantes</H2>
+          <EnConstruccion />
+          <H3>Comprobante contable</H3>
+          <P>
+            Cualquier comprobante se podrá descargar en PDF: los manuales, los de saldos iniciales, las
+            transferencias, el de cierre y los automáticos. Trae el tipo y el número, la fecha, el concepto, de dónde
+            salió, las líneas con cuenta, tercero, descripción, débito y crédito, las sumas iguales y los espacios de
+            firma «Elaboró», «Revisó» y «Aprobó». Si está anulado, lo dice en una banda, con el motivo.
+          </P>
+          <H3>Recibo de caja y comprobante de egreso: dos versiones</H3>
+          <P>
+            El recibo y el egreso <a href="#recibos-y-egresos" style={link}>ya se descargan en PDF</a>. Con esta entrega
+            tendrán dos versiones:
+          </P>
+          <Table
+            head={["Versión", "Qué trae", "Para quién"]}
+            rows={[
+              ["Para el cliente o el proveedor", "Sin cuentas contables: quién paga o recibe, los documentos, los conceptos, la forma de pago, el total y el valor en letras.", "Para entregar."],
+              ["Con cuentas contables", "Lo mismo, más la cuenta contable del banco o la caja, la de cada concepto y la del IVA descontable.", "Para el archivo de tu contador."],
+            ]}
+          />
+          <Bullets
+            items={[
+              "El NIT del tercero sale con su dígito de verificación.",
+              "El valor en letras sale más limpio: «SON: … PESOS M/CTE».",
+              "Si el egreso lleva IVA descontable, las dos versiones lo dicen.",
+            ]}
+          />
+        </section>
+
+        <section id="egreso-iva-y-compras" className="mb-10">
+          <H2>Egreso con IVA y controles en las compras</H2>
+          <EnConstruccion />
+          <H3>IVA descontable en un gasto sin factura de compra</H3>
+          <P>
+            Hoy, un gasto que lleva IVA hay que registrarlo como compra. Con esta entrega, el concepto{" "}
+            <B>Gasto</B> de un egreso podrá llevar su IVA:
+          </P>
+          <Bullets
+            items={[
+              "Escribes el valor total que salió del banco o la caja y, aparte, cuánto de ese valor es IVA.",
+              "El gasto se registra por el valor sin IVA, y el IVA va a la cuenta de IVA descontable, los dos a nombre del proveedor.",
+              "El IVA debe ser mayor que cero y menor que el total. Solo aplica al concepto Gasto.",
+              "Ejemplo: pagas $119.000 por papelería. $100.000 quedan como gasto y $19.000 como IVA descontable.",
+            ]}
+          />
+          <P>
+            Si ese IVA se puede descontar o no depende de tu caso: pregúntale a tu contador.
+          </P>
+
+          <H3>Aviso de compra duplicada</H3>
+          <Bullets
+            items={[
+              "Al registrar o editar una compra, si ya hay otra del mismo proveedor (mismo NIT) con el mismo número de documento, la compra no se guarda de una: te avisa y te muestra cuál es la otra.",
+              "Al comparar el número no cuentan los espacios, los guiones ni las mayúsculas: «FV-900» y «fv 900» son el mismo.",
+              "Si de verdad es otra compra, se puede guardar de todos modos, y queda anotado.",
+              "No se revisan las compras sin número de documento, las canceladas ni las órdenes de compra.",
+              "El aviso funciona con la contabilidad activada.",
+            ]}
+          />
+
+          <H3>Una compra con pagos no se edita</H3>
+          <P>
+            Ya hoy, a una compra pagada con un comprobante de egreso{" "}
+            <a href="#registrar-pago" style={link}>no se le cambia el total ni las retenciones</a>. Con esta entrega
+            tampoco se le cambia el <B>IVA</B> ni el valor de sus líneas, y el mensaje te dice qué egresos hay que
+            anular antes. Para corregirla: anula primero el egreso, corrige la compra y vuelve a pagarla. Sí se le
+            pueden cambiar la descripción y el concepto del gasto.
+          </P>
+        </section>
+
+        <section id="pendiente" className="mb-10">
+          <H2>Lo que todavía no hay</H2>
+          <P>
+            Para que no lo busques, esto todavía no existe en la contabilidad de FusionCRM, ni está en la entrega que
+            viene:
+          </P>
+          <Bullets
+            items={[
+              <><B>Retenciones dentro del recibo de caja.</B> Las retenciones del cliente se anotan en la factura con «Aplicar retenciones», no en el recibo.</>,
+              <><B>Cruzar un anticipo contra una factura posterior.</B> El anticipo queda registrado, pero todavía no se puede aplicar después a una factura desde el recibo.</>,
+              <><B>Inventario.</B> La contabilidad no lleva existencias ni calcula el costo de lo vendido.</>,
+              <><B>Formularios de impuestos.</B> No se generan las declaraciones de IVA, retención ni renta. Los libros le dan los datos a tu contador.</>,
+              <><B>Nómina.</B> No se liquida ni se contabiliza sola.</>,
+            ]}
+          />
+          <P>
+            La conciliación bancaria, el cierre del año y el balance general y el estado de resultados contables ya no
+            están en esta lista: están <a href="#en-construccion" style={link}>en construcción</a>, con el motor listo y
+            las pantallas en la siguiente entrega.
+          </P>
           <P>
             Si necesitas alguno, cuéntale a <a href="/docs/soporte" style={link}>soporte</a>.
           </P>
