@@ -144,6 +144,8 @@ const navigation: NavItem[] = [
       { title: "Informes de facturación", href: "/docs/invoices#reports" },
       { title: "Verificador CUFE", href: "/docs/invoices#verify-cufe" },
       { title: "Configuración DIAN", href: "/docs/invoices#config" },
+      { title: "Alta en la DIAN", href: "/docs/alta-dian" },
+      { title: "Habilitar documento soporte", href: "/docs/alta-dian#documento-soporte" },
     ],
   },
   {

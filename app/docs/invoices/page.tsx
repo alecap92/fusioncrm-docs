@@ -94,20 +94,27 @@ export default function InvoicesPage() {
         <section id="config" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Configuración DIAN</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
-            Antes de emitir facturas electrónicas, debes completar la configuración DIAN en{" "}
-            <strong style={{ color: "var(--foreground)" }}>Configuración → Facturación → Facturación electrónica</strong>.
-            Está organizada en pestañas; arriba ves el estado actual: <em>Producción</em> o <em>Desarrollo</em> (pruebas).
+            Antes de emitir facturas electrónicas, tu empresa debe estar dada de alta ante la DIAN y
+            configurada en{" "}
+            <strong style={{ color: "var(--foreground)" }}>Ajustes → Facturación → Facturación electrónica</strong>.
+            Si todavía no facturas electrónicamente, empieza por el{" "}
+            <a href="/docs/alta-dian" style={{ color: "#d1345b" }}>asistente de alta en la DIAN</a>: te lleva paso a paso
+            y deja esta configuración lista.
+          </p>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            La configuración está organizada en pestañas:
           </p>
           <div className="space-y-4 mb-6">
             {[
-              { step: "Resolución", desc: "Número de resolución DIAN, prefijo (ej. FV), rango de numeración y vigencia." },
-              { step: "Compañía", desc: "Datos de tu empresa que salen en la factura: NIT y DV, dirección, municipio, teléfono, correo, tipo de régimen y de responsabilidad." },
-              { step: "Email y Placeholders", desc: "Plantilla del correo con el que se envían las facturas y textos que aparecen en el PDF." },
-              { step: "Software", desc: "ID del Software y PIN de tu software de facturación electrónica." },
-              { step: "Certificado", desc: "Sube tu certificado digital en formato .p12 y su contraseña. Con él se firman las facturas." },
-              { step: "Token", desc: "Token de autenticación con la API de facturación electrónica." },
-              { step: "Actions", desc: "«Crear empresa» y «Sincronizar numeración» con la DIAN." },
-              { step: "Doc Soporte", desc: "Configuración de los documentos soporte." },
+              { step: "Empresa", desc: "Datos de tu empresa que salen en la factura: NIT y DV, dirección, municipio, teléfono, correo, tipo de régimen y de responsabilidad. Aquí está también el botón «Sincronizar con la DIAN»." },
+              { step: "Resolución y consecutivos", desc: "Resolución de facturación, prefijo, rango de numeración y vigencia." },
+              { step: "Certificado", desc: "Tu certificado digital (.p12 o .pfx) y su contraseña. Con él se firman los documentos." },
+              { step: "Software", desc: "ID del software y PIN de tu software de facturación electrónica." },
+              { step: "Documento soporte", desc: "Configuración de los documentos soporte y su habilitación ante la DIAN." },
+              { step: "Correo de envío", desc: "El correo con el que se envían las facturas a tus clientes." },
+              { step: "Recepción de facturas", desc: "El buzón de donde se leen las facturas que te envían tus proveedores." },
+              { step: "Plantilla del PDF", desc: "Cómo se ve el PDF de tus facturas." },
+              { step: "Avanzado", desc: "Opciones técnicas. Solo la ve el propietario de la cuenta." },
             ].map((s) => (
               <div key={s.step} className="p-4 rounded-lg border" style={{ backgroundColor: "var(--muted)", borderColor: "var(--border)" }}>
                 <p className="font-semibold text-sm mb-1" style={{ color: "var(--foreground)" }}>{s.step}</p>
@@ -115,6 +122,17 @@ export default function InvoicesPage() {
               </div>
             ))}
           </div>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Cómo se guardan los cambios</h3>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• Cada pestaña tiene su propio botón <strong style={{ color: "var(--foreground)" }}>Guardar</strong>: guarda solo lo de esa pestaña. No hay un botón para guardar todo a la vez, así que guarda antes de cambiar de pestaña.</li>
+            <li>• Al guardar las pestañas <em>Resolución y consecutivos</em>, <em>Software</em>, <em>Certificado</em> y <em>Correo de envío</em>, los cambios también se envían al servicio de facturación.</li>
+            <li>• En la pestaña <em>Empresa</em>, <strong style={{ color: "var(--foreground)" }}>Guardar</strong> solo actualiza los datos en FusionCRM. Para que la DIAN y el servicio de facturación los conozcan, pulsa además <strong style={{ color: "var(--foreground)" }}>Sincronizar con la DIAN</strong>.</li>
+            <li>• Si otra persona (o tú mismo en otra pestaña del navegador) guardó cambios antes que tú, verás un aviso de que la configuración cambió. Recarga la página para ver la versión actual antes de volver a guardar.</li>
+          </ul>
+          <Callout type="danger" title="Datos sensibles">
+            Nunca compartas el PIN del software ni la contraseña del certificado por chat o correo,
+            ni siquiera con el soporte de FusionCRM. Escríbelos solo en sus campos dentro de FusionCRM.
+          </Callout>
           <Callout type="warning">
             Para obtener tu resolución de facturación electrónica, debes solicitarla directamente
             ante la DIAN en el portal Muisca. Este proceso puede tomar varios días hábiles.
@@ -310,8 +328,14 @@ export default function InvoicesPage() {
             pequeño proveedor), tú emites el documento soporte electrónico para poder llevar esa
             compra como costo o gasto. Se manejan en{" "}
             <strong style={{ color: "var(--foreground)" }}>Facturación → Documentos Soporte</strong>, y su resolución
-            se configura en la pestaña <em>Doc Soporte</em> de la <a href="#config" style={{ color: "#d1345b" }}>configuración DIAN</a>.
+            se configura en la pestaña <em>Documento soporte</em> de la <a href="#config" style={{ color: "#d1345b" }}>configuración DIAN</a>.
           </p>
+          <Callout type="warning" title="Primero, habilítalo ante la DIAN">
+            Si tu documento soporte no ha superado su set de pruebas ante la DIAN, FusionCRM no te deja
+            emitirlo: la DIAN lo rechazaría y se perdería el consecutivo. En Ajustes → Facturación verás el
+            aviso «Tu documento soporte no está habilitado ante la DIAN» con el botón «Habilitar ahora».
+            Sigue los pasos en <a href="/docs/alta-dian#documento-soporte" style={{ color: "#d1345b" }}>Habilitar el documento soporte</a>.
+          </Callout>
           <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
             <li>1. Haz clic en <strong style={{ color: "var(--foreground)" }}>Nuevo Documento Soporte</strong>.</li>
             <li>2. En <strong style={{ color: "var(--foreground)" }}>Proveedor</strong>, toca <strong style={{ color: "var(--foreground)" }}>Seleccionar</strong> y elige al proveedor de tus contactos. Si el contacto tiene empresa vinculada, puedes emitir a nombre de la persona o de la empresa.</li>
@@ -428,7 +452,7 @@ export default function InvoicesPage() {
 
         <DocNav
           prev={{ href: "/docs/quotes", title: "Cotizaciones" }}
-          next={{ href: "/docs/products", title: "Productos" }}
+          next={{ href: "/docs/alta-dian", title: "Alta en la DIAN y documento soporte" }}
         />
       </article>
 
