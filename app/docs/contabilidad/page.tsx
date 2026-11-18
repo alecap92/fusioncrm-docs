@@ -516,7 +516,7 @@ export default function ContabilidadPage() {
             items={[
               "«Otra cuenta» solo la pueden usar el propietario y el contador.",
               "Un comprobante lleva máximo 50 documentos y 20 conceptos. Si son más, regístralo en dos.",
-              "Un pago mayor que lo que se debe se rechaza. Si te pagan de más, registra la diferencia como anticipo.",
+              "Un pago mayor que lo que se debe se rechaza.",
               "Un recibo no aplica retenciones: cobra contra el saldo que la factura tenga en ese momento.",
               <>Si todavía no hay bancos ni cajas, la pantalla te pide crear uno primero en <a href="#bancos-y-caja" style={link}>Bancos y caja</a>.</>,
             ]}
@@ -740,7 +740,7 @@ export default function ContabilidadPage() {
               <><B>Cierre anual.</B> Hay fecha de cierre de período, pero no el cierre contable de fin de año.</>,
               <><B>Balance general y estado de resultados contables.</B> Los libros que hay son el balance de prueba y los auxiliares. El estado de resultados de <a href="/docs/invoices#reports" style={link}>Informes</a> es un informe de gestión, no sale de los libros.</>,
               <><B>Retenciones dentro del recibo de caja.</B> Las retenciones del cliente se anotan en la factura con «Aplicar retenciones», no en el recibo.</>,
-              <><B>Cruzar un anticipo contra una factura posterior.</B> El anticipo queda registrado, pero aplicarlo después a una factura se hace con un comprobante manual.</>,
+              <><B>Cruzar un anticipo contra una factura posterior.</B> El anticipo queda registrado, pero todavía no se puede aplicar después a una factura desde el recibo.</>,
             ]}
           />
           <P>
