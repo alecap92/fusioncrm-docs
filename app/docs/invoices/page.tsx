@@ -255,6 +255,11 @@ export default function InvoicesPage() {
             <li>• Importa compras masivamente desde Excel/CSV con «Importar»</li>
             <li>• Genera reportes de compras por proveedor y período</li>
           </ul>
+          <Callout type="note" title="Con la contabilidad activada">
+            Una compra se paga con un comprobante de egreso, desde «Pagos y saldo» en su menú, y mientras tenga
+            pagos su estado lo fijan ellos. Ver{" "}
+            <a href="/docs/contabilidad#registrar-pago" style={{ color: "#d1345b" }}>Contabilidad → Pagar una compra</a>.
+          </Callout>
         </section>
 
         <section id="debit-notes" className="mb-10">
@@ -299,6 +304,11 @@ export default function InvoicesPage() {
             anotaste uno mal, elimínalo con su botón y vuelve a registrarlo. Las facturas rechazadas,
             anuladas o en borrador no se pueden cobrar.
           </p>
+          <Callout type="note" title="Con la contabilidad activada">
+            «Registrar pago» pide además el banco o la caja y crea un recibo de caja. Un abono que nació de un
+            recibo no se elimina aquí: se quita anulando el recibo. Ver{" "}
+            <a href="/docs/contabilidad#registrar-pago" style={{ color: "#d1345b" }}>Contabilidad → Registrar pago</a>.
+          </Callout>
         </section>
 
         <section id="customer-withholdings" className="mb-10">

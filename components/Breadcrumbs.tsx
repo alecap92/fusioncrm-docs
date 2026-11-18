@@ -16,6 +16,7 @@ const labels: Record<string, string> = {
   quotes: "Cotizaciones",
   invoices: "Facturación",
   "alta-dian": "Alta en la DIAN",
+  contabilidad: "Contabilidad",
   products: "Productos",
   reports: "Reportes",
   "lead-scoring": "Lead Scoring",

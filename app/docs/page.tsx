@@ -3,7 +3,7 @@ import Link from "next/link";
 import {
   Users, Briefcase, GitBranch, MessageSquare, Mail, FileText,
   BarChart2, Settings, Code2, Puzzle, Zap, Star, Package, CreditCard,
-  ArrowRight, BookOpen, Send, Calendar, FolderKanban, TrendingUp, LayoutTemplate, Activity, Phone, Columns3, Truck } from "lucide-react";
+  ArrowRight, BookOpen, Send, Calendar, FolderKanban, TrendingUp, LayoutTemplate, Activity, Phone, Columns3, Truck, Calculator } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "CRM para WhatsApp: guía de inicio y módulos",
@@ -34,6 +34,7 @@ const cards = [
   { icon: <Send size={20} />, title: "Campañas Masivas", desc: "Email y WhatsApp marketing a segmentos de contactos.", href: "/docs/mass-campaigns", color: "#d1345b" },
   { icon: <FileText size={20} />, title: "Cotizaciones", desc: "Genera, envía y da seguimiento a presupuestos.", href: "/docs/quotes", color: "#6366f1" },
   { icon: <CreditCard size={20} />, title: "Facturación", desc: "Facturas electrónicas DIAN Colombia (módulo adicional).", href: "/docs/invoices", color: "#14b8a6" },
+  { icon: <Calculator size={20} />, title: "Contabilidad", desc: "Comprobantes automáticos, recibos de caja, egresos y libros (se activa a pedido).", href: "/docs/contabilidad", color: "#0d9488" },
   { icon: <Truck size={20} />, title: "Envíos", desc: "Cotiza, genera y rastrea guías con Envia.com (módulo adicional).", href: "/docs/shipments", color: "#ea580c" },
   { icon: <Package size={20} />, title: "Productos", desc: "Catálogo de productos y servicios con precios.", href: "/docs/products", color: "#f97316" },
   { icon: <BarChart2 size={20} />, title: "Reportes", desc: "Analytics, reportes de ventas y dashboards personalizados.", href: "/docs/reports", color: "#84cc16" },

@@ -131,7 +131,7 @@ export default function ProductsPage() {
         </section>
 
         <DocNav
-          prev={{ href: "/docs/invoices", title: "Facturación" }}
+          prev={{ href: "/docs/contabilidad", title: "Contabilidad" }}
           next={{ href: "/docs/shipments", title: "Envíos" }}
         />
       </article>
