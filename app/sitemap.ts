@@ -15,6 +15,7 @@ const PRIORITY: Record<string, number> = {
   contacts: 0.8,
   deals: 0.8,
   invoices: 0.8,
+  contabilidad: 0.8,
   quotes: 0.8,
   shipments: 0.8,
   workflows: 0.8,

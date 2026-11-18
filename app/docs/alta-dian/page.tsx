@@ -199,7 +199,7 @@ export default function AltaDianPage() {
 
         <DocNav
           prev={{ href: "/docs/invoices", title: "Facturación" }}
-          next={{ href: "/docs/products", title: "Productos" }}
+          next={{ href: "/docs/contabilidad", title: "Contabilidad" }}
         />
       </article>
 

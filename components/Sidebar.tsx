@@ -6,7 +6,7 @@ import {
   Home, Users, Briefcase, GitBranch, MessageSquare, Mail, FileText,
   BarChart2, Settings, Code2, Puzzle, Zap, Star, Package, ShoppingCart,
   FileBarChart, Calendar, FolderKanban, ChevronDown, ChevronRight, X, Menu,
-  BookOpen, Send, LifeBuoy, CreditCard, TrendingUp, LayoutTemplate, Activity, Library, Target, Truck } from "lucide-react";
+  BookOpen, Send, LifeBuoy, CreditCard, TrendingUp, LayoutTemplate, Activity, Library, Target, Truck, Calculator } from "lucide-react";
 
 interface NavItem {
   title: string;
@@ -146,6 +146,24 @@ const navigation: NavItem[] = [
       { title: "Configuración DIAN", href: "/docs/invoices#config" },
       { title: "Alta en la DIAN", href: "/docs/alta-dian" },
       { title: "Habilitar documento soporte", href: "/docs/alta-dian#documento-soporte" },
+    ],
+  },
+  {
+    title: "Contabilidad",
+    group: "Facturación",
+    icon: <Calculator size={16} />,
+    children: [
+      { title: "Qué es y cómo se activa", href: "/docs/contabilidad" },
+      { title: "Configura tu contabilidad", href: "/docs/contabilidad#configurar" },
+      { title: "Documento interno de venta", href: "/docs/contabilidad#documento-interno" },
+      { title: "Comprobantes", href: "/docs/contabilidad#comprobantes" },
+      { title: "Bancos y caja", href: "/docs/contabilidad#bancos-y-caja" },
+      { title: "Recibos de caja y egresos", href: "/docs/contabilidad#recibos-y-egresos" },
+      { title: "Registrar pago y compras", href: "/docs/contabilidad#registrar-pago" },
+      { title: "Importar desde otro software", href: "/docs/contabilidad#importar" },
+      { title: "Libros", href: "/docs/contabilidad#libros" },
+      { title: "Quién puede hacer qué", href: "/docs/contabilidad#roles" },
+      { title: "Lo que todavía no hay", href: "/docs/contabilidad#pendiente" },
     ],
   },
   {
