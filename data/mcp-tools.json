@@ -38,7 +38,7 @@
     "src/mcp/tools/users.ts",
     "src/mcp/tools/whatsapp-templates.ts"
   ],
-  "toolCount": 238,
+  "toolCount": 239,
   "tools": [
     {
       "name": "add_contacts_to_list",
@@ -1283,11 +1283,54 @@
     },
     {
       "name": "create_deal",
-      "description": "Create a deal (cuerpo igual que POST /api/deals). Acepta companyId opcional para asociar una empresa (debe pertenecer a la organización); si no se envía y el contacto principal tiene empresa vinculada, el deal la HEREDA automáticamente. customFields acepta el id, la key o el nombre de cada campo. La respuesta trae customFields[].fieldId y .key (reenviables) e ignoredFields si mandaste claves que no se aplican.",
+      "description": "Create a deal (cuerpo igual que POST /api/deals). Obligatorios: title, amount y pipeline. La ETAPA va en `status` con el _id de la etapa (list_deals_config trae pipelines y etapas con isWon/isLost); no existe `stage` ni `stageId` como parámetro, y un texto como 'won' responde 400 INVALID_STATUS. Sin `status` el negocio nace en la primera etapa del pipeline. Crear directo en una etapa ganada/perdida sella wonAt/lostAt. En las lecturas la etapa sale como `status` (get_deal, detail=full) o como `stage` (list_deals compact/standard): es el mismo dato. Acepta companyId opcional para asociar una empresa (debe pertenecer a la organización); si no se envía y el contacto principal tiene empresa vinculada, el deal la HEREDA automáticamente. customFields acepta el id, la key o el nombre de cada campo. La respuesta trae customFields[].fieldId y .key (reenviables) e ignoredFields si mandaste claves que no se aplican.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
+          "title": {
+            "type": "string",
+            "description": "Título del negocio (obligatorio)"
+          },
+          "amount": {
+            "description": "Monto del negocio (obligatorio; número)",
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "pipeline": {
+            "type": "string",
+            "description": "_id del pipeline (obligatorio; ver list_deals_config)"
+          },
+          "status": {
+            "description": "_id de la ETAPA, que debe ser del mismo pipeline (ver list_deals_config). NO es 'won'/'lost' ni el nombre de la etapa. Si se omite: primera etapa del pipeline.",
+            "type": "string"
+          },
+          "closingDate": {
+            "description": "Fecha de cierre YYYY-MM-DD (estimada; si nace ganado/perdido es la fecha real). Por defecto hoy.",
+            "type": "string"
+          },
+          "contact": {
+            "description": "Contacto: { id } de uno existente, { mobile, name, ... } para buscarlo por teléfono y crearlo si no existe, o directamente el _id del contacto como texto",
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "mobile": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": {}
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
           "contactId": {
             "description": "ID del contacto a asociar (atajo de contact:{id}). Si no existe en la organización el negocio NO se crea (404).",
             "type": "string"
@@ -1334,6 +1377,11 @@
             ]
           }
         },
+        "required": [
+          "title",
+          "amount",
+          "pipeline"
+        ],
         "additionalProperties": {}
       },
       "group": "deals"
@@ -1669,7 +1717,7 @@
     },
     {
       "name": "create_invoice",
-      "description": "Crear factura electrónica (POST /api/invoices, formato DIAN). Requiere customer con identification_number, invoice_lines no vacío y legal_monetary_totals.payable_amount > 0.",
+      "description": "Crear factura electrónica (POST /api/invoices, formato DIAN). Requiere customer con identification_number, invoice_lines no vacío y legal_monetary_totals.payable_amount > 0.\nInventario (solo empresas con el inventario encendido): para que una línea descuente existencias manda inventory: [{ line, itemId }] (line = posición en invoice_lines desde 1; itemId = el _id del producto si no tiene variantes, o el _id de la variante; el producto debe tener «Maneja inventario»). La respuesta trae inventoryApplied: [{ line, itemId, applied, reason? }]: una marca con applied false NO descontó inventario y la factura se emitió igual (reason: not-tracked = ese producto no es de la empresa o no maneja inventario; line-not-found; duplicate-line; invalid; not-available = la empresa no factura donde vive el inventario). Si la empresa tiene la facturación en el servicio nuevo pero el inventario apagado, mandar marcas válidas responde 409 FDN-INVENTARIO-APAGADO antes de gastar número: reintenta sin inventory. Sin inventory, nada cambia.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -1722,6 +1770,27 @@
           },
           "notes": {
             "type": "string"
+          },
+          "inventory": {
+            "description": "Solo con el inventario encendido: líneas que descuentan existencias",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "line": {
+                  "type": "number",
+                  "description": "Posición de la línea en invoice_lines, desde 1"
+                },
+                "itemId": {
+                  "type": "string",
+                  "description": "_id del producto (sin variantes) o de la variante"
+                }
+              },
+              "required": [
+                "line",
+                "itemId"
+              ]
+            }
           },
           "quotationId": {
             "description": "_id de la cotización de la que sale la factura (opcional). Debe ser de esta organización y no estar anulada ni rechazada (si no, 400 sin emitir). Con la factura válida ante la DIAN la cotización pasa a Facturada.",
@@ -1908,7 +1977,7 @@
     },
     {
       "name": "create_product",
-      "description": "Crear producto (POST /api/products).",
+      "description": "Crear producto (POST /api/products). inventory: { tracked: true } lo marca como «Maneja inventario» (sus ventas y compras marcadas mueven existencias en las empresas con el inventario encendido; en las demás la marca se guarda y no hace nada).",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -1942,6 +2011,19 @@
           },
           "notes": {
             "type": "string"
+          },
+          "inventory": {
+            "description": "«Maneja inventario». Solo { tracked: boolean }",
+            "type": "object",
+            "properties": {
+              "tracked": {
+                "type": "boolean",
+                "description": "true = maneja inventario"
+              }
+            },
+            "required": [
+              "tracked"
+            ]
           }
         },
         "required": [
@@ -1954,7 +2036,7 @@
     },
     {
       "name": "create_product_variant",
-      "description": "Crea una variante de un producto de la organización. El sku debe ser único en TODA la organización: uno repetido responde 409. No marca el producto como 'con variantes' (hasVariants); si hace falta, usa update_product. Requiere products:write.",
+      "description": "Crea una variante de un producto de la organización. El sku debe ser único en TODA la organización: uno repetido responde 409. No marca el producto como 'con variantes' (hasVariants); si hace falta, usa update_product. Requiere products:write. Si el producto maneja inventario (inventario encendido), no envíes stock: responde 409 STOCK_MANAGED_BY_INVENTORY (las existencias se cambian con un ajuste de inventario, desde la web).",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -2104,7 +2186,7 @@
     },
     {
       "name": "create_purchase",
-      "description": "Registrar una compra a un proveedor (POST /api/purchases). Requiere purchases:write.\nkind=invoice (default): factura del proveedor. Obligatorios: orderNumber (el número de la factura del proveedor), total y paymentMethod. Si cubre una OC abierta, manda orderRef con el id de la OC (ver list_open_purchase_orders): la OC queda completed con invoiceRef. 409 si la OC ya está facturada o cancelada.\nkind=order: orden de compra. El servidor genera el consecutivo OC-n (settings.purchases.numberPrefix + contador): NO mandes orderNumber, se ignora. Obligatorios: total y paymentMethod. Sus retenciones son estimadas y no entran en informes ni certificados.\nEl proveedor puede ir como supplierId (contacto de la MISMA organización) o simplemente como supplierName + supplierNIT.\nEn cada ítem, si no se envía total se calcula como quantity × unitPrice, y tax vacío se toma como 0.",
+      "description": "Registrar una compra a un proveedor (POST /api/purchases). Requiere purchases:write.\nkind=invoice (default): factura del proveedor. Obligatorios: orderNumber (el número de la factura del proveedor), total y paymentMethod. Si cubre una OC abierta, manda orderRef con el id de la OC (ver list_open_purchase_orders): la OC queda completed con invoiceRef. 409 si la OC ya está facturada o cancelada.\nkind=order: orden de compra. El servidor genera el consecutivo OC-n (settings.purchases.numberPrefix + contador): NO mandes orderNumber, se ignora. Obligatorios: total y paymentMethod. Sus retenciones son estimadas y no entran en informes ni certificados.\nEl proveedor puede ir como supplierId (contacto de la MISMA organización) o simplemente como supplierName + supplierNIT.\nEn cada ítem, si no se envía total se calcula como quantity × unitPrice, y tax vacío se toma como 0.\nCompra repetida: si ya hay una compra de ese proveedor con ese número, responde 409 con code PURCHASE_DUPLICATE y las compras que ya existen en existing y duplicates (no se guardó nada). Muéstraselas a la persona; solo si confirma que es otra compra, repite la misma llamada con allowDuplicate: true.\nCon la contabilidad encendida (empresas con libros; las demás no notan nada) una compra NO se marca pagada a mano: status 'completed' sin un pago registrado responde 409 FDN-COMPRA-PAGADA-SIN-EGRESO, porque una compra se paga con un comprobante de egreso y por API y MCP no se crean egresos. Regístrala en 'pending' y dile a la persona que registre el pago desde la web (Facturación → Cobros y pagos → Nuevo egreso). Excepción: una compra con fecha anterior o igual a los saldos iniciales de la empresa sí acepta 'completed'. OJO con un gasto sin documento (voucherType 'Sin documento' con conceptId): sin status nace 'completed' y responde ese mismo 409; mándalo siempre con status 'pending' y que la persona registre el egreso en la web.\nInventario (solo empresas con el inventario encendido): para que un renglón sume existencias manda en el ítem inventory: { itemId } (el _id del producto si no tiene variantes, o el _id de la variante; el producto debe tener «Maneja inventario», ver list_products con tracked). La respuesta trae inventoryApplied: [{ line, itemId, applied, reason? }] (line = posición del ítem desde 1): un ítem con applied false se guardó SIN mover inventario (reason: not-tracked = ese producto no es de la empresa o no maneja inventario; invalid; not-available = la empresa no lleva las compras donde vive el inventario). Sin inventory en ningún ítem, nada cambia.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -2168,7 +2250,7 @@
             ]
           },
           "status": {
-            "description": "Por defecto pending. En una factura es el estado de pago (completed = pagada); en una OC se ignora (nace abierta).",
+            "description": "Por defecto pending (un gasto sin documento nace completed si no lo mandas). En una factura es el estado de pago (completed = pagada); en una OC se ignora (nace abierta). Con la contabilidad encendida 'completed' (a mano o por defecto) responde 409 FDN-COMPRA-PAGADA-SIN-EGRESO: manda pending.",
             "type": "string",
             "enum": [
               "pending",
@@ -2198,6 +2280,19 @@
                 },
                 "total": {
                   "type": "number"
+                },
+                "inventory": {
+                  "description": "Solo con el inventario encendido: este renglón suma existencias de ese producto",
+                  "type": "object",
+                  "properties": {
+                    "itemId": {
+                      "type": "string",
+                      "description": "_id del producto (sin variantes) o de la variante"
+                    }
+                  },
+                  "required": [
+                    "itemId"
+                  ]
                 }
               },
               "required": [
@@ -2206,6 +2301,10 @@
                 "unitPrice"
               ]
             }
+          },
+          "allowDuplicate": {
+            "description": "Solo `true`, y solo para repetir una compra que acaba de responder 409 `PURCHASE_DUPLICATE` (ya hay una compra de ese proveedor con ese número; el 409 trae `existing` y `duplicates` con las que ya existen). Antes de mandarlo, muéstrale esas compras a la persona y espera a que confirme que es otra compra distinta. Nunca en el primer intento ni por tu cuenta. No se guarda: vale para esa sola llamada.",
+            "type": "boolean"
           }
         },
         "required": [
@@ -2274,6 +2373,11 @@
                   "type": "string"
                 },
                 "productId": {
+                  "description": "_id del producto del catálogo (opcional)",
+                  "type": "string"
+                },
+                "variantId": {
+                  "description": "_id de la variante elegida, si el producto tiene variantes (opcional). Sirve para que la factura que nazca de esta cotización marque el inventario de esa variante",
                   "type": "string"
                 }
               },
@@ -3311,7 +3415,7 @@
     },
     {
       "name": "delete_invoice_payment",
-      "description": "Eliminar un abono mal registrado de una factura de venta (DELETE /api/invoices/:id/payments/:paymentId). Requiere invoices:write. El saldo se recalcula. El paymentId sale de get_invoice_payments. No toca las retenciones (para eso remove_invoice_withholdings).",
+      "description": "Eliminar un abono mal registrado de una factura de venta (DELETE /api/invoices/:id/payments/:paymentId). Requiere invoices:write. El saldo se recalcula. El paymentId sale de get_invoice_payments. No toca las retenciones (para eso remove_invoice_withholdings). Un abono que trae voucher (lo registró un recibo de caja: empresas con la contabilidad encendida, también los cobros hechos con register_invoice_payments) NO se elimina por aquí: responde 409 PAYMENT_OF_VOUCHER. Por API y MCP no se anulan recibos: dile a la persona que anule el recibo desde la web (Facturación → Cobros y pagos → Recibos de caja) y el abono se retira con él.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -3352,7 +3456,7 @@
     },
     {
       "name": "delete_product",
-      "description": "Eliminar un producto del catálogo por su ID (DELETE /products/:id, permiso products:delete). BORRA el producto Y TODAS sus variantes (tallas, colores, SKUs de ProductVariant). Es IRREVERSIBLE: no hay papelera ni forma de recuperarlo. Si el producto aparece en una cotización abierta (borrador, lista o enviada) responde 409 PRODUCT_IN_OPEN_QUOTATIONS y NO borra nada: cierra o edita esas cotizaciones primero. No toca cotizaciones ni facturas ya emitidas (guardan su propia copia del ítem). Confirma con el usuario el nombre del producto (get_product) antes de llamarla. Para solo cambiar precio o datos usa update_product.",
+      "description": "Eliminar un producto del catálogo por su ID (DELETE /products/:id, permiso products:delete). BORRA el producto Y TODAS sus variantes (tallas, colores, SKUs de ProductVariant). Es IRREVERSIBLE: no hay papelera ni forma de recuperarlo. Si el producto aparece en una cotización abierta (borrador, lista o enviada) responde 409 PRODUCT_IN_OPEN_QUOTATIONS y NO borra nada: cierra o edita esas cotizaciones primero. Si el producto (o alguna de sus variantes) tiene existencias distintas de cero en el inventario responde 409 PRODUCT_HAS_STOCK (itemIds dice cuáles) y NO borra nada: primero hay que dejarlas en cero con un ajuste de inventario, que se hace desde la web. No toca cotizaciones ni facturas ya emitidas (guardan su propia copia del ítem). Confirma con el usuario el nombre del producto (get_product) antes de llamarla. Para solo cambiar precio o datos usa update_product.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -3370,7 +3474,7 @@
     },
     {
       "name": "delete_product_variant",
-      "description": "ELIMINA una variante de producto. Es IRREVERSIBLE y libera su sku. Si solo quieres dejar de ofrecerla usa update_product_variant con isActive=false. Confirma con el usuario antes de llamarlo. Requiere products:delete.",
+      "description": "ELIMINA una variante de producto. Es IRREVERSIBLE y libera su sku. Si solo quieres dejar de ofrecerla usa update_product_variant con isActive=false. Una variante con existencias distintas de cero en el inventario no se elimina: responde 409 PRODUCT_HAS_STOCK; primero hay que dejarlas en cero con un ajuste de inventario, que se hace desde la web. Confirma con el usuario antes de llamarlo. Requiere products:delete.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -4391,7 +4495,7 @@
     },
     {
       "name": "get_invoice_payments",
-      "description": "Estado de cobro y abonos de UNA factura de venta (GET /api/invoices/:id/payments). Requiere invoices:read. Devuelve receivable (total, withheld, netTotal, paid, balance, status), collectible y payments[{_id, amount, paidAt, method, reference, note}]. El _id de cada abono es el que pide delete_invoice_payment.",
+      "description": "Estado de cobro y abonos de UNA factura de venta (GET /api/invoices/:id/payments). Requiere invoices:read. Devuelve receivable (total, withheld, netTotal, paid, balance, status), collectible y payments[{_id, amount, paidAt, method, reference, note, voucher?}]. El _id de cada abono es el que pide delete_invoice_payment. voucher { id, kind, number } aparece cuando el abono lo registró un recibo de caja (contabilidad encendida): ese abono no se elimina suelto.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -4498,7 +4602,7 @@
     },
     {
       "name": "get_product",
-      "description": "Obtener producto por ID.",
+      "description": "Obtener producto por ID, con sus variantes activas. inventory: { tracked } dice si maneja inventario (ausente = no). Con el inventario encendido y el producto marcado, el stock de cada variante es la existencia del kardex.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -5039,6 +5143,21 @@
         }
       },
       "group": "automations"
+    },
+    {
+      "name": "list_bank_accounts",
+      "description": "Cuentas de dinero de la empresa: bancos y cajas (GET /api/treasury/bank-accounts). Requiere invoices:read y que la empresa tenga la contabilidad activada; si no la tiene responde 403 PLAN_MODULE_REQUIRED o 409 (FDN_NOT_ENABLED, FDN_MIXED_OWNERSHIP, FDN-CONTABILIDAD-APAGADA) y no hay nada que elegir: register_invoice_payments funciona igual sin bankAccountId.\nSirve para elegir el bankAccountId de un cobro en register_invoice_payments cuando el pago NO entró a la cuenta por defecto. Cada fila: id, kind (bank = banco, cash = caja), name, bankName, accountType, accountNumber, ledgerAccount (cuenta contable) y active. Solo lectura: por API y MCP no se crean ni editan cuentas de dinero, ni se anulan recibos.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "includeInactive": {
+            "description": "true = incluir las desactivadas (por defecto solo las activas)",
+            "type": "boolean"
+          }
+        }
+      },
+      "group": "invoices"
     },
     {
       "name": "list_calendar_events",
@@ -6415,7 +6534,7 @@
     },
     {
       "name": "list_product_variants",
-      "description": "Lista las variantes de producto de la organización (SKU, precio, stock, atributos como talla o color, activa o no). Filtra por productId para ver las de un producto (404 si el producto no es de la organización). Para el catálogo de productos usa list_products.",
+      "description": "Lista las variantes de producto de la organización (SKU, precio, stock, atributos como talla o color, activa o no). En productos que manejan inventario, stock es la cantidad del kardex (puede ser negativa o decimal). Filtra por productId para ver las de un producto (404 si el producto no es de la organización). Para el catálogo de productos usa list_products.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -6446,7 +6565,7 @@
     },
     {
       "name": "list_products",
-      "description": "Listar productos con filtros.",
+      "description": "Listar productos con filtros. Cada producto que tiene la marca «Maneja inventario» guardada trae inventory: { tracked } (ausente = no maneja inventario); tracked: true filtra los que la tienen.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -6464,6 +6583,10 @@
             "type": "string"
           },
           "hasVariants": {
+            "type": "boolean"
+          },
+          "tracked": {
+            "description": "true = solo los que manejan inventario; false = solo los que no",
             "type": "boolean"
           },
           "priceMin": {
@@ -7314,7 +7437,7 @@
     },
     {
       "name": "register_invoice_payments",
-      "description": "Registrar abonos (pagos recibidos) a facturas de venta, en LOTE (POST /api/invoices/payments). Requiere invoices:write. Es lo mismo que 'Registrar pago' de la columna Cobro de /invoices: no emite nada ante la DIAN ni cambia el estado DIAN.\nFlujo recomendado: primero con dryRun: true y mostrarle a la persona la tabla (result por ítem y summary); aplicar sin dryRun solo con su aprobación.\nCada ítem identifica la factura con id (preferido) o prefix+number. amount = lo recibido (número, sin separadores de miles). Un abono NO puede pasar del saldo: si el cliente pagó unos pesos de más (redondeo), manda full: true + amount y se registra el saldo exacto (lo recibido queda en la nota). full se rechaza si amount se aleja del saldo más de $1.000 o 1 %: un pago parcial va sin full.\nSi el pago llegó corto por retenciones, manda withholdings en el mismo ítem (mismos conceptos y reglas que apply_invoice_withholdings: amount o pct; reteIva es sobre el IVA). Se aplican ANTES del abono y REEMPLAZAN las que tuviera la factura; así el neto baja y el abono la deja en cero. Ojo con facturas pagadas en cuotas: si cada cuota trae retención, manda en la última el set COMPLETO (las de todas las cuotas), o la segunda borra la primera.\npaidAt = fecha del pago (YYYY-MM-DD, se guarda en hora de Bogotá; no se aceptan fechas futuras ni inexistentes). reference = referencia o descripción del banco (queda en el abono). Antiduplicados por factura: mismo monto + mismo día => result 'skipped' aunque la referencia sea otra (el mismo pago registrado antes desde la web). Repetir la conciliación es seguro.\nCada ítem es independiente (no es atómico): uno con error (result 'error' + code: INVOICE_NOT_FOUND, NOT_COLLECTIBLE, ALREADY_PAID, PAYMENT_INVALID, CONFLICT, INTERNAL_ERROR…) no frena a los demás. En dryRun, varios ítems sobre la misma factura se simulan en orden (el segundo ve el saldo que dejó el primero). Máximo 100 ítems por llamada.",
+      "description": "Registrar abonos (pagos recibidos) a facturas de venta, en LOTE (POST /api/invoices/payments). Requiere invoices:write. Es lo mismo que 'Registrar pago' de la columna Cobro de /invoices: no emite nada ante la DIAN ni cambia el estado DIAN.\nFlujo recomendado: primero con dryRun: true y mostrarle a la persona la tabla (result por ítem y summary); aplicar sin dryRun solo con su aprobación.\nCada ítem identifica la factura con id (preferido) o prefix+number. amount = lo recibido (número, sin separadores de miles). Un abono NO puede pasar del saldo: si el cliente pagó unos pesos de más (redondeo), manda full: true + amount y se registra el saldo exacto (lo recibido queda en la nota). full se rechaza si amount se aleja del saldo más de $1.000 o 1 %: un pago parcial va sin full.\nSi el pago llegó corto por retenciones, manda withholdings en el mismo ítem (mismos conceptos y reglas que apply_invoice_withholdings: amount o pct; reteIva es sobre el IVA). Se aplican ANTES del abono y REEMPLAZAN las que tuviera la factura; así el neto baja y el abono la deja en cero. Ojo con facturas pagadas en cuotas: si cada cuota trae retención, manda en la última el set COMPLETO (las de todas las cuotas), o la segunda borra la primera.\npaidAt = fecha del pago (YYYY-MM-DD, se guarda en hora de Bogotá; no se aceptan fechas futuras ni inexistentes). reference = referencia o descripción del banco (queda en el abono). Antiduplicados por factura: mismo monto + mismo día => result 'skipped' aunque la referencia sea otra (el mismo pago registrado antes desde la web). Repetir la conciliación es seguro.\nCada ítem es independiente (no es atómico): uno con error (result 'error' + code: INVOICE_NOT_FOUND, NOT_COLLECTIBLE, ALREADY_PAID, PAYMENT_INVALID, CONFLICT, INTERNAL_ERROR…) no frena a los demás. En dryRun, varios ítems sobre la misma factura se simulan en orden (el segundo ve el saldo que dejó el primero). Máximo 100 ítems por llamada.\nCON LA CONTABILIDAD ENCENDIDA (empresas con libros; las demás no notan nada): cada cobro crea un RECIBO DE CAJA, uno por factura, y el ítem responde además voucher { id, kind: 'RC', number }. El dinero entra al banco o la caja por defecto de la empresa (caja si method es efectivo, banco en lo demás); para elegir otra cuenta manda bankAccountId (los ids salen de list_bank_accounts). Sin cuenta por defecto y sin bankAccountId el ítem responde code MONEY_DEFAULT_ACCOUNT_REQUIRED: pídele a la persona que la configure en Ajustes → Contabilidad → Bancos y caja, o que diga a cuál entra. Las retenciones del ítem se aplican antes y el recibo va por el neto. Un cobro con fecha anterior o igual a los saldos iniciales se rechaza en su ítem (code DATE_IN_OPENING_BALANCES, también en dryRun): usa una fecha posterior.\nCon la contabilidad encendida repetir la misma llamada no duplica el recibo: cada cobro lleva un requestId estable (el que mandes o uno derivado del token, la factura, el valor, la fecha, la referencia, la forma de pago, la nota y la cuenta de dinero). Un ítem con replayed: true YA estaba registrado con ese recibo: no se creó otro. Si de verdad hubo dos pagos iguales en todo eso, mándale a cada uno su propio requestId además de skipDuplicates: false (dentro de un mismo lote, dos ítems idénticos con skipDuplicates: false sí crean dos recibos). code RECEIPT_VOIDED: ese requestId es de un recibo que se anuló; manda uno nuevo. Un ítem con result 'pending' (pending: true + requestId) NO es un error ni un éxito: el recibo quedó en proceso y se termina solo en unos minutos; no lo registres por otra vía, repite la misma llamada más tarde. code BATCH_TIMEOUT o PREVIOUS_ITEM_FAILED: ese ítem no se intentó, repite el lote. El resumen trae además pending.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -7359,6 +7482,14 @@
                   "type": "string"
                 },
                 "note": {
+                  "type": "string"
+                },
+                "bankAccountId": {
+                  "description": "Solo con la contabilidad encendida: id de la cuenta de dinero (banco o caja) donde entró el pago; sale de list_bank_accounts. Sin él se usa la cuenta por defecto de la empresa. Sin contabilidad se ignora",
+                  "type": "string"
+                },
+                "requestId": {
+                  "description": "Solo con la contabilidad encendida: identificador propio del cobro (8 a 100 letras, números, guion o guion bajo) para que repetirlo no duplique el recibo. Si no lo mandas se deriva uno estable. Sin contabilidad se ignora",
                   "type": "string"
                 },
                 "withholdings": {
@@ -9259,12 +9390,38 @@
     },
     {
       "name": "update_deal",
-      "description": "Update a deal by ID. Campos editables: title, amount, pipeline, status, closingDate, customFields, contact, companyId y assignedTo. Una clave que no se aplica sale en `ignoredFields` de la respuesta. Para varios negocios a la vez usa update_deals.\n\nPara asociar un contacto a un deal existente enviar `contact`:\n  - { \"id\": \"<contactId>\" } para usar un contacto ya existente de la organización\n  - { \"mobile\": \"573001234567\", \"name\": \"...\", \"company\": \"...\" } para buscarlo por teléfono y crearlo si no existe\n  - `null` para desasociar el contacto actual.\n\nPara asociar una empresa enviar `companyId` (debe pertenecer a la organización); `null` o \"\" desasocia la empresa actual.",
+      "description": "Update a deal by ID. Campos editables: title, amount, pipeline, status, closingDate, customFields, contact, companyId y assignedTo. Una clave que no se aplica sale en `ignoredFields` de la respuesta. Para varios negocios a la vez usa update_deals.\n\nPara MOVER DE ETAPA (incluido marcar ganado o perdido) enviar `status` con el _id de la etapa destino, del pipeline del negocio (list_deals_config las trae con isWon/isLost). No existe `stage` ni `stageId` como parámetro, y un texto como 'won' responde 400 INVALID_STATUS. Llegar a una etapa ganada/perdida sella wonAt/lostAt solo. En las lecturas la etapa sale como `status` (get_deal) o `stage` (list_deals compact/standard).\n\nPara asociar un contacto a un deal existente enviar `contact`:\n  - { \"id\": \"<contactId>\" } para usar un contacto ya existente de la organización\n  - { \"mobile\": \"573001234567\", \"name\": \"...\", \"company\": \"...\" } para buscarlo por teléfono y crearlo si no existe\n  - `null` para desasociar el contacto actual.\n\nPara asociar una empresa enviar `companyId` (debe pertenecer a la organización); `null` o \"\" desasocia la empresa actual.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
           "id": {
+            "type": "string"
+          },
+          "title": {
+            "description": "Título del negocio",
+            "type": "string"
+          },
+          "amount": {
+            "description": "Monto del negocio (número)",
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "pipeline": {
+            "description": "_id del pipeline. Si lo cambias sin mandar `status`, el negocio pasa a la primera etapa del pipeline nuevo; para otra etapa manda también `status`",
+            "type": "string"
+          },
+          "status": {
+            "description": "_id de la ETAPA destino, del pipeline del negocio (ver list_deals_config). NO es 'won'/'lost' ni el nombre. null la quita",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "closingDate": {
+            "description": "YYYY-MM-DD; con un cambio a ganado/perdido es la fecha real de cierre",
             "type": "string"
           },
           "contact": {
@@ -9607,7 +9764,7 @@
                   ]
                 },
                 "pipeline": {
-                  "description": "_id del pipeline",
+                  "description": "_id del pipeline; si cambia y no mandas status, el negocio pasa a la primera etapa del pipeline nuevo",
                   "type": "string"
                 },
                 "status": {
@@ -10549,7 +10706,7 @@
     },
     {
       "name": "update_product",
-      "description": "Actualizar producto por ID (PUT /products/:id). Solo se tocan los campos enviados.",
+      "description": "Actualizar producto por ID (PUT /products/:id). Solo se tocan los campos enviados. inventory: { tracked } pone o quita «Maneja inventario»; quitarla (tracked: false) a un producto con existencias distintas de cero en el inventario responde 409 PRODUCT_HAS_STOCK (itemIds dice cuáles): primero hay que dejarlas en cero con un ajuste de inventario, que se hace desde la web.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -10607,6 +10764,19 @@
                 "type": "null"
               }
             ]
+          },
+          "inventory": {
+            "description": "«Maneja inventario». Solo { tracked: boolean }",
+            "type": "object",
+            "properties": {
+              "tracked": {
+                "type": "boolean",
+                "description": "true = maneja inventario; false = deja de manejarlo"
+              }
+            },
+            "required": [
+              "tracked"
+            ]
           }
         },
         "required": [
@@ -10618,7 +10788,7 @@
     },
     {
       "name": "update_product_variant",
-      "description": "Edita una variante de producto: sku (único en la organización, 409 si se repite), price, stock, imageUrl, isActive (false la oculta sin borrarla) o attributeValues (REEMPLAZA la lista completa). Parcial: solo cambia lo que envíes; null en stock o imageUrl los limpia. No cambia de producto padre. Requiere products:write.",
+      "description": "Edita una variante de producto: sku (único en la organización, 409 si se repite), price, stock, imageUrl, isActive (false la oculta sin borrarla) o attributeValues (REEMPLAZA la lista completa). Parcial: solo cambia lo que envíes; null en stock o imageUrl los limpia. No cambia de producto padre. Si el producto maneja inventario (inventario encendido), stock es de solo lectura (lo lleva el kardex): enviarlo responde 409 STOCK_MANAGED_BY_INVENTORY y nada cambia; los demás campos se editan como siempre. Requiere products:write.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -10748,7 +10918,7 @@
     },
     {
       "name": "update_purchase",
-      "description": "Actualizar una compra por ID (PUT /api/purchases/:id). Solo se tocan los campos enviados; enviar items los REEMPLAZA. supplierId vacío o null desvincula al proveedor. kind no se cambia después de crear (400 si difiere); orderNumber de una OC lo asigna el servidor (400 si difiere); cancelar una OC ya facturada responde 409. Requiere purchases:write.",
+      "description": "Actualizar una compra por ID (PUT /api/purchases/:id). Solo se tocan los campos enviados; enviar items los REEMPLAZA. supplierId vacío o null desvincula al proveedor. kind no se cambia después de crear (400 si difiere); orderNumber de una OC lo asigna el servidor (400 si difiere); cancelar una OC ya facturada responde 409. Si el número nuevo ya lo tiene otra compra del mismo proveedor, responde 409 con code PURCHASE_DUPLICATE y esas compras en existing y duplicates (no se cambió nada): solo con la confirmación de la persona se repite con allowDuplicate: true. Requiere purchases:write. Con la contabilidad encendida (empresas con libros; las demás no notan nada) una compra NO se marca pagada a mano: status 'completed' sin un pago registrado responde 409 FDN-COMPRA-PAGADA-SIN-EGRESO, porque una compra se paga con un comprobante de egreso y por API y MCP no se crean egresos. Déjala en 'pending' y dile a la persona que registre el pago desde la web (Facturación → Cobros y pagos → Nuevo egreso). Excepción: una compra con fecha anterior o igual a los saldos iniciales de la empresa sí acepta 'completed'. Pasarla a 'pending' siempre se permite, y una compra que ya estaba 'completed' se puede editar sin cambiar el estado. Una compra con pagos registrados no se edita, cancela ni borra (409 FDN-COMPRA-CON-PAGOS). Inventario (solo empresas con el inventario encendido): para que un renglón sume existencias manda en el ítem inventory: { itemId } (el _id del producto si no tiene variantes, o el _id de la variante; el producto debe tener «Maneja inventario», ver list_products con tracked). La respuesta trae inventoryApplied: [{ line, itemId, applied, reason? }] (line = posición del ítem desde 1): un ítem con applied false se guardó SIN mover inventario (reason: not-tracked = ese producto no es de la empresa o no maneja inventario; invalid; not-available = la empresa no lleva las compras donde vive el inventario). Como items REEMPLAZA los renglones, repite inventory en cada ítem que deba seguir moviendo inventario (get_purchase lo devuelve en cada renglón).",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -10802,6 +10972,7 @@
             ]
           },
           "status": {
+            "description": "Con la contabilidad encendida, pasar a 'completed' a mano responde 409 FDN-COMPRA-PAGADA-SIN-EGRESO (se paga con un egreso desde la web)",
             "type": "string",
             "enum": [
               "pending",
@@ -10831,6 +11002,19 @@
                 },
                 "total": {
                   "type": "number"
+                },
+                "inventory": {
+                  "description": "Solo con el inventario encendido: este renglón suma existencias de ese producto",
+                  "type": "object",
+                  "properties": {
+                    "itemId": {
+                      "type": "string",
+                      "description": "_id del producto (sin variantes) o de la variante"
+                    }
+                  },
+                  "required": [
+                    "itemId"
+                  ]
                 }
               },
               "required": [
@@ -10839,6 +11023,10 @@
                 "unitPrice"
               ]
             }
+          },
+          "allowDuplicate": {
+            "description": "Solo `true`, y solo para repetir una compra que acaba de responder 409 `PURCHASE_DUPLICATE` (ya hay una compra de ese proveedor con ese número; el 409 trae `existing` y `duplicates` con las que ya existen). Antes de mandarlo, muéstrale esas compras a la persona y espera a que confirme que es otra compra distinta. Nunca en el primer intento ni por tu cuenta. No se guarda: vale para esa sola llamada.",
+            "type": "boolean"
           }
         },
         "required": [
@@ -10916,7 +11104,7 @@
             "type": "string"
           },
           "items": {
-            "description": "Reemplaza TODOS los ítems (name, quantity, unitPrice, taxes, total…)",
+            "description": "Reemplaza TODOS los ítems (name, quantity, unitPrice, taxes, total…; opcionales productId y variantId, los _id del producto y de la variante del catálogo)",
             "type": "array",
             "items": {
               "type": "object",
