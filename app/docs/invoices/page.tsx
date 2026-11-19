@@ -256,8 +256,9 @@ export default function InvoicesPage() {
             <li>• Genera reportes de compras por proveedor y período</li>
           </ul>
           <Callout type="note" title="Con la contabilidad activada">
-            Una compra se paga con un comprobante de egreso, desde «Pagos y saldo» en su menú, y mientras tenga
-            pagos su estado lo fijan ellos. Ver{" "}
+            Una compra se paga con un comprobante de egreso, desde «Pagos y saldo» en su menú o con «Registrar el
+            pago» en «Cambiar estado»: la opción «Pagada» ya no se marca a mano. Mientras la compra tenga pagos, su
+            estado lo fijan ellos. Ver{" "}
             <a href="/docs/contabilidad#registrar-pago" style={{ color: "#d1345b" }}>Contabilidad → Pagar una compra</a>.
           </Callout>
         </section>
