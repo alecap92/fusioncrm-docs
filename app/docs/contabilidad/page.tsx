@@ -754,7 +754,7 @@ export default function ContabilidadPage() {
             rows={[
               ["Anticipo", "Anticipo del cliente: plata que te entregan antes de facturar.", "Anticipo al proveedor: plata que entregas antes de la compra."],
               ["Otro ingreso", "Un ingreso que no es de una factura.", "No aplica."],
-              ["Gasto", "No aplica.", <>Un gasto que no es de una compra registrada, con su concepto del gasto. Si el valor trae IVA que puedes descontar, <a key="a" href="#egreso-iva-y-compras" style={link}>dilo en el mismo gasto</a>.</>],
+              ["Gasto", "No aplica.", <>Un gasto que no es de una compra registrada ni de un <a key="ds" href="#pagar-documento-soporte" style={link}>documento soporte</a>, con su concepto del gasto. Si el valor trae IVA que puedes descontar, <a key="a" href="#egreso-iva-y-compras" style={link}>dilo en el mismo gasto</a>.</>],
               ["Otra cuenta", "Una cuenta contable que eliges. Sirve para cobrar un saldo que venía de antes.", "Una cuenta contable que eliges. Sirve para pagar un saldo que venía de antes."],
             ]}
           />
@@ -767,6 +767,49 @@ export default function ContabilidadPage() {
               <>Si todavía no hay bancos ni cajas, la pantalla te pide crear uno primero en <a href="#bancos-y-caja" style={link}>Bancos y caja</a>.</>,
             ]}
           />
+
+          <H3 id="pagar-documento-soporte">Pagar un documento soporte</H3>
+          <P>
+            Un <a href="/docs/invoices#support-documents" style={link}>documento soporte</a> y un egreso son dos
+            cosas distintas, y hacen falta las dos:
+          </P>
+          <Table
+            head={["Documento", "Qué registra", "¿Va a la DIAN?"]}
+            rows={[
+              [<B key="b">Documento soporte</B>, "La compra: el gasto, y que le quedas debiendo al proveedor.", "Sí. La DIAN lo valida."],
+              [<B key="b">Comprobante de egreso</B>, "El pago: la plata que salió del banco o la caja, y que ya no le debes.", "No. Es un documento interno de tu contabilidad."],
+            ]}
+          />
+          <P>
+            Cuando la DIAN valida un documento soporte, queda registrado solo como una compra de ese proveedor. Por
+            eso se paga igual que una factura de proveedor:
+          </P>
+          <Steps
+            items={[
+              <>Entra a Facturación → <B>Egresos</B> y haz clic en <B>Nuevo egreso</B>.</>,
+              "Elige al proveedor. Entre sus compras por pagar aparece el documento soporte, con su número.",
+              "Márcalo y escribe cuánto le pagas.",
+              <>En <B>Cómo pagaste</B>, elige el banco o la caja y pon la <B>Fecha</B> en que salió la plata, que puede ser distinta a la del documento.</>,
+              <>Haz clic en <B>Revisar</B> y después en <B>Guardar</B>.</>,
+            ]}
+          />
+          <P>
+            También puedes llegar desde Facturación → <B>Documentos Soporte</B>: la columna <B>Pago</B> muestra
+            «Falta el egreso» en los que no has pagado, y al hacer clic se abre «Pagos y saldo» de su compra.
+          </P>
+          <Bullets
+            items={[
+              "Si no registras el egreso, el documento sigue siendo válido ante la DIAN, pero tus libros dicen que le debes al proveedor y que esa plata sigue en el banco. La conciliación bancaria no va a cuadrar.",
+              "El método de pago que elegiste al emitir el documento soporte no mueve ningún banco: el que saca la plata es el egreso.",
+              "Si le retienes al proveedor, pon las retenciones en la compra antes de pagarla. El egreso paga lo que queda después de ellas.",
+              "Un documento soporte emitido antes de este cambio no tiene compra todavía: créala con «Registrar pago» en el menú del documento.",
+            ]}
+          />
+          <Callout type="warning" title="No uses el concepto «Gasto» para pagar un documento soporte">
+            El documento soporte ya registró el gasto. Si además lo pagas con un egreso al concepto «Gasto», el gasto
+            queda dos veces y la deuda con el proveedor nunca se cancela. El concepto «Gasto» es para lo que no tiene
+            ni factura ni documento soporte.
+          </Callout>
 
           <H3 id="egreso-iva-y-compras">Un gasto con IVA en el egreso</H3>
           <P>

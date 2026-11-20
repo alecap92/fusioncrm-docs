@@ -360,6 +360,40 @@ export default function InvoicesPage() {
             <strong style={{ color: "var(--foreground)" }}>Descargar XML</strong> o <strong style={{ color: "var(--foreground)" }}>Enviar por correo</strong> al
             proveedor. Un documento ya validado por la DIAN no se puede eliminar.
           </p>
+
+          <h3 id="pagar-documento-soporte" className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Pagar un documento soporte</h3>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Emitir el documento soporte <strong style={{ color: "var(--foreground)" }}>no lo paga</strong>. El documento le dice a la DIAN que
+            hiciste la compra; el pago es otro paso. El <strong style={{ color: "var(--foreground)" }}>Método de pago</strong> que eliges al
+            emitirlo (efectivo, transferencia…) es un dato del documento: no saca plata de ningún banco ni
+            de la caja.
+          </p>
+          <Callout type="note" title="Con la contabilidad activada">
+            Cuando la DIAN valida el documento, FusionCRM lo registra solo como una 
+            <a href="#purchases" style={{ color: "#d1345b" }}>compra</a> a nombre de ese proveedor, con el mismo número. Desde ahí se
+            paga con un comprobante de egreso, igual que cualquier factura de proveedor. El gasto se
+            cuenta una sola vez. Ver 
+            <a href="/docs/contabilidad#pagar-documento-soporte" style={{ color: "#d1345b" }}>Contabilidad → Pagar un documento soporte</a>.
+          </Callout>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Con la contabilidad activada, la lista tiene la columna <strong style={{ color: "var(--foreground)" }}>Pago</strong>:
+          </p>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Falta el egreso:</strong> el documento está validado pero no has registrado su pago. En tus libros todavía le debes al proveedor. Haz clic en el aviso para registrarlo.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Pagado:</strong> su compra quedó pagada con un comprobante de egreso.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>—:</strong> no aplica (el documento está cancelado o rechazado, o es anterior a tus saldos iniciales).</li>
+          </ul>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Para pagarlo, abre el menú del documento y elige <strong style={{ color: "var(--foreground)" }}>Registrar pago</strong>, o haz clic
+            en «Falta el egreso». Se abre «Pagos y saldo» de su compra. Si el documento es anterior a este
+            cambio y todavía no tiene compra, primero se abre el formulario de la compra ya lleno: revísalo,
+            haz clic en <strong style={{ color: "var(--foreground)" }}>Crear compra</strong> y enseguida se abre «Pagos y saldo».
+          </p>
+          <Callout type="warning" title="No lo pagues de otra forma: el gasto quedaría dos veces">
+            No registres el pago con un egreso al concepto «Gasto», ni crees a mano una compra de tipo
+            «Documento soporte con no obligados» para un documento que emitiste en FusionCRM. En los dos
+            casos el gasto se cuenta dos veces: una por el documento y otra por lo que registraste.
+          </Callout>
         </section>
 
         <section id="withholdings-config" className="mb-10">
