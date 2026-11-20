@@ -111,6 +111,11 @@ export default function ProductsPage() {
             crear un producto por cada una. El precio por cantidad lo usan las cotizaciones
             automáticas: aplican la escala cuyo mínimo no supere la cantidad pedida.
           </Callout>
+          <Callout type="note" title="Si tu empresa lleva inventario">
+            Con el inventario encendido, la ficha del producto tiene además la sección «Inventario», con la casilla
+            «Maneja inventario», la unidad y la existencia mínima. Ver{" "}
+            <a href="/docs/contabilidad#inventario" style={{ color: "#d1345b" }}>Contabilidad → Inventario</a>.
+          </Callout>
         </section>
 
         <section id="usage" className="mb-10">

@@ -291,6 +291,16 @@ export default function ApiPage() {
           <code>POST /shipments</code> (generar una guía cobra saldo).
         </Callout>
 
+        <Callout type="note" title="Pagos de facturas con la contabilidad activada">
+          Si la empresa tiene la contabilidad activada, registrar un pago de una factura por la API crea un{" "}
+          <strong>recibo de caja</strong> por cada factura, y la respuesta lo trae en <code>voucher</code>. Puedes
+          decir a qué cuenta entró con <code>bankAccountId</code> (las cuentas se leen con{" "}
+          <code>GET /treasury/bank-accounts</code>); sin él se usa el banco o la caja por defecto de la empresa, y si
+          no hay defecto la API responde 422 <code>MONEY_DEFAULT_ACCOUNT_REQUIRED</code>. Marcar una compra como
+          pagada sin egreso también se rechaza. El detalle está en{" "}
+          <Link href="/docs/contabilidad#api-y-mcp" style={{ color: "#d1345b" }}>Contabilidad → Cobros por la API y por un asistente</Link>.
+        </Callout>
+
         <section id="reference" className="mb-10 mt-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Referencia de endpoints</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>

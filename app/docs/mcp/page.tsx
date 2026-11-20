@@ -359,6 +359,14 @@ export default function McpPage() {
             solo se hace desde la app con <em>Enviar ahora</em>. Las integraciones solo se leen, sin
             claves ni contraseñas.
           </Callout>
+          <Callout type="note" title="Pagos con la contabilidad activada">
+            Si tu empresa tiene la contabilidad activada, pedirle a la IA que registre el pago de una factura
+            (<code>register_invoice_payments</code>) crea un <strong>recibo de caja</strong> por cada factura. Si no
+            le dices a qué cuenta entró la plata, se usa el banco o la caja por defecto de tu empresa; si no hay
+            defecto, el pago se rechaza y la IA te lo dice. Para elegir, la IA puede consultar tus bancos y cajas
+            (<code>list_bank_accounts</code>). Los recibos se anulan desde la app, no desde la IA. El detalle está en{" "}
+            <a href="/docs/contabilidad#api-y-mcp" style={{ color: "#d1345b" }}>Contabilidad → Cobros por la API y por un asistente</a>.
+          </Callout>
           <div className="space-y-6 mt-6">
             {grouped.map((g) => (
               <div key={g.group}>
