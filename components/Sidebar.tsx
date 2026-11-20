@@ -169,6 +169,7 @@ const navigation: NavItem[] = [
       { title: "Libros", href: "/docs/contabilidad#libros" },
       { title: "Estados financieros", href: "/docs/contabilidad#estados-financieros" },
       { title: "Revisión y registro de cambios", href: "/docs/contabilidad#revision" },
+      { title: "Impuestos: borradores de IVA, retención y Simple", href: "/docs/contabilidad#impuestos" },
       { title: "Cierre del año", href: "/docs/contabilidad#cierre-anual" },
       { title: "Quién puede hacer qué", href: "/docs/contabilidad#roles" },
       { title: "Lo que todavía no hay", href: "/docs/contabilidad#pendiente" },

@@ -47,6 +47,7 @@ const toc = [
   { id: "estados-financieros", label: "Estados financieros" },
   { id: "revision", label: "Revisión" },
   { id: "registro-de-cambios", label: "Registro de cambios" },
+  { id: "impuestos", label: "Impuestos" },
   { id: "cierre-anual", label: "Cierre del año" },
   { id: "roles", label: "Quién puede hacer qué" },
   { id: "pendiente", label: "Lo que todavía no hay" },
@@ -1639,6 +1640,67 @@ export default function ContabilidadPage() {
           />
         </section>
 
+        <section id="impuestos" className="mb-10">
+          <H2>Impuestos: los borradores para tu contador</H2>
+          <P>
+            <B>Contabilidad → Impuestos</B> arma, con tus ventas y tus compras, el borrador de tres declaraciones: el{" "}
+            <B>IVA</B> (formulario 300), la <B>retención en la fuente</B> (formulario 350) y, si tu empresa está en el
+            Régimen Simple, el <B>anticipo bimestral del Simple</B>. Los ven el propietario, el contador y el usuario de
+            solo lectura.
+          </P>
+          <Callout type="note" title="Es un borrador: FusionCRM no presenta la declaración">
+            Las cifras son para que tu contador las revise y diligencie el formulario en el portal de la DIAN. Nada de
+            esta pantalla se envía a la DIAN ni genera comprobantes.
+          </Callout>
+          <H3 id="impuestos-borrador">Cómo leer un borrador</H3>
+          <Table
+            head={["Parte", "Qué muestra"]}
+            rows={[
+              ["Fechas", "Eliges el rango que quieras. Hay atajos: bimestres, cuatrimestres y año para el IVA; meses para la retención; bimestres para el Simple."],
+              ["Renglones", "El número de renglón del formulario, el valor exacto y el valor del formulario, aproximado al múltiplo de mil más cercano."],
+              ["Documentos", "Un renglón con movimientos dice cuántos documentos lo forman. Al abrirlo ves cada factura o compra con su base, su tarifa y su impuesto, y el enlace al documento y a su comprobante."],
+              ["Cruce contra tus libros", "Compara el borrador con lo registrado en cada cuenta de impuestos. Si coinciden lo dice; si no, te muestra la diferencia y el enlace al auxiliar."],
+              ["Avisos", "Arriba, en lenguaje llano: compras con la tarifa de IVA sin confirmar, documentos que todavía no están en la contabilidad o movimientos manuales que están en los libros y no en el borrador."],
+              ["Excel y PDF", "Los dos botones de arriba descargan el borrador para enviárselo a tu contador."],
+            ]}
+          />
+          <H3 id="impuestos-presentada">Marcar como presentada y saldo a favor</H3>
+          <P>
+            Cuando tu contador presente la declaración, pulsa <B>Marcar como presentada</B> (el número del formulario y
+            la fecha son opcionales). Guardamos una copia de esas cifras. Si después cambia algún documento del período,
+            la pantalla te avisa renglón por renglón qué cambió frente a lo presentado. En el IVA, el saldo a favor de un
+            período presentado pasa solo al período siguiente. Marcar no cambia tus libros y se puede <B>Deshacer</B>{" "}
+            escribiendo el motivo, que queda en el registro de cambios. Solo marcan y deshacen el propietario y el
+            contador.
+          </P>
+          <H3 id="impuestos-compras">La tarifa de IVA de cada compra</H3>
+          <P>
+            Para armar el borrador de IVA, cada compra lleva renglones con su tarifa: 19 %, 5 %, exento, excluido u
+            otra. El IVA de cada renglón se calcula solo y el total de la compra es la suma. Una compra que nace de una
+            factura recibida trae los renglones y las tarifas de la factura. Una compra anterior, guardada sin tarifa,
+            abre con la tarifa que dedujimos de sus valores y la marca <B>«Tarifa sin confirmar»</B>: revísala y
+            confírmala. Esto aplica a las empresas con la contabilidad encendida; en las demás, el formulario de compra
+            no cambia.
+          </P>
+          <H3 id="impuestos-ajustes">Lo que se configura</H3>
+          <Bullets
+            items={[
+              <><B>Ajustes → Contabilidad → Impuestos:</B> si tu empresa está en el Régimen Simple (se detecta de tu facturación electrónica o lo eliges tú), tu grupo de actividad, la tarifa de ICA por mil y, si empezaste con un saldo a favor de IVA, su valor y su fecha.</>,
+              <><B>Ajustes → Retenciones:</B> a qué concepto del formulario 350 corresponde cada concepto de retención y, si quieres, la cuenta contable de cada uno.</>,
+              <><B>Conceptos de gasto:</B> si cada concepto es de bienes o de servicios, porque el formulario de IVA los separa.</>,
+            ]}
+          />
+          <H3 id="impuestos-limites">Lo que los borradores no calculan</H3>
+          <Bullets
+            items={[
+              <>Importaciones, AIU, IVA no descontable, retenciones asumidas y sanciones, en el IVA.</>,
+              <>Autorretenciones y retenciones de nómina, en la retención en la fuente.</>,
+              <>La tabla de tarifas del Simple es la general por grupo y tramo: tu contador debe validarla para tu actividad antes de pagar.</>,
+              <>El ICA de varios municipios, el calendario tributario y la información exógena.</>,
+            ]}
+          />
+        </section>
+
         <section id="cierre-anual" className="mb-10">
           <H2>Cierre del año</H2>
           <P>
@@ -1788,7 +1850,7 @@ export default function ContabilidadPage() {
               <><B>Inventario con varias bodegas, lotes, series o producción.</B> El inventario es de una sola bodega y costo promedio: mira <a href="#inventario-limites" style={link}>lo que no hace</a>.</>,
               <><B>Un rol de auxiliar contable.</B> No hay un rol intermedio que registre comprobantes sin ser propietario ni contador. Hoy los libros los escriben solo ellos dos.</>,
               <><B>Anular un recibo por la API o por un asistente.</B> Un recibo se anula desde la web.</>,
-              <><B>Formularios de impuestos.</B> No se generan las declaraciones de IVA, retención ni renta. Los libros le dan los datos a tu contador.</>,
+              <><B>Presentar impuestos.</B> Los <a href="#impuestos" style={link}>borradores de IVA, retención y Simple</a> son para tu contador: FusionCRM no presenta declaraciones ante la DIAN ni arma la de renta.</>,
               <><B>Nómina.</B> No se liquida ni se contabiliza sola.</>,
             ]}
           />
