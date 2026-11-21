@@ -78,6 +78,7 @@ const GROUP_LABELS: Record<string, string> = {
   notifications: "Notificaciones",
   "import-export": "Importar y exportar",
   purchases: "Compras",
+  accounting: "Contabilidad (solo consulta)",
   shipments: "Envíos",
   agents: "Agentes IA",
   reports: "Reportes",
