@@ -1014,11 +1014,29 @@ export default function ContabilidadPage() {
               "Repetir el mismo pago no crea dos recibos: la respuesta dice que ya estaba registrado.",
               "Si el pago trae retenciones del cliente, se aplican primero y el recibo va por el valor neto.",
               "Si un pago queda «en proceso», se termina solo. Repetir la misma solicitud no lo duplica.",
-              "Un abono que nació así se quita anulando su recibo, desde la web. Ni la API ni un asistente anulan recibos.",
+              "Un abono que nació así se quita anulando su recibo. Desde la web, o por la API y un asistente solo con el acceso del propietario y escribiendo el motivo.",
               <>En el <a href="#registro-de-cambios" style={link}>Registro de cambios</a>, lo que entró por estos caminos dice «por la API» o «por un asistente (MCP)».</>,
               "Sin la contabilidad activada, los pagos por la API y por un asistente siguen registrándose como abonos, igual que antes.",
             ]}
           />
+          <P>
+            Además de los cobros, por la API y por un asistente se puede hacer esto otro. Sirve sobre todo para
+            conciliar el banco sin abrir cada pantalla:
+          </P>
+          <Table
+            head={["Qué", "Quién puede"]}
+            rows={[
+              ["Registrar o quitar las retenciones de una compra, y calcularlas sin guardar", "Cualquier acceso con permiso de compras. Una compra que ya tiene un egreso no cambia de retenciones: primero las retenciones, después el egreso."],
+              ["Ver los documentos soporte y registrar la compra que paga uno", "Cualquier acceso con permiso de compras. Emitir un documento soporte sigue siendo desde la web."],
+              ["Ver las retenciones practicadas a cada proveedor en el año", "Cualquier acceso con permiso de compras. El certificado en PDF se descarga desde la web."],
+              ["Anular un recibo de caja o un comprobante de egreso", <><B key="b">Solo con el acceso del propietario</B>, y con el motivo escrito.</>],
+              ["Consultar los libros: catálogo de cuentas, balance de prueba, auxiliares y los borradores de IVA y de retención", <><B key="b">Solo con el acceso del propietario o del contador.</B> Es solo consulta.</>],
+            ]}
+          />
+          <P>
+            Lo que no se hace por estos caminos: anular una transferencia, cerrar o reabrir una conciliación, escribir
+            comprobantes contables y cerrar el año. Eso es de la web.
+          </P>
         </section>
 
         <section id="conciliacion" className="mb-10">
