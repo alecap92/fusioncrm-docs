@@ -246,7 +246,7 @@ export default function InvoicesPage() {
             <li>• Si pasan más de 7 días sin revisar, la pantalla te lo recuerda.</li>
             <li>• Nunca se crea la compra sola: cada factura que llega queda pendiente hasta que pulsas «Crear compra».</li>
           </ul>
-          <Callout type="info">
+          <Callout type="note">
             El enlace de la DIAN se usa una sola vez para leer la lista y se descarta: FusionCRM no lo guarda.
             Si la DIAN responde con una verificación de seguridad, la revisión se detiene; espera un rato y
             pide un enlace nuevo. FusionCRM nunca entra a la DIAN con tu certificado ni resuelve verificaciones
