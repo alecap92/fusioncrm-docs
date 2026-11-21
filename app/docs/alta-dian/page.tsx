@@ -118,7 +118,7 @@ export default function AltaDianPage() {
                   </>
                 ),
               },
-              { t: "Correo de envío (opcional)", d: "El correo con el que se envían las facturas a tus clientes. Puedes saltarlo y configurarlo después." },
+              { t: "Correo de envío (opcional)", d: "Puedes saltarlo: sin configurarlo, tus facturas salen solas desde el correo de Fusion (facturacion@mail.fusioncol.com) con el nombre de tu empresa, y las respuestas llegan al correo de tu empresa. Si prefieres que salgan desde tu propio correo, pon aquí los datos SMTP de tu cuenta." },
               { t: "Revisión", d: "Revisa el resumen y pulsa «Crear empresa»." },
             ]}
           />

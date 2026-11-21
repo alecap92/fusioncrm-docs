@@ -111,7 +111,7 @@ export default function InvoicesPage() {
               { step: "Certificado", desc: "Tu certificado digital (.p12 o .pfx) y su contraseña. Con él se firman los documentos." },
               { step: "Software", desc: "ID del software y PIN de tu software de facturación electrónica." },
               { step: "Documento soporte", desc: "Configuración de los documentos soporte y su habilitación ante la DIAN." },
-              { step: "Correo de envío", desc: "El correo con el que se envían las facturas a tus clientes." },
+              { step: "Correo de envío", desc: "Opcional. Si no configuras nada, tus facturas salen solas desde el correo de Fusion con el nombre de tu empresa. Si pones tu propia cuenta (SMTP), salen desde ella." },
               { step: "Recepción de facturas", desc: "El buzón de donde se leen las facturas que te envían tus proveedores." },
               { step: "Plantilla del PDF", desc: "Cómo se ve el PDF de tus facturas." },
               { step: "Avanzado", desc: "Opciones técnicas. Solo la ve el propietario de la cuenta." },
@@ -129,6 +129,20 @@ export default function InvoicesPage() {
             <li>• En la pestaña <em>Empresa</em>, <strong style={{ color: "var(--foreground)" }}>Guardar</strong> solo actualiza los datos en FusionCRM. Para que la DIAN y el servicio de facturación los conozcan, pulsa además <strong style={{ color: "var(--foreground)" }}>Sincronizar con la DIAN</strong>.</li>
             <li>• Si otra persona (o tú mismo en otra pestaña del navegador) guardó cambios antes que tú, verás un aviso de que la configuración cambió. Recarga la página para ver la versión actual antes de volver a guardar.</li>
           </ul>
+          <h3 id="correo-de-envio" className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Desde qué correo salen tus facturas</h3>
+          <p className="mb-3" style={{ color: "var(--muted-foreground)" }}>
+            No necesitas configurar un correo para que tus clientes reciban la factura. Hay dos caminos:
+          </p>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Sin configurar nada</strong>: la factura, las notas y el documento soporte salen solos desde <code>facturacion@mail.fusioncol.com</code>, con el nombre de tu empresa como remitente. Si tu cliente responde ese correo, la respuesta llega al correo de tu empresa (el de la pestaña <em>Empresa</em>).</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Con tu propia cuenta</strong>: si en <em>Correo de envío</em> guardas los datos SMTP de tu correo, las facturas salen desde esa cuenta y con tu dominio. Después de guardar, pulsa <strong style={{ color: "var(--foreground)" }}>Probar conexión</strong> para confirmar que funciona.</li>
+          </ul>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Esto aplica tanto al correo automático al emitir como a «Enviar por correo» desde el menú de la factura.
+            Por el correo de Fusion puedes enviar hasta 200 correos al día; si necesitas más, configura tu propia cuenta.
+            Si guardaste una cuenta propia y deja de funcionar (por ejemplo, cambiaste la contraseña), el envío falla
+            hasta que la corrijas: no pasa solo al correo de Fusion.
+          </p>
           <Callout type="danger" title="Datos sensibles">
             Nunca compartas el PIN del software ni la contraseña del certificado por chat o correo,
             ni siquiera con el soporte de FusionCRM. Escríbelos solo en sus campos dentro de FusionCRM.
