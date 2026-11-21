@@ -225,6 +225,49 @@ export default function InvoicesPage() {
             <li>• Para que una factura cuente como gasto y se le calculen las retenciones, pulsa «Crear compra» en su fila, revisa los datos y confirma. Nada se crea solo.</li>
             <li>• El pago al proveedor se marca después en <a href="#purchases" style={{ color: "#d1345b" }}>Compras</a>.</li>
           </ul>
+
+          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--foreground)" }}>Traer de la DIAN lo que el correo no trajo</h3>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            El correo no siempre trae todas las facturas: algunos proveedores las envían a otra dirección o
+            no las envían. La DIAN sí las tiene todas a nombre de tu empresa. Si tus compras están en la
+            facturación electrónica de FusionCRM, «Sincronizar» tiene un segundo paso que revisa esa lista
+            y trae lo que falte.
+          </p>
+          <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>1. Entra a <strong style={{ color: "var(--foreground)" }}>catalogo-vpfe.dian.gov.co</strong>, elige <strong style={{ color: "var(--foreground)" }}>Empresa</strong> y escribe el tipo y número de documento del representante legal y el NIT de la empresa.</li>
+            <li>2. La DIAN envía un correo con un enlace de acceso a la dirección registrada en el RUT. El enlace sirve durante 60 minutos.</li>
+            <li>3. En ese correo, haz clic derecho sobre el botón de ingreso y elige «Copiar dirección del enlace».</li>
+            <li>4. En Recepción de facturas pulsa <strong style={{ color: "var(--foreground)" }}>Sincronizar</strong>, pasa al paso <strong style={{ color: "var(--foreground)" }}>DIAN</strong>, pega el enlace, revisa las fechas y pulsa <strong style={{ color: "var(--foreground)" }}>Revisar en la DIAN</strong>.</li>
+          </ol>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• Al terminar ves cuántos documentos listó la DIAN, cuántos son nuevos y cuántos ya estaban. Los nuevos se descargan solos en unos minutos y aparecen en la pestaña Pendientes; puedes cerrar la ventana mientras tanto.</li>
+            <li>• Los acuses de recibo de tus clientes aparecen en el conteo pero no se registran: no son compras.</li>
+            <li>• Las fechas vienen puestas desde tu última revisión hasta hoy. Para ponerte al día con meses anteriores, cámbialas; cada revisión cubre máximo 366 días. Si un rango trae más de 400 documentos, la ventana te lo dice: repite con un rango más corto, por ejemplo mes por mes.</li>
+            <li>• Si pasan más de 7 días sin revisar, la pantalla te lo recuerda.</li>
+            <li>• Nunca se crea la compra sola: cada factura que llega queda pendiente hasta que pulsas «Crear compra».</li>
+          </ul>
+          <Callout type="info">
+            El enlace de la DIAN se usa una sola vez para leer la lista y se descarta: FusionCRM no lo guarda.
+            Si la DIAN responde con una verificación de seguridad, la revisión se detiene; espera un rato y
+            pide un enlace nuevo. FusionCRM nunca entra a la DIAN con tu certificado ni resuelve verificaciones
+            por ti.
+          </Callout>
+
+          <h3 className="text-lg font-semibold mb-3 mt-6" style={{ color: "var(--foreground)" }}>Pestañas y origen de cada factura</h3>
+          <ul className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Pendientes:</strong> las que todavía no has registrado como compra. Es la vista con la que abre la pantalla.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Ya en compras:</strong> las que ya tienen su compra, con enlace a ella.</li>
+            <li>• <strong style={{ color: "var(--foreground)" }}>Todas:</strong> la lista completa.</li>
+          </ul>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Cada fila dice por dónde llegó: <strong style={{ color: "var(--foreground)" }}>Correo</strong> (el buzón de facturas),{" "}
+            <strong style={{ color: "var(--foreground)" }}>DIAN</strong> (la trajo una revisión en la DIAN),{" "}
+            <strong style={{ color: "var(--foreground)" }}>CUFE</strong> (pegaste su CUFE),{" "}
+            <strong style={{ color: "var(--foreground)" }}>XML</strong> (subiste el archivo),{" "}
+            <strong style={{ color: "var(--foreground)" }}>Migración</strong> (venía de tu historial) o{" "}
+            <strong style={{ color: "var(--foreground)" }}>Referencia</strong> (se trajo porque una nota crédito o débito la menciona).
+            «Visto en la DIAN» significa que, además, una revisión confirmó que la DIAN la tiene.
+          </p>
         </section>
 
         <section id="credit-notes" className="mb-10">
