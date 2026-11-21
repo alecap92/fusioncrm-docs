@@ -21,6 +21,7 @@
     "src/mcp/tools/deals.ts",
     "src/mcp/tools/document-templates.ts",
     "src/mcp/tools/email-templates.ts",
+    "src/mcp/tools/expense-concepts.ts",
     "src/mcp/tools/exports.ts",
     "src/mcp/tools/import.ts",
     "src/mcp/tools/integrations.ts",
@@ -35,10 +36,11 @@
     "src/mcp/tools/scoring-rules.ts",
     "src/mcp/tools/shipments.ts",
     "src/mcp/tools/stage-transitions.ts",
+    "src/mcp/tools/treasury.ts",
     "src/mcp/tools/users.ts",
     "src/mcp/tools/whatsapp-templates.ts"
   ],
-  "toolCount": 239,
+  "toolCount": 253,
   "tools": [
     {
       "name": "add_contacts_to_list",
@@ -1189,9 +1191,13 @@
                 },
                 "assignToTeam": {
                   "description": "userId de un empleado de la organización.",
-                  "type": [
-                    "string",
-                    "null"
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
                   ]
                 },
                 "webhookEnabled": {
@@ -1200,9 +1206,13 @@
                 },
                 "webhookUrl": {
                   "description": "URL https del webhook de la etapa.",
-                  "type": [
-                    "string",
-                    "null"
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
                   ]
                 },
                 "reopenOnNewMessage": {
@@ -1254,9 +1264,13 @@
           },
           "assignToTeam": {
             "description": "userId de un empleado de la organización.",
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "webhookEnabled": {
@@ -1265,9 +1279,13 @@
           },
           "webhookUrl": {
             "description": "URL https.",
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "reopenOnNewMessage": {
@@ -1293,11 +1311,15 @@
             "description": "Título del negocio (obligatorio)"
           },
           "amount": {
-            "description": "Monto del negocio (obligatorio; número)",
-            "type": [
-              "number",
-              "string"
-            ]
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Monto del negocio (obligatorio; número)"
           },
           "pipeline": {
             "type": "string",
@@ -1351,11 +1373,19 @@
                       "type": "string"
                     },
                     "value": {
-                      "type": [
-                        "string",
-                        "number",
-                        "boolean",
-                        "null"
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
                       ]
                     }
                   },
@@ -1371,9 +1401,13 @@
           },
           "assignedTo": {
             "description": "userId del dueño del negocio (empleado de la organización; ver list_users); null lo deja sin dueño",
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         },
@@ -1428,9 +1462,13 @@
           },
           "requiredForStage": {
             "description": "_id de la etapa (del mismo pipeline) para la que es requisito; null = ninguna",
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "enforcement": {
@@ -1560,6 +1598,151 @@
         ]
       },
       "group": "pipelines"
+    },
+    {
+      "name": "create_disbursement",
+      "description": "Registrar un COMPROBANTE DE EGRESO (CE): el pago a un proveedor o un gasto que sale de un banco o una caja (POST /api/treasury/disbursements). Requiere purchases:write y la contabilidad activada (si no: 403 PLAN_MODULE_REQUIRED o 409 FDN_NOT_ENABLED / FDN_MIXED_OWNERSHIP / FDN-CONTABILIDAD-APAGADA / FDN-CONTABILIDAD-EN-SOMBRA). Es la ÚNICA forma de pagar una compra con libros: el pago queda en la compra y en los libros.\nrequestId es OBLIGATORIO (8 a 100 letras, números, guion o guion bajo), uno por cada egreso. Hazlo DETERMINISTA a partir de la línea de origen (p. ej. 'ce-' + cuenta + fecha + número de línea del extracto + purchaseId, o un hash de eso), NUNCA aleatorio: así repetir un lote entero no duplica nada. Si la llamada falla por red, tarda o responde 202 / 503, repítela con el MISMO requestId y el MISMO contenido: no duplica (responde 200 con replayed: true). Con otro contenido responde 409 FDN-SOLICITUD-DISTINTA. ⚠️ Un replayed: true NO garantiza que el pago cuente: revisa data.voucher.status; si es 'voided' (ese comprobante se anuló en la web) el pago NO está registrado: confírmalo con la persona y, si hay que registrarlo de nuevo, usa otro requestId. Solo status 'applied' es un pago hecho.\nFlujo: primero con dryRun: true (valida todo, no gasta número ni escribe; data.voucher sale con id y number en null y data.documents trae el saldo antes y después de cada compra), muéstrale a la persona la tabla, y solo con su aprobación repite SIN dryRun con el mismo requestId.\napplications: [{ purchaseId, amount }] = las compras que se pagan (purchaseId es el _id de la compra; los saldos salen de list_payables o get_purchase_payments). concepts: [{ kind, description, amount, ... }] = lo que no es una compra: kind 'advance' (anticipo a proveedor), 'expense' (gasto, con conceptId; acepta vat = IVA descontable, mayor que 0 y menor que amount, que sigue siendo lo que salió del banco), 'account' (con account: una cuenta contable que reciba movimientos, p. ej. una comisión bancaria o el 4x1000). Al menos una aplicación o un concepto; máximo 50 aplicaciones y 20 conceptos; una compra no se repite. Montos en texto decimal ('2380000.00') o número con máximo dos decimales; nunca se redondea.\nparty { id: NIT o cédula (solo dígitos, sin dígito de verificación), name: nombre o razón social }: si mandas party, id Y name son obligatorios. Es obligatorio SIN aplicaciones; con aplicaciones puedes omitirlo (es el proveedor de esas compras; todas del mismo, si no 400 code FDN-COMPROBANTE-TERCEROS). date YYYY-MM-DD: día real, no futuro (400 FDN-COMPROBANTE-FECHA-FUTURA), no en período cerrado (409 FDN-PERIODO-CONGELADO). bankAccountId: de list_bank_accounts; sin él se usa la cuenta por defecto (caja si method es efectivo, banco en lo demás) y sin cuenta por defecto responde 400 code FDN-SIN-CUENTA-DE-DINERO-POR-DEFECTO (pídele a la persona que diga la cuenta). method, reference y note quedan en el pago.\nErrores: los de fusion-dian llegan con status 400 (validación) o 409 (conflicto), success: false, error (texto) y code / fdnCode = el código FDN-… ; un rechazo de una compra trae index = posición de la aplicación y no gasta número (400 FDN-PAGO-EXCEDE-SALDO, 400 FDN-PAGO-INVALIDO, 409 FDN-COMPRA-NO-PAGABLE…).\n409 FDN-COMPRA-YA-PAGADA tiene dos casos; mira la compra con get_purchase_payments antes de hacer nada: (a) payments trae un pago con voucher (comprobante de egreso) y balance 0 → YA está pagada: NO repitas el egreso ni la toques; (b) la compra está 'completed' SIN ningún pago → alguien la marcó pagada a mano: solo en ese caso, con la aprobación de la persona, pásala a 'pending' con update_purchase y repite el egreso.\nRespuestas: 201 creado (data.voucher con number CE-n y status applied); 200 en dryRun o si ya estaba (replayed: true). 202 con data.pending: true NO es error ni éxito: quedó en proceso y se termina solo en unos minutos; NO lo registres por otra vía: repite la misma llamada (mismo requestId) más tarde o búscalo con list_treasury_vouchers. 409 FDN-COMPROBANTE-NO-APLICADO: una compra cambió en medio; el comprobante quedó anulado con su número gastado; revisa y crea otro con un requestId nuevo (derivado de lo mismo + un sufijo, p. ej. '-r2'). Un campo que no existe → 400 FIELD_NOT_ALLOWED. Por API no se anulan egresos: se anulan desde la web.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Identificador del intento, obligatorio (8 a 100: letras, números, - o _). Reintentar = el MISMO"
+          },
+          "dryRun": {
+            "description": "true = simular sin guardar (recomendado primero)",
+            "type": "boolean"
+          },
+          "date": {
+            "type": "string",
+            "description": "Fecha del pago, YYYY-MM-DD"
+          },
+          "bankAccountId": {
+            "description": "Cuenta de dinero de la que salió (list_bank_accounts). Sin él, la de por defecto",
+            "type": "string"
+          },
+          "party": {
+            "description": "Tercero { id, name }. Obligatorio si no hay applications",
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "NIT o cédula del proveedor o tercero"
+              },
+              "name": {
+                "type": "string",
+                "description": "Nombre o razón social (obligatorio dentro de party)"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          },
+          "method": {
+            "description": "Forma de pago, ej. Transferencia, Efectivo",
+            "type": "string"
+          },
+          "reference": {
+            "description": "Referencia del banco",
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "applications": {
+            "description": "Compras que se pagan (máx. 50)",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "purchaseId": {
+                  "type": "string",
+                  "description": "_id de la compra que se paga"
+                },
+                "amount": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "description": "Valor pagado a esa compra"
+                }
+              },
+              "required": [
+                "purchaseId",
+                "amount"
+              ]
+            }
+          },
+          "concepts": {
+            "description": "Lo que no es una compra (máx. 20)",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "advance",
+                    "expense",
+                    "account"
+                  ],
+                  "description": "advance = anticipo; expense = gasto (con conceptId); account = cuenta contable (con account)"
+                },
+                "conceptId": {
+                  "description": "Concepto de gasto (solo kind expense)",
+                  "type": "string"
+                },
+                "account": {
+                  "description": "Cuenta contable (solo kind account)",
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Descripción del concepto"
+                },
+                "amount": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "description": "Valor que salió del banco por este concepto"
+                },
+                "vat": {
+                  "description": "IVA descontable incluido en amount (solo kind expense)",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "description",
+                "amount"
+              ]
+            }
+          }
+        },
+        "required": [
+          "requestId",
+          "date"
+        ]
+      },
+      "group": "invoices"
     },
     {
       "name": "create_dynamic_contact_list",
@@ -2186,7 +2369,7 @@
     },
     {
       "name": "create_purchase",
-      "description": "Registrar una compra a un proveedor (POST /api/purchases). Requiere purchases:write.\nkind=invoice (default): factura del proveedor. Obligatorios: orderNumber (el número de la factura del proveedor), total y paymentMethod. Si cubre una OC abierta, manda orderRef con el id de la OC (ver list_open_purchase_orders): la OC queda completed con invoiceRef. 409 si la OC ya está facturada o cancelada.\nkind=order: orden de compra. El servidor genera el consecutivo OC-n (settings.purchases.numberPrefix + contador): NO mandes orderNumber, se ignora. Obligatorios: total y paymentMethod. Sus retenciones son estimadas y no entran en informes ni certificados.\nEl proveedor puede ir como supplierId (contacto de la MISMA organización) o simplemente como supplierName + supplierNIT.\nEn cada ítem, si no se envía total se calcula como quantity × unitPrice, y tax vacío se toma como 0.\nCompra repetida: si ya hay una compra de ese proveedor con ese número, responde 409 con code PURCHASE_DUPLICATE y las compras que ya existen en existing y duplicates (no se guardó nada). Muéstraselas a la persona; solo si confirma que es otra compra, repite la misma llamada con allowDuplicate: true.\nCon la contabilidad encendida (empresas con libros; las demás no notan nada) una compra NO se marca pagada a mano: status 'completed' sin un pago registrado responde 409 FDN-COMPRA-PAGADA-SIN-EGRESO, porque una compra se paga con un comprobante de egreso y por API y MCP no se crean egresos. Regístrala en 'pending' y dile a la persona que registre el pago desde la web (Facturación → Cobros y pagos → Nuevo egreso). Excepción: una compra con fecha anterior o igual a los saldos iniciales de la empresa sí acepta 'completed'. OJO con un gasto sin documento (voucherType 'Sin documento' con conceptId): sin status nace 'completed' y responde ese mismo 409; mándalo siempre con status 'pending' y que la persona registre el egreso en la web.\nInventario (solo empresas con el inventario encendido): para que un renglón sume existencias manda en el ítem inventory: { itemId } (el _id del producto si no tiene variantes, o el _id de la variante; el producto debe tener «Maneja inventario», ver list_products con tracked). La respuesta trae inventoryApplied: [{ line, itemId, applied, reason? }] (line = posición del ítem desde 1): un ítem con applied false se guardó SIN mover inventario (reason: not-tracked = ese producto no es de la empresa o no maneja inventario; invalid; not-available = la empresa no lleva las compras donde vive el inventario). Sin inventory en ningún ítem, nada cambia.",
+      "description": "Registrar una compra a un proveedor (POST /api/purchases). Requiere purchases:write.\nkind=invoice (default): factura del proveedor. Obligatorios: orderNumber (el número de la factura del proveedor), total y paymentMethod. Si cubre una OC abierta, manda orderRef con el id de la OC (ver list_open_purchase_orders): la OC queda completed con invoiceRef. 409 si la OC ya está facturada o cancelada.\nkind=order: orden de compra. El servidor genera el consecutivo OC-n (settings.purchases.numberPrefix + contador): NO mandes orderNumber, se ignora. Obligatorios: total y paymentMethod. Sus retenciones son estimadas y no entran en informes ni certificados.\nEl proveedor puede ir como supplierId (contacto de la MISMA organización) o simplemente como supplierName + supplierNIT.\nEn cada ítem, si no se envía total se calcula como quantity × unitPrice, y tax vacío se toma como 0.\nCompra repetida: si ya hay una compra de ese proveedor con ese número, responde 409 con code PURCHASE_DUPLICATE y las compras que ya existen en existing y duplicates (no se guardó nada). Muéstraselas a la persona; solo si confirma que es otra compra, repite la misma llamada con allowDuplicate: true.\nCon la contabilidad encendida (empresas con libros; las demás no notan nada) una compra NO se marca pagada a mano: status 'completed' sin un pago registrado responde 409 FDN-COMPRA-PAGADA-SIN-EGRESO, porque una compra se paga con un comprobante de egreso. Regístrala en 'pending' y paga con create_disbursement (con la aprobación de la persona) o desde la web (Facturación → Cobros y pagos → Nuevo egreso). Excepción: una compra con fecha anterior o igual a los saldos iniciales de la empresa sí acepta 'completed'. OJO con un gasto sin documento (voucherType 'Sin documento' con conceptId): sin status nace 'completed' y responde ese mismo 409; mándalo siempre con status 'pending' y regístrale el egreso con create_disbursement (o desde la web).\nInventario (solo empresas con el inventario encendido): para que un renglón sume existencias manda en el ítem inventory: { itemId } (el _id del producto si no tiene variantes, o el _id de la variante; el producto debe tener «Maneja inventario», ver list_products con tracked). La respuesta trae inventoryApplied: [{ line, itemId, applied, reason? }] (line = posición del ítem desde 1): un ítem con applied false se guardó SIN mover inventario (reason: not-tracked = ese producto no es de la empresa o no maneja inventario; invalid; not-available = la empresa no lleva las compras donde vive el inventario). Sin inventory en ningún ítem, nada cambia.\nTarifa de IVA por renglón (opcional): cada ítem puede llevar vat: { class, percent } (class taxed = gravado, con percent 19, 5…; exempt = exento; excluded = excluido o no gravado, los dos con percent 0). Sirve para el borrador de la declaración de IVA de las empresas con contabilidad. Sin vat no pasa nada: la tarifa se deduce del IVA y el valor del renglón y queda marcada «sin confirmar». Si el IVA del ítem no corresponde a su tarifa (más de $2 de diferencia sobre total − tax) responde 400 con code PURCHASE_ITEM_VAT_INVALID y el renglón en line (desde 1): corrige tax o percent de ese ítem. get_purchase devuelve vat en los renglones que lo tienen guardado.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -2293,6 +2476,28 @@
                   "required": [
                     "itemId"
                   ]
+                },
+                "vat": {
+                  "description": "Opcional: la tarifa de IVA de este renglón. Sin él la tarifa se deduce del IVA y el valor del renglón (y queda «sin confirmar» en el borrador de IVA)",
+                  "type": "object",
+                  "properties": {
+                    "class": {
+                      "type": "string",
+                      "enum": [
+                        "taxed",
+                        "exempt",
+                        "excluded"
+                      ],
+                      "description": "taxed = gravado; exempt = exento (tarifa 0); excluded = excluido o no gravado"
+                    },
+                    "percent": {
+                      "description": "Tarifa de IVA del renglón: 19, 5… Mayor que 0 solo con class taxed; 0 u omitido en exempt y excluded",
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "class"
+                  ]
                 }
               },
               "required": [
@@ -2301,6 +2506,10 @@
                 "unitPrice"
               ]
             }
+          },
+          "conceptId": {
+            "description": "Concepto de gasto (expense_concepts): el id que devuelve list_expense_concepts. Clasifica la compra en los reportes y en los libros; obligatorio en un gasto sin documento (voucherType 'Sin documento'). Se valida (de la empresa y activo; si no, 400) y sale en la respuesta como conceptId",
+            "type": "string"
           },
           "allowDuplicate": {
             "description": "Solo `true`, y solo para repetir una compra que acaba de responder 409 `PURCHASE_DUPLICATE` (ya hay una compra de ese proveedor con ese número; el 409 trae `existing` y `duplicates` con las que ya existen). Antes de mandarlo, muéstrale esas compras a la persona y espera a que confirme que es otra compra distinta. Nunca en el primer intento ni por tu cuenta. No se guarda: vale para esa sola llamada.",
@@ -2448,6 +2657,131 @@
       "group": "quotations"
     },
     {
+      "name": "create_receipt",
+      "description": "Registrar un RECIBO DE CAJA (RC): dinero que entra a un banco o una caja por facturas de venta y/o conceptos (POST /api/treasury/receipts). Requiere invoices:write y la contabilidad activada. Para cobrar facturas una por una o en lote desde un extracto, register_invoice_payments sigue sirviendo (con libros también crea un recibo por factura); usa create_receipt cuando un solo pago cubre varias facturas del mismo cliente, o para anticipos y otros ingresos.\nrequestId es OBLIGATORIO (8 a 100 letras, números, guion o guion bajo), uno por recibo, DETERMINISTA a partir de la línea de origen (cuenta + fecha + línea del extracto + facturas), nunca aleatorio: repetir un lote no duplica. Si la llamada falla por red, tarda o responde 202 / 503, repítela con el MISMO requestId y el MISMO contenido: no duplica (200 replayed: true). Con otro contenido: 409 FDN-SOLICITUD-DISTINTA. Un replayed con data.voucher.status 'voided' (se anuló en la web) NO es un cobro registrado: solo 'applied' lo es; confírmalo con la persona y usa otro requestId si hay que registrarlo de nuevo.\nFlujo: primero dryRun: true (no gasta número; data.documents trae el saldo antes y después de cada factura), muéstraselo a la persona y aplica sin dryRun con el mismo requestId solo con su aprobación.\napplications: [{ saleId, amount }] (saleId = el _id de la factura de venta, el invoiceId de list_receivables). concepts: [{ kind, description, amount, account? }] con kind 'advance' (anticipo de cliente), 'otherIncome' (otro ingreso) o 'account' (con account: cualquier cuenta que reciba movimientos; así se cobra un saldo inicial de cartera). Al menos una aplicación o un concepto; máximo 50 y 20. party { id, name } (los dos obligatorios si lo mandas) obligatorio sin aplicaciones; con aplicaciones de varios clientes, 400 FDN-COMPROBANTE-TERCEROS. date YYYY-MM-DD no futura ni en período cerrado (409 FDN-PERIODO-CONGELADO). bankAccountId de list_bank_accounts o la cuenta por defecto (sin ella, 400 code FDN-SIN-CUENTA-DE-DINERO-POR-DEFECTO). Montos en texto decimal o número con máximo dos decimales.\nRespuestas: 201 creado; 200 en dryRun o replayed. 202 con data.pending: true NO es error ni éxito: quedó en proceso y se termina solo; repite la misma llamada más tarde o búscalo con list_treasury_vouchers, nunca por otra vía. Errores de fusion-dian: status 400 (validación) o 409 (conflicto) con code / fdnCode = FDN-…; los de una factura traen index (409 FDN-NO-COBRABLE, 400 FDN-ABONO-INVALIDO…). Un campo que no existe → 400 FIELD_NOT_ALLOWED. Por API no se anulan recibos.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Identificador del intento, obligatorio (8 a 100). Reintentar = el MISMO"
+          },
+          "dryRun": {
+            "description": "true = simular sin guardar (recomendado primero)",
+            "type": "boolean"
+          },
+          "date": {
+            "type": "string",
+            "description": "Fecha del pago recibido, YYYY-MM-DD"
+          },
+          "bankAccountId": {
+            "description": "Cuenta de dinero a la que entró (list_bank_accounts)",
+            "type": "string"
+          },
+          "party": {
+            "description": "Tercero. Obligatorio si no hay applications",
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "NIT o cédula del cliente o tercero"
+              },
+              "name": {
+                "type": "string",
+                "description": "Nombre o razón social (obligatorio dentro de party)"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          },
+          "method": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "applications": {
+            "description": "Facturas que se cobran (máx. 50)",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "saleId": {
+                  "type": "string",
+                  "description": "_id de la factura de venta"
+                },
+                "amount": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "description": "Valor abonado a esa factura"
+                }
+              },
+              "required": [
+                "saleId",
+                "amount"
+              ]
+            }
+          },
+          "concepts": {
+            "description": "Lo que no es una factura (máx. 20)",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "advance",
+                    "otherIncome",
+                    "account"
+                  ]
+                },
+                "account": {
+                  "description": "Cuenta contable (solo kind account)",
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "amount": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "description",
+                "amount"
+              ]
+            }
+          }
+        },
+        "required": [
+          "requestId",
+          "date"
+        ]
+      },
+      "group": "invoices"
+    },
+    {
       "name": "create_scoring_rule",
       "description": "Crea una regla de puntuación de leads (queda activa salvo isActive=false). Condiciones de CONTACTO (propertyName obligatorio = key de una propiedad de contacto; consulta list_contact_properties): exists (sin value), equals / not_equals (texto, número o booleano), contains (texto), greater_than / less_than (número), in_list (arreglo). Condiciones de NEGOCIOS (propertyName no se usa): last_deal_older_than / last_deal_newer_than / purchase_frequency_less_than (días), deal_amount_greater_than / deal_amount_less_than / total_deals_amount_greater_than (monto), total_deals_count_greater_than (cantidad), deal_status_is (id de etapa), deal_pipeline_is (id de pipeline), has_purchased_product (id de producto), deal_field_value_is ({ fieldId, value }). points puede ser negativo. NO recalcula los puntajes existentes: para aplicarla a todos los contactos llama después recalculate_scoring_rules. Requiere settings:write.",
       "inputSchema": {
@@ -2519,10 +2853,16 @@
                     {
                       "type": "array",
                       "items": {
-                        "type": [
-                          "string",
-                          "number",
-                          "boolean"
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          }
                         ]
                       }
                     },
@@ -2533,10 +2873,16 @@
                           "type": "string"
                         },
                         "value": {
-                          "type": [
-                            "string",
-                            "number",
-                            "boolean"
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            }
                           ]
                         }
                       },
@@ -2923,6 +3269,60 @@
         "additionalProperties": {}
       },
       "group": "tasks"
+    },
+    {
+      "name": "create_transfer",
+      "description": "Transferencia entre dos cuentas de dinero de la empresa (banco a banco, caja a banco…) (POST /api/treasury/transfers). Requiere invoices:write Y purchases:write y la contabilidad activada. Crea un comprobante TR-n en los libros.\nrequestId OBLIGATORIO (8 a 90 letras, números, guion o guion bajo), DETERMINISTA a partir de la línea de origen (cuentas + fecha + línea del extracto), nunca aleatorio. Si falla por red o responde 503 con retryable: true, repite con el MISMO requestId y el mismo contenido: no duplica (replayed: true). Con otro contenido: 409 FDN-SOLICITUD-DISTINTA.\nPrimero dryRun: true (no gasta número; id y number en null), luego sin dryRun con la aprobación de la persona. Las dos cuentas activas y distintas; date YYYY-MM-DD no futura ni en período cerrado. amount: texto sin signo con máximo dos decimales ('150000.00'); un número exacto (150000 o 150000.5) se convierte a ese texto antes de enviarlo; uno con más de dos decimales se rechaza. Errores: 400 code FDN-TRANSFERENCIA-INVALIDA (validación), 409 FDN-PERIODO-CONGELADO, 400 FIELD_NOT_ALLOWED (campo que no existe). Por API no se anulan transferencias.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Identificador del intento, obligatorio (8 a 90). Reintentar = el MISMO"
+          },
+          "dryRun": {
+            "type": "boolean"
+          },
+          "date": {
+            "type": "string",
+            "description": "YYYY-MM-DD"
+          },
+          "fromBankAccountId": {
+            "type": "string",
+            "description": "Cuenta de la que sale (list_bank_accounts)"
+          },
+          "toBankAccountId": {
+            "type": "string",
+            "description": "Cuenta a la que entra"
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "description": "Texto '150000.00'; un número exacto se convierte a texto"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "requestId",
+          "date",
+          "fromBankAccountId",
+          "toBankAccountId",
+          "amount"
+        ]
+      },
+      "group": "invoices"
     },
     {
       "name": "create_whatsapp_template",
@@ -3589,11 +3989,15 @@
         "type": "object",
         "properties": {
           "number": {
-            "description": "Número de cotización",
-            "type": [
-              "string",
-              "number"
-            ]
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "description": "Número de cotización"
           }
         },
         "required": [
@@ -3686,17 +4090,27 @@
                 },
                 "value": {
                   "description": "Valor principal del filtro",
-                  "type": [
-                    "string",
-                    "number",
-                    "boolean"
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
                   ]
                 },
                 "valueTo": {
                   "description": "Valor superior para condición between",
-                  "type": [
-                    "string",
-                    "number"
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
                   ]
                 }
               },
@@ -3745,9 +4159,13 @@
           },
           "timezone": {
             "description": "Zona de messagesFrom/messagesTo: offset en horas (-5) o IANA. Default: la de la organización.",
-            "type": [
-              "number",
-              "string"
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
             ]
           },
           "detail": {
@@ -3866,11 +4284,19 @@
               "type": "string"
             },
             "additionalProperties": {
-              "type": [
-                "string",
-                "number",
-                "boolean",
-                "null"
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
               ]
             },
             "description": "Valores por campo: { \"cliente.firstName\": \"Ana\", \"cliente.address?\": \"Cra 1 #2-3\" }."
@@ -4112,9 +4538,13 @@
           },
           "timezone": {
             "description": "Zona de messagesFrom/messagesTo: offset en horas (-5) o IANA. Default: la de la organización.",
-            "type": [
-              "number",
-              "string"
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
             ]
           },
           "detail": {
@@ -4670,6 +5100,28 @@
       "group": "purchases"
     },
     {
+      "name": "get_purchase_payments",
+      "description": "Lo que debe una compra y sus pagos (GET /api/treasury/purchases/:id/payments). Requiere purchases:read y la contabilidad activada. Devuelve payable { payable, paid, balance, paymentStatus } y payments[{ id, amount, paidDay, method, reference, voucher { id, kind: CE, number } }]. Id mal formado o que no existe: 404 FDN-COMPRA-NO-EXISTE.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "_id de la compra"
+          },
+          "includeRemoved": {
+            "description": "true = incluir los pagos retirados (de egresos anulados)",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "purchases"
+    },
+    {
       "name": "get_purchases_overview",
       "description": "Resumen de compras de un período: total bruto, retenciones practicadas, neto (bruto − retenciones, incluye facturas sin pagar) y desglose. Requiere el módulo de facturación electrónica del plan y el permiso purchases:read.",
       "inputSchema": {
@@ -4708,6 +5160,24 @@
         ]
       },
       "group": "quotations"
+    },
+    {
+      "name": "get_reconciliation",
+      "description": "Un extracto contra los libros (GET /api/treasury/reconciliations/:id). Requiere invoices:read o purchases:read. data.reconciliation trae rev (lo pide match/unmatch), lines[] del banco (con match confirmado o suggestion { confidence high|low, entries[{ entryId, lineIndex }] } y hint fee | tax4x1000 | interest), movements[] de los libros ({ entryId, lineIndex, amount con signo, matched, pending }) y summary (booksBalance, bankBalance, difference, reconciled). Lo que está en el banco y no en los libros (comisiones, 4x1000, intereses) se registra con create_disbursement o create_receipt (concepto account o expense) y luego se cruza: la siguiente lectura ya trae el movimiento.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "id de la conciliación"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "invoices"
     },
     {
       "name": "get_sales_forecast",
@@ -4813,6 +5283,24 @@
       "group": "tasks"
     },
     {
+      "name": "get_treasury_voucher",
+      "description": "Un recibo de caja o comprobante de egreso con sus aplicaciones (documento, valor, paymentId, state), conceptos y rastro (GET /api/treasury/vouchers/:id). Requiere invoices:read (RC) o purchases:read (CE). Id que no existe: 404 FDN-COMPROBANTE-TESORERIA-NO-EXISTE.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "id del comprobante (el voucher.id de la creación o del listado)"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "group": "invoices"
+    },
+    {
       "name": "get_user",
       "description": "Devuelve un usuario de la organización por id (nombre, correo, celular, rol, avatar, lastSeenAt). Un id de otra organización o inexistente responde 404. Solo lectura. Requiere users:read.",
       "inputSchema": {
@@ -4869,11 +5357,19 @@
                 "type": "string"
               },
               "additionalProperties": {
-                "type": [
-                  "string",
-                  "number",
-                  "boolean",
-                  "null"
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               }
             },
@@ -4924,11 +5420,15 @@
             "description": "ID del contacto"
           },
           "companyId": {
-            "description": "ID de la empresa; null o \"\" desvincula",
-            "type": [
-              "string",
-              "null"
-            ]
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "ID de la empresa; null o \"\" desvincula"
           }
         },
         "required": [
@@ -5146,7 +5646,7 @@
     },
     {
       "name": "list_bank_accounts",
-      "description": "Cuentas de dinero de la empresa: bancos y cajas (GET /api/treasury/bank-accounts). Requiere invoices:read y que la empresa tenga la contabilidad activada; si no la tiene responde 403 PLAN_MODULE_REQUIRED o 409 (FDN_NOT_ENABLED, FDN_MIXED_OWNERSHIP, FDN-CONTABILIDAD-APAGADA) y no hay nada que elegir: register_invoice_payments funciona igual sin bankAccountId.\nSirve para elegir el bankAccountId de un cobro en register_invoice_payments cuando el pago NO entró a la cuenta por defecto. Cada fila: id, kind (bank = banco, cash = caja), name, bankName, accountType, accountNumber, ledgerAccount (cuenta contable) y active. Solo lectura: por API y MCP no se crean ni editan cuentas de dinero, ni se anulan recibos.",
+      "description": "Cuentas de dinero de la empresa: bancos y cajas (GET /api/treasury/bank-accounts). Requiere invoices:read y que la empresa tenga la contabilidad activada; si no la tiene responde 403 PLAN_MODULE_REQUIRED o 409 (FDN_NOT_ENABLED, FDN_MIXED_OWNERSHIP, FDN-CONTABILIDAD-APAGADA) y no hay nada que elegir: register_invoice_payments funciona igual sin bankAccountId.\nSirve para elegir el bankAccountId de un cobro en register_invoice_payments cuando el pago NO entró a la cuenta por defecto. Cada fila: id, kind (bank = banco, cash = caja), name, bankName, accountType, accountNumber, ledgerAccount (cuenta contable) y active. Solo lectura: por API y MCP no se crean ni editan cuentas de dinero, ni se anulan recibos.\nSALDO: con withBalance: true cada fila trae además balance, el saldo EN LIBROS de esa cuenta (texto con dos decimales; positivo = dinero que la empresa tiene, negativo = sobregiro; \"0.00\" sin movimientos), y la respuesta trae balanceAsOf (la fecha de corte). asOf (YYYY-MM-DD) pide el saldo a otra fecha: lo registrado con fecha posterior no cuenta; sin asOf es a hoy (hora de Bogotá). Es lo que dice la contabilidad (comprobantes vigentes de la cuenta contable de esa cuenta de dinero), NO el saldo del banco: es el mismo summary.booksBalance de get_reconciliation para un extracto que termina ese día, y lo que falte registrar (comisiones, 4x1000, pagos sin comprobante) no está. balance null: cuenta desactivada cuya cuenta contable usa hoy otra cuenta activa. Sin withBalance ni asOf la respuesta no trae saldo. Mandar asOf ya pide el saldo (no hace falta withBalance). Una fecha que no existe responde 400 con code FDN-CUENTA-DINERO-INVALIDA.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -5154,6 +5654,14 @@
           "includeInactive": {
             "description": "true = incluir las desactivadas (por defecto solo las activas)",
             "type": "boolean"
+          },
+          "withBalance": {
+            "description": "true = cada cuenta trae balance (saldo en libros) y la respuesta balanceAsOf. Por defecto no se calcula",
+            "type": "boolean"
+          },
+          "asOf": {
+            "description": "Fecha de corte del saldo, YYYY-MM-DD (lo posterior no cuenta). Mandarla ya pide el saldo; sin ella, con withBalance: true, es a hoy",
+            "type": "string"
           }
         }
       },
@@ -5653,9 +6161,13 @@
           },
           "timezone": {
             "description": "Offset UTC en horas (-5) o zona IANA (America/Bogota). Para dateFrom/dateTo el default es 0; para messagesFrom/messagesTo, la zona de la organización.",
-            "type": [
-              "number",
-              "string"
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
             ]
           },
           "source": {
@@ -6161,6 +6673,21 @@
       "group": "templates"
     },
     {
+      "name": "list_expense_concepts",
+      "description": "Conceptos de gasto de la empresa (GET /api/purchases/expense-concepts). Requiere purchases:read. Devuelve data.groups (key, label, type costo|gasto) y data.concepts[{ _id, key, label, group, groupLabel, type, order, active, pucCode?, taxKind? }]. El _id es el conceptId de create_purchase / update_purchase (clasifica la compra; obligatorio en un gasto sin documento) y de los conceptos kind 'expense' de create_disbursement. pucCode = la cuenta contable del concepto (empresas con contabilidad). Por defecto solo los activos. Solo lectura: los conceptos se crean y editan desde la web.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "includeInactive": {
+            "description": "true = incluir los desactivados",
+            "type": "boolean"
+          }
+        }
+      },
+      "group": "purchases"
+    },
+    {
       "name": "list_forms",
       "description": "Listar los formularios de captación de la organización (nombre, slug público, campos, si crea negocio, total de envíos).",
       "inputSchema": {
@@ -6516,6 +7043,24 @@
         }
       },
       "group": "purchases"
+    },
+    {
+      "name": "list_payables",
+      "description": "Cuentas por pagar: las compras que pueden recibir un pago con un egreso, las más antiguas primero (GET /api/treasury/payables). Requiere purchases:read y la contabilidad activada. Cada fila: id (el purchaseId de create_disbursement), number, date, supplier { name, nit }, total, payable, paid, balance (texto decimal). count y totalBalance son de TODAS las compras con saldo; truncated avisa que hay más que limit (por defecto 100, máximo 200). Una compra marcada «pagada» a mano sin egreso NO sale aquí: si hay que pagarla con un egreso, pásala antes a 'pending' con update_purchase.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "supplier": {
+            "description": "NIT del proveedor",
+            "type": "string"
+          },
+          "limit": {
+            "type": "number"
+          }
+        }
+      },
+      "group": "invoices"
     },
     {
       "name": "list_pipeline_stages",
@@ -6905,6 +7450,33 @@
       "group": "invoices"
     },
     {
+      "name": "list_reconciliations",
+      "description": "Extractos subidos para conciliar, más recientes primero (GET /api/treasury/reconciliations). Requiere invoices:read o purchases:read. Cada encabezado: id, bankAccountId, from, to, status (open | closed), lineCount, matchedCount, rev. Paginación con nextCursor → cursor; limit 1 a 200 (50).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "bankAccountId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "closed"
+            ]
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "number"
+          }
+        }
+      },
+      "group": "invoices"
+    },
+    {
       "name": "list_scoring_rules",
       "description": "Lista las reglas de puntuación de leads (lead scoring) de la organización. Cada regla tiene un nombre, si está activa y sus condiciones: propertyName (propiedad del contacto), condition, value y points. El puntaje de un contacto (leadScore) es la suma de los points de TODAS las condiciones que cumple en las reglas activas. Úsalo antes de crear o editar reglas para no duplicarlas.",
       "inputSchema": {
@@ -6988,6 +7560,87 @@
         }
       },
       "group": "tasks"
+    },
+    {
+      "name": "list_transfers",
+      "description": "Transferencias entre cuentas de dinero (comprobantes TR), más recientes primero (GET /api/treasury/transfers). Requiere invoices:read o purchases:read. Responde transfers, count y nextCursor (→ cursor); limit 1 a 200 (50).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "bankAccountId": {
+            "type": "string"
+          },
+          "from": {
+            "description": "YYYY-MM-DD",
+            "type": "string"
+          },
+          "to": {
+            "description": "YYYY-MM-DD",
+            "type": "string"
+          },
+          "includeVoided": {
+            "type": "boolean"
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "number"
+          }
+        }
+      },
+      "group": "invoices"
+    },
+    {
+      "name": "list_treasury_vouchers",
+      "description": "Recibos de caja (RC) y comprobantes de egreso (CE), más recientes primero (GET /api/treasury/vouchers). Requiere invoices:read o purchases:read: con solo invoices:read se ven solo los RC, con solo purchases:read solo los CE. Sirve para comprobar si un comprobante que respondió 202 ya quedó (status applied) antes de repetirlo. Cada fila: id, kind, number, date, party, bankAccount, method, reference, total (texto decimal), status (applying | applied | voiding | voided; stuck = atascado, lo anula una persona desde la web), applicationsCount, conceptsCount. Paginación: nextCursor → cursor.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "RC",
+              "CE"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "applying",
+              "applied",
+              "voiding",
+              "voided",
+              "stuck"
+            ]
+          },
+          "party": {
+            "description": "NIT o cédula del tercero",
+            "type": "string"
+          },
+          "from": {
+            "description": "Desde YYYY-MM-DD",
+            "type": "string"
+          },
+          "to": {
+            "description": "Hasta YYYY-MM-DD",
+            "type": "string"
+          },
+          "q": {
+            "description": "Texto: número, referencia o tercero",
+            "type": "string"
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "number"
+          }
+        }
+      },
+      "group": "invoices"
     },
     {
       "name": "list_users",
@@ -7127,6 +7780,74 @@
         }
       },
       "group": "notifications"
+    },
+    {
+      "name": "match_reconciliation_lines",
+      "description": "Confirmar cruces de una conciliación: cada línea del extracto contra una o varias líneas de los libros (POST /api/treasury/reconciliations/:id/matches). Requiere invoices:write Y purchases:write. Manda rev = el de la última lectura (get_reconciliation): si cambió, 409 code CONFLICT con fdnCode FDN-CONFLICTO (vuelve a leer y repite). La suma con signo de las líneas de libros debe ser el valor de la línea del banco (400 code FDN-CRUCE-NO-CUADRA). Una línea de libros pertenece a un solo cruce (409 FDN-CRUCE-DUPLICADO). line 'opening' cruza el saldo inicial (solo en el primer extracto de la cuenta, subido con openingBalance). Cruza solo lo que la persona aprobó: una sugerencia no es un cruce. Conciliación cerrada: 409 FDN-CONCILIACION-CERRADA (se reabre desde la web).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "id de la conciliación"
+          },
+          "rev": {
+            "type": "number",
+            "description": "rev de la última lectura"
+          },
+          "matches": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "line": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "string",
+                      "const": "opening"
+                    }
+                  ],
+                  "description": "Número de la línea del extracto, o 'opening'"
+                },
+                "entries": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "entryId": {
+                        "type": "string"
+                      },
+                      "lineIndex": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "entryId",
+                      "lineIndex"
+                    ]
+                  },
+                  "description": "Líneas de libros (de movements o suggestion.entries)"
+                }
+              },
+              "required": [
+                "line",
+                "entries"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "rev",
+          "matches"
+        ]
+      },
+      "group": "invoices"
     },
     {
       "name": "move_all_conversations_pipeline",
@@ -7437,7 +8158,7 @@
     },
     {
       "name": "register_invoice_payments",
-      "description": "Registrar abonos (pagos recibidos) a facturas de venta, en LOTE (POST /api/invoices/payments). Requiere invoices:write. Es lo mismo que 'Registrar pago' de la columna Cobro de /invoices: no emite nada ante la DIAN ni cambia el estado DIAN.\nFlujo recomendado: primero con dryRun: true y mostrarle a la persona la tabla (result por ítem y summary); aplicar sin dryRun solo con su aprobación.\nCada ítem identifica la factura con id (preferido) o prefix+number. amount = lo recibido (número, sin separadores de miles). Un abono NO puede pasar del saldo: si el cliente pagó unos pesos de más (redondeo), manda full: true + amount y se registra el saldo exacto (lo recibido queda en la nota). full se rechaza si amount se aleja del saldo más de $1.000 o 1 %: un pago parcial va sin full.\nSi el pago llegó corto por retenciones, manda withholdings en el mismo ítem (mismos conceptos y reglas que apply_invoice_withholdings: amount o pct; reteIva es sobre el IVA). Se aplican ANTES del abono y REEMPLAZAN las que tuviera la factura; así el neto baja y el abono la deja en cero. Ojo con facturas pagadas en cuotas: si cada cuota trae retención, manda en la última el set COMPLETO (las de todas las cuotas), o la segunda borra la primera.\npaidAt = fecha del pago (YYYY-MM-DD, se guarda en hora de Bogotá; no se aceptan fechas futuras ni inexistentes). reference = referencia o descripción del banco (queda en el abono). Antiduplicados por factura: mismo monto + mismo día => result 'skipped' aunque la referencia sea otra (el mismo pago registrado antes desde la web). Repetir la conciliación es seguro.\nCada ítem es independiente (no es atómico): uno con error (result 'error' + code: INVOICE_NOT_FOUND, NOT_COLLECTIBLE, ALREADY_PAID, PAYMENT_INVALID, CONFLICT, INTERNAL_ERROR…) no frena a los demás. En dryRun, varios ítems sobre la misma factura se simulan en orden (el segundo ve el saldo que dejó el primero). Máximo 100 ítems por llamada.\nCON LA CONTABILIDAD ENCENDIDA (empresas con libros; las demás no notan nada): cada cobro crea un RECIBO DE CAJA, uno por factura, y el ítem responde además voucher { id, kind: 'RC', number }. El dinero entra al banco o la caja por defecto de la empresa (caja si method es efectivo, banco en lo demás); para elegir otra cuenta manda bankAccountId (los ids salen de list_bank_accounts). Sin cuenta por defecto y sin bankAccountId el ítem responde code MONEY_DEFAULT_ACCOUNT_REQUIRED: pídele a la persona que la configure en Ajustes → Contabilidad → Bancos y caja, o que diga a cuál entra. Las retenciones del ítem se aplican antes y el recibo va por el neto. Un cobro con fecha anterior o igual a los saldos iniciales se rechaza en su ítem (code DATE_IN_OPENING_BALANCES, también en dryRun): usa una fecha posterior.\nCon la contabilidad encendida repetir la misma llamada no duplica el recibo: cada cobro lleva un requestId estable (el que mandes o uno derivado del token, la factura, el valor, la fecha, la referencia, la forma de pago, la nota y la cuenta de dinero). Un ítem con replayed: true YA estaba registrado con ese recibo: no se creó otro. Si de verdad hubo dos pagos iguales en todo eso, mándale a cada uno su propio requestId además de skipDuplicates: false (dentro de un mismo lote, dos ítems idénticos con skipDuplicates: false sí crean dos recibos). code RECEIPT_VOIDED: ese requestId es de un recibo que se anuló; manda uno nuevo. Un ítem con result 'pending' (pending: true + requestId) NO es un error ni un éxito: el recibo quedó en proceso y se termina solo en unos minutos; no lo registres por otra vía, repite la misma llamada más tarde. code BATCH_TIMEOUT o PREVIOUS_ITEM_FAILED: ese ítem no se intentó, repite el lote. El resumen trae además pending.",
+      "description": "Registrar abonos (pagos recibidos) a facturas de venta, en LOTE (POST /api/invoices/payments). Requiere invoices:write. Es lo mismo que 'Registrar pago' de la columna Cobro de /invoices: no emite nada ante la DIAN ni cambia el estado DIAN.\nFlujo recomendado: primero con dryRun: true y mostrarle a la persona la tabla (result por ítem y summary); aplicar sin dryRun solo con su aprobación.\nCada ítem identifica la factura con id (preferido) o prefix+number. amount = lo recibido (número, sin separadores de miles). Un abono NO puede pasar del saldo: si el cliente pagó unos pesos de más (redondeo), manda full: true + amount y se registra el saldo exacto (lo recibido queda en la nota). full se rechaza si amount se aleja del saldo más de $1.000 o 1 %: un pago parcial va sin full.\nSi el pago llegó corto por retenciones, manda withholdings en el mismo ítem (mismos conceptos y reglas que apply_invoice_withholdings: amount o pct; reteIva es sobre el IVA). Se aplican ANTES del abono y REEMPLAZAN las que tuviera la factura; así el neto baja y el abono la deja en cero. Ojo con facturas pagadas en cuotas: si cada cuota trae retención, manda en la última el set COMPLETO (las de todas las cuotas), o la segunda borra la primera.\npaidAt = fecha del pago (YYYY-MM-DD, se guarda en hora de Bogotá; no se aceptan fechas futuras ni inexistentes). reference = referencia o descripción del banco (queda en el abono). Antiduplicados por factura: mismo monto + mismo día => result 'skipped' aunque la referencia sea otra (el mismo pago registrado antes desde la web). Repetir la conciliación es seguro.\nCada ítem es independiente (no es atómico): uno con error (result 'error' + code: INVOICE_NOT_FOUND, NOT_COLLECTIBLE, ALREADY_PAID, PAYMENT_INVALID, CONFLICT, INTERNAL_ERROR…) no frena a los demás. En dryRun, varios ítems sobre la misma factura se simulan en orden (el segundo ve el saldo que dejó el primero). Máximo 100 ítems por llamada.\nCON LA CONTABILIDAD ENCENDIDA (empresas con libros; las demás no notan nada): cada cobro crea un RECIBO DE CAJA, uno por factura, y el ítem responde además voucher { id, kind: 'RC', number }. El dinero entra al banco o la caja por defecto de la empresa (caja si method es efectivo, banco en lo demás); para elegir otra cuenta manda bankAccountId (los ids salen de list_bank_accounts). Sin cuenta por defecto y sin bankAccountId el ítem responde code MONEY_DEFAULT_ACCOUNT_REQUIRED: pídele a la persona que la configure en Ajustes → Contabilidad → Bancos y caja, o que diga a cuál entra. Las retenciones del ítem se aplican antes y el recibo va por el neto. Un cobro con fecha anterior o igual a los saldos iniciales se rechaza en su ítem (code DATE_IN_OPENING_BALANCES, también en dryRun): usa una fecha posterior.\nCon la contabilidad encendida repetir la misma llamada no duplica el recibo: cada cobro lleva un requestId estable (el que mandes o uno derivado del token, la factura, el valor, la fecha, la referencia, la forma de pago, la nota y la cuenta de dinero). Un ítem con replayed: true YA estaba registrado con ese recibo: no se creó otro, y su receivable es el saldo guardado de la factura (el cobro no se aplicó otra vez). El resumen los distingue: registered cuenta todo lo que quedó registrado y replayed cuántos de esos ya lo estaban (replayedAmount es su parte de amount); lo que esta llamada registró de nuevo es registered − replayed. Si de verdad hubo dos pagos iguales en todo eso, mándale a cada uno su propio requestId además de skipDuplicates: false (dentro de un mismo lote, dos ítems idénticos con skipDuplicates: false sí crean dos recibos). code RECEIPT_VOIDED: ese requestId es de un recibo que se anuló; manda uno nuevo. Un ítem con result 'pending' (pending: true + requestId) NO es un error ni un éxito: el recibo quedó en proceso y se termina solo en unos minutos; no lo registres por otra vía, repite la misma llamada más tarde. code BATCH_TIMEOUT o PREVIOUS_ITEM_FAILED: ese ítem no se intentó, repite el lote. El resumen trae además pending.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -7726,9 +8447,13 @@
           },
           "timezone": {
             "description": "Zona de messagesFrom/messagesTo: offset en horas (-5) o IANA. Default: la de la organización.",
-            "type": [
-              "number",
-              "string"
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
             ]
           },
           "detail": {
@@ -8222,6 +8947,40 @@
       "group": "shipments"
     },
     {
+      "name": "unmatch_reconciliation_line",
+      "description": "Deshacer el cruce de una línea del extracto (DELETE /api/treasury/reconciliations/:id/matches/:line?rev=). Requiere invoices:write Y purchases:write. line es el número de la línea (1 a 2.000) o 'opening'; rev el de la última lectura (409 FDN-CONFLICTO si cambió). No borra nada: la línea vuelve a quedar sin cruzar.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "id de la conciliación"
+          },
+          "line": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "const": "opening"
+              }
+            ]
+          },
+          "rev": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "line",
+          "rev"
+        ]
+      },
+      "group": "invoices"
+    },
+    {
       "name": "unpublish_landing_page",
       "description": "Despublica una landing page: vuelve a borrador y su URL pública deja de responder (404) de inmediato; los anuncios, QR o enlaces que apunten a ella quedan rotos hasta volver a publicarla. No borra la página, sus secciones ni sus estadísticas. Requiere landings:write.",
       "inputSchema": {
@@ -8306,28 +9065,44 @@
             ]
           },
           "contactId": {
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "companyId": {
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "advisorId": {
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "reminder": {
             "description": "Fecha-hora ISO 8601, o null para quitarlo",
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         },
@@ -8749,15 +9524,23 @@
             "type": "boolean"
           },
           "assignedTo": {
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "contactId": {
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "reminderEnabled": {
@@ -8774,9 +9557,13 @@
             }
           },
           "recurrenceRule": {
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "externalId": {
@@ -8832,9 +9619,13 @@
           },
           "lineId": {
             "description": "Otra línea de WhatsApp de la organización (id de list_whatsapp_lines); null la quita y la campaña vuelve a salir por la línea por defecto",
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "template": {
@@ -8889,9 +9680,13 @@
               },
               "headerMediaUrl": {
                 "description": "URL https de la cabecera; null la quita",
-                "type": [
-                  "string",
-                  "null"
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               }
             }
@@ -9059,9 +9854,13 @@
           },
           "companyId": {
             "description": "_id de la empresa; null o '' desvincula",
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "source": {
@@ -9113,16 +9912,24 @@
           },
           "whatsappUserId": {
             "description": "BSUID de WhatsApp ('CO.298…'); null o '' lo quita. Nunca lo pongas en mobile.",
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "whatsappUsername": {
             "description": "Alias de WhatsApp ('@claudiahoyos'); se guarda sin @ y en minúsculas; null o '' lo quita. Solo se guarda: NO enlaza conversaciones ni asigna BSUID.",
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         },
@@ -9362,9 +10169,13 @@
             "type": "boolean"
           },
           "assignToTeam": {
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "webhookEnabled": {
@@ -9372,9 +10183,13 @@
           },
           "webhookUrl": {
             "description": "URL https, o null para quitarla.",
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "reopenOnNewMessage": {
@@ -9404,9 +10219,13 @@
           },
           "amount": {
             "description": "Monto del negocio (número)",
-            "type": [
-              "number",
-              "string"
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
             ]
           },
           "pipeline": {
@@ -9415,9 +10234,13 @@
           },
           "status": {
             "description": "_id de la ETAPA destino, del pipeline del negocio (ver list_deals_config). NO es 'won'/'lost' ni el nombre. null la quita",
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "closingDate": {
@@ -9443,9 +10266,13 @@
           },
           "companyId": {
             "description": "Empresa a asociar al deal; null o \"\" desasocia",
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "customFields": {
@@ -9460,11 +10287,19 @@
                       "type": "string"
                     },
                     "value": {
-                      "type": [
-                        "string",
-                        "number",
-                        "boolean",
-                        "null"
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
                       ]
                     }
                   },
@@ -9480,9 +10315,13 @@
           },
           "assignedTo": {
             "description": "userId del dueño del negocio (empleado de la organización; ver list_users); null lo deja sin dueño",
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         },
@@ -9548,9 +10387,13 @@
                 },
                 "requiredForStage": {
                   "description": "Id de la etapa de este pipeline que exige el ítem (null = informativo)",
-                  "type": [
-                    "string",
-                    "null"
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
                   ]
                 },
                 "enforcement": {
@@ -9617,9 +10460,13 @@
           },
           "requiredForStage": {
             "description": "_id de etapa del pipeline, o null para quitar el requisito",
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "enforcement": {
@@ -9693,15 +10540,23 @@
             "type": "string"
           },
           "isWon": {
-            "type": [
-              "boolean",
-              "null"
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "isLost": {
-            "type": [
-              "boolean",
-              "null"
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "probability": {
@@ -9758,9 +10613,13 @@
                   "type": "string"
                 },
                 "amount": {
-                  "type": [
-                    "number",
-                    "string"
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "string"
+                    }
                   ]
                 },
                 "pipeline": {
@@ -9769,9 +10628,13 @@
                 },
                 "status": {
                   "description": "_id de la etapa (del pipeline del negocio); null la quita",
-                  "type": [
-                    "string",
-                    "null"
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
                   ]
                 },
                 "closingDate": {
@@ -9788,11 +10651,19 @@
                         "description": "id, key o nombre del campo"
                       },
                       "value": {
-                        "type": [
-                          "string",
-                          "number",
-                          "boolean",
-                          "null"
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "null"
+                          }
                         ]
                       }
                     },
@@ -9821,16 +10692,24 @@
                   ]
                 },
                 "companyId": {
-                  "type": [
-                    "string",
-                    "null"
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
                   ]
                 },
                 "assignedTo": {
                   "description": "userId del dueño; null lo quita",
-                  "type": [
-                    "string",
-                    "null"
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
                   ]
                 }
               },
@@ -10034,16 +10913,24 @@
           },
           "listId": {
             "description": "Lista estática donde se agrega el contacto; null la quita",
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "ownerId": {
             "description": "Usuario dueño de los contactos creados; null lo quita",
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "deal": {
@@ -10127,9 +11014,13 @@
           },
           "imageLibraryId": {
             "description": "ID de una imagen de la biblioteca para enviarla con el fragmento; null la quita. Solo formato \"text\" y texto de máximo 1.024 caracteres.",
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         },
@@ -10162,9 +11053,13 @@
           },
           "formId": {
             "description": "Id de formulario de la organización; null lo desasocia",
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "sections": {
@@ -10918,7 +11813,7 @@
     },
     {
       "name": "update_purchase",
-      "description": "Actualizar una compra por ID (PUT /api/purchases/:id). Solo se tocan los campos enviados; enviar items los REEMPLAZA. supplierId vacío o null desvincula al proveedor. kind no se cambia después de crear (400 si difiere); orderNumber de una OC lo asigna el servidor (400 si difiere); cancelar una OC ya facturada responde 409. Si el número nuevo ya lo tiene otra compra del mismo proveedor, responde 409 con code PURCHASE_DUPLICATE y esas compras en existing y duplicates (no se cambió nada): solo con la confirmación de la persona se repite con allowDuplicate: true. Requiere purchases:write. Con la contabilidad encendida (empresas con libros; las demás no notan nada) una compra NO se marca pagada a mano: status 'completed' sin un pago registrado responde 409 FDN-COMPRA-PAGADA-SIN-EGRESO, porque una compra se paga con un comprobante de egreso y por API y MCP no se crean egresos. Déjala en 'pending' y dile a la persona que registre el pago desde la web (Facturación → Cobros y pagos → Nuevo egreso). Excepción: una compra con fecha anterior o igual a los saldos iniciales de la empresa sí acepta 'completed'. Pasarla a 'pending' siempre se permite, y una compra que ya estaba 'completed' se puede editar sin cambiar el estado. Una compra con pagos registrados no se edita, cancela ni borra (409 FDN-COMPRA-CON-PAGOS). Inventario (solo empresas con el inventario encendido): para que un renglón sume existencias manda en el ítem inventory: { itemId } (el _id del producto si no tiene variantes, o el _id de la variante; el producto debe tener «Maneja inventario», ver list_products con tracked). La respuesta trae inventoryApplied: [{ line, itemId, applied, reason? }] (line = posición del ítem desde 1): un ítem con applied false se guardó SIN mover inventario (reason: not-tracked = ese producto no es de la empresa o no maneja inventario; invalid; not-available = la empresa no lleva las compras donde vive el inventario). Como items REEMPLAZA los renglones, repite inventory en cada ítem que deba seguir moviendo inventario (get_purchase lo devuelve en cada renglón).",
+      "description": "Actualizar una compra por ID (PUT /api/purchases/:id). Solo se tocan los campos enviados; enviar items los REEMPLAZA. supplierId vacío o null desvincula al proveedor. kind no se cambia después de crear (400 si difiere); orderNumber de una OC lo asigna el servidor (400 si difiere); cancelar una OC ya facturada responde 409. Si el número nuevo ya lo tiene otra compra del mismo proveedor, responde 409 con code PURCHASE_DUPLICATE y esas compras en existing y duplicates (no se cambió nada): solo con la confirmación de la persona se repite con allowDuplicate: true. Requiere purchases:write. Con la contabilidad encendida (empresas con libros; las demás no notan nada) una compra NO se marca pagada a mano: status 'completed' sin un pago registrado responde 409 FDN-COMPRA-PAGADA-SIN-EGRESO, porque una compra se paga con un comprobante de egreso. Déjala en 'pending' y paga con create_disbursement (o desde la web: Facturación → Cobros y pagos → Nuevo egreso). Si create_disbursement responde 409 FDN-COMPRA-YA-PAGADA, mira get_purchase_payments ANTES de tocarla: si ya tiene un pago con comprobante de egreso (voucher) y balance 0, está pagada de verdad: NO la cambies ni repitas el egreso. Solo una compra 'completed' SIN ningún pago (marcada pagada a mano) se pasa aquí a 'pending', con la aprobación de la persona, para pagarla con el egreso. Excepción: una compra con fecha anterior o igual a los saldos iniciales de la empresa sí acepta 'completed'. Una compra que ya estaba 'completed' se puede editar sin cambiar el estado. Una compra con pagos registrados no se edita, cancela ni borra (409 FDN-COMPRA-CON-PAGOS). Inventario (solo empresas con el inventario encendido): para que un renglón sume existencias manda en el ítem inventory: { itemId } (el _id del producto si no tiene variantes, o el _id de la variante; el producto debe tener «Maneja inventario», ver list_products con tracked). La respuesta trae inventoryApplied: [{ line, itemId, applied, reason? }] (line = posición del ítem desde 1): un ítem con applied false se guardó SIN mover inventario (reason: not-tracked = ese producto no es de la empresa o no maneja inventario; invalid; not-available = la empresa no lleva las compras donde vive el inventario). Como items REEMPLAZA los renglones, repite inventory en cada ítem que deba seguir moviendo inventario (get_purchase lo devuelve en cada renglón). Tarifa de IVA por renglón (opcional): cada ítem puede llevar vat: { class, percent } (taxed = gravado con percent 19, 5…; exempt = exento; excluded = excluido o no gravado, los dos con percent 0); sin vat la tarifa se deduce del IVA y el valor del renglón y queda «sin confirmar» en el borrador de IVA. Al reemplazar items, repite el vat que devuelve get_purchase para conservar la tarifa confirmada. Si el IVA del ítem no corresponde a su tarifa responde 400 PURCHASE_ITEM_VAT_INVALID con el renglón en line (desde 1).",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -10943,9 +11838,13 @@
             "type": "string"
           },
           "supplierId": {
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "supplierName": {
@@ -10972,7 +11871,7 @@
             ]
           },
           "status": {
-            "description": "Con la contabilidad encendida, pasar a 'completed' a mano responde 409 FDN-COMPRA-PAGADA-SIN-EGRESO (se paga con un egreso desde la web)",
+            "description": "Con la contabilidad encendida, pasar a 'completed' a mano responde 409 FDN-COMPRA-PAGADA-SIN-EGRESO (se paga con un egreso: create_disbursement)",
             "type": "string",
             "enum": [
               "pending",
@@ -11015,6 +11914,28 @@
                   "required": [
                     "itemId"
                   ]
+                },
+                "vat": {
+                  "description": "Opcional: la tarifa de IVA de este renglón. Sin él la tarifa se deduce del IVA y el valor del renglón (y queda «sin confirmar» en el borrador de IVA)",
+                  "type": "object",
+                  "properties": {
+                    "class": {
+                      "type": "string",
+                      "enum": [
+                        "taxed",
+                        "exempt",
+                        "excluded"
+                      ],
+                      "description": "taxed = gravado; exempt = exento (tarifa 0); excluded = excluido o no gravado"
+                    },
+                    "percent": {
+                      "description": "Tarifa de IVA del renglón: 19, 5… Mayor que 0 solo con class taxed; 0 u omitido en exempt y excluded",
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "class"
+                  ]
                 }
               },
               "required": [
@@ -11023,6 +11944,17 @@
                 "unitPrice"
               ]
             }
+          },
+          "conceptId": {
+            "description": "Concepto de gasto (expense_concepts): el id que devuelve list_expense_concepts. null o \"\" lo quita (vuelve a «Sin clasificar»). Un concepto inactivo solo se acepta si ya era el de la compra. Se valida (de la empresa y activo; si no, 400) y sale en la respuesta como conceptId",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "allowDuplicate": {
             "description": "Solo `true`, y solo para repetir una compra que acaba de responder 409 `PURCHASE_DUPLICATE` (ya hay una compra de ese proveedor con ese número; el 409 trae `existing` y `duplicates` con las que ya existen). Antes de mandarlo, muéstrale esas compras a la persona y espera a que confirme que es otra compra distinta. Nunca en el primer intento ni por tu cuenta. No se guarda: vale para esa sola llamada.",
@@ -11191,10 +12123,16 @@
                     {
                       "type": "array",
                       "items": {
-                        "type": [
-                          "string",
-                          "number",
-                          "boolean"
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          }
                         ]
                       }
                     },
@@ -11205,10 +12143,16 @@
                           "type": "string"
                         },
                         "value": {
-                          "type": [
-                            "string",
-                            "number",
-                            "boolean"
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            }
                           ]
                         }
                       },
@@ -11295,6 +12239,106 @@
         "additionalProperties": {}
       },
       "group": "tasks"
+    },
+    {
+      "name": "upload_bank_statement",
+      "description": "Subir el extracto de una cuenta de banco para conciliarlo (POST /api/treasury/reconciliations). Requiere invoices:write Y purchases:write y la contabilidad activada. La conciliación no mueve dinero: dice qué línea del banco es qué línea de los libros.\nArchivo .xlsx o .csv en base64 (fileBase64, máximo 600 KB → si no, 413 STATEMENT_FILE_TOO_LARGE; máximo 2.000 líneas) con su fileName. format: generic (columnas por su encabezado, o dichas en mapping) o bancolombia. Signo: positivo = entra plata. from/to (YYYY-MM-DD) por defecto salen del archivo; mándalos si las fechas vienen sin año. openingBalance es necesario para poder cruzar el saldo inicial (no se agrega después). closingBalance si el archivo no trae saldo. Los dos son texto con máximo dos decimales ('1500000.00', negativo con '-'); un número exacto se convierte a ese texto antes de enviarlo.\n⚠️ dryRun es TRUE por defecto aquí: sin dryRun: false solo revisa el archivo (data.lines, problems, warnings) y no guarda nada. Revisa con la persona y guarda con dryRun: false y el MISMO requestId (OBLIGATORIO, 8 a 90). Repetir el mismo requestId responde alreadyUploaded: true (no duplica); con otro contenido, 409 FDN-SOLICITUD-DISTINTA. Un archivo con filas malas: 400 code FDN-EXTRACTO-CON-ERRORES con el informe fila por fila (problems); sin encabezados reconocibles: 400 FDN-EXTRACTO-ARCHIVO con detected.headers (úsalos en mapping). requestId determinista (cuenta + período), nunca aleatorio.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Identificador del intento, obligatorio (8 a 90). Reintentar = el MISMO"
+          },
+          "dryRun": {
+            "description": "Por defecto true (solo revisa). false = guardar",
+            "type": "boolean"
+          },
+          "bankAccountId": {
+            "type": "string",
+            "description": "Cuenta de dinero del extracto (list_bank_accounts)"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "fileBase64": {
+            "type": "string",
+            "description": "El archivo .xlsx o .csv en base64"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "generic",
+              "bancolombia"
+            ]
+          },
+          "mapping": {
+            "description": "Nombre de la columna del archivo para cada campo (amount, o debit + credit)",
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "reference": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "string"
+              },
+              "debit": {
+                "type": "string"
+              },
+              "credit": {
+                "type": "string"
+              },
+              "balance": {
+                "type": "string"
+              }
+            }
+          },
+          "from": {
+            "description": "Primer día del extracto YYYY-MM-DD",
+            "type": "string"
+          },
+          "to": {
+            "description": "Último día del extracto YYYY-MM-DD",
+            "type": "string"
+          },
+          "openingBalance": {
+            "description": "Texto '1500000.00'; un número exacto se convierte a texto",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "closingBalance": {
+            "description": "Texto '1500000.00'; un número exacto se convierte a texto",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          }
+        },
+        "required": [
+          "requestId",
+          "bankAccountId",
+          "fileName",
+          "fileBase64"
+        ]
+      },
+      "group": "invoices"
     },
     {
       "name": "upload_knowledge_base_text",
