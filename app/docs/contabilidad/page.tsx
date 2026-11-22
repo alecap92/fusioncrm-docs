@@ -41,6 +41,9 @@ const toc = [
   { id: "api-y-mcp", label: "Cobros por API y asistente" },
   { id: "cuentas-por-pagar", label: "Cuentas por pagar" },
   { id: "regularizar", label: "Regularizar una compra pagada" },
+  { id: "cxp-lote", label: "Pagar varias compras de una vez" },
+  { id: "cxp-vencimiento", label: "Vencimiento de la compra" },
+  { id: "cxp-informe", label: "Antigüedad a una fecha" },
   { id: "conciliacion", label: "Conciliación bancaria" },
   { id: "inventario", label: "Inventario" },
   { id: "importar", label: "Importar desde otro software" },
@@ -1038,7 +1041,26 @@ export default function ContabilidadPage() {
               [<>Consultar las <a key="a" href="#cuentas-por-pagar" style={link}>cuentas por pagar</a>: las compras con saldo, las marcadas como pagadas sin egreso o las dos, con su antigüedad y el resumen por proveedor</>, "Cualquier acceso con permiso de compras. Es solo consulta."],
               [<>Listar solo las compras pagadas sin egreso</>, "Cualquier acceso con permiso de compras."],
               [<>Registrar el egreso de una compra marcada como pagada a mano</>, "Cualquier acceso que pueda registrar egresos. El egreso se aplica directamente: no hay que cambiar antes el estado de la compra. Si la compra ya tiene su pago, o está dentro de los saldos iniciales, el egreso se rechaza con un mensaje que lo explica."],
+              [<>Pagar o regularizar varias compras de una vez, con un <a key="a" href="#cxp-lote" style={link}>lote de egresos</a></>, "Cualquier acceso que pueda registrar egresos. Siempre en dos pasos: primero se simula y después se confirma el mismo lote; sin la simulación, el lote se rechaza. Máximo 100 compras por lote."],
+              [<>Consultar cómo quedó un lote de egresos</>, "Cualquier acceso con permiso de compras. Es solo consulta. Por la API también se listan los últimos lotes."],
+              [<>Consultar la antigüedad de las cuentas por pagar a una fecha, y pedirla por vencimiento</>, "Cualquier acceso con permiso de compras. El Excel y el PDF del informe se descargan desde la web o por la API, no por un asistente."],
+              [<>Escribir el vencimiento o el plazo de una compra al registrarla o al editarla</>, "Cualquier acceso que pueda escribir compras. Se manda la fecha en que vence o el plazo en días, no los dos."],
               ["Consultar los libros: catálogo de cuentas, balance de prueba, auxiliares y los borradores de IVA y de retención", <><B key="b">Solo con el acceso del propietario o del contador.</B> Es solo consulta.</>],
+            ]}
+          />
+          <P>
+            Sobre el lote de egresos por la API o por un asistente:
+          </P>
+          <Bullets
+            items={[
+              "La simulación no registra nada: devuelve los egresos que se crearían y, compra por compra, cuáles entran y cuáles no, con su motivo. Un asistente debe mostrártela antes de confirmar.",
+              "Si algo cambió entre la simulación y la confirmación, no se registra nada y la respuesta trae el plan de ahora, para revisarlo y confirmar otra vez.",
+              "Que el lote responda bien no quiere decir que todas las compras quedaron pagadas: el resultado se lee compra por compra.",
+              "El lote se identifica con una clave que elige quien lo envía. Repetir la misma clave con el mismo contenido no duplica nada: devuelve el resultado guardado o termina el lote que quedó a medias.",
+              "Si la respuesta de la confirmación no llega, no se reenvía con otra clave ni se pagan esas compras por otro camino: se consulta el lote por su clave.",
+              "Las filas fallidas se reintentan en un lote nuevo, con otra clave, simulando primero.",
+              "Para los usuarios con cupo por hora en la API (los que no son el propietario), confirmar un lote cuenta una creación por cada compra enviada. Simular no gasta cupo, pero avisa si el lote no cabe. No hay un tope por valor.",
+              "Herramientas nuevas para un asistente: registrar un lote de egresos, consultar un lote y consultar la antigüedad a una fecha. La consulta de cuentas por pagar acepta además la antigüedad por vencimiento.",
             ]}
           />
           <P>
@@ -1079,7 +1101,7 @@ export default function ContabilidadPage() {
           <Bullets
             items={[
               <><B>Tarjetas de antigüedad:</B> «0 a 30 días», «31 a 60 días», «61 a 90 días» y «Más de 90 días», cada una con su valor y su cantidad de compras.</>,
-              <>La antigüedad se cuenta desde la <B>fecha de la factura</B> del proveedor hasta hoy. Todavía no hay fecha de vencimiento en las compras.</>,
+              <>La antigüedad se cuenta desde la <B>fecha de la factura</B> del proveedor hasta hoy. También puedes verla contada desde el <a href="#cxp-por-vencer" style={link}>vencimiento</a> de cada compra.</>,
               <><B>Lista de proveedores:</B> de mayor a menor valor. De cada uno ves el nombre, el NIT, cuántas compras son, de cuándo es la más antigua, el total y cómo se reparte por antigüedad.</>,
               <>Toca un proveedor para ver sus compras: número, fecha, hace cuántos días y saldo. El número abre «Pagos y saldo» de esa compra. Si son muchas, usa <B>Cargar más</B>.</>,
               <><B>Buscar:</B> por nombre o por NIT. Si no sale nada, prueba con otro nombre o con el NIT sin puntos.</>,
@@ -1109,7 +1131,7 @@ export default function ContabilidadPage() {
               "Si después anulas ese egreso, la compra queda por pagar. No vuelve a figurar como pagada a mano.",
               <>Un proveedor sin NIT no puede recibir un egreso. La pantalla te lo dice y te lleva a ponérselo con <B>Ponerle el NIT</B>. Mientras no lo tenga, puede que sus compras no se vean completas.</>,
               "Una compra marcada como pagada que no debe nada (por ejemplo, con una nota crédito por todo su valor) no aparece: no hay nada que regularizar.",
-              <>Todavía no se pueden pagar varios proveedores de una vez: se registra un egreso por proveedor. Mira <a href="#pendiente" style={link}>lo que todavía no hay</a>.</>,
+              <>Para pagar o regularizar varias compras de una vez, incluso de varios proveedores, usa el <a href="#cxp-lote" style={link}>lote de egresos</a>.</>,
             ]}
           />
 
@@ -1161,6 +1183,207 @@ export default function ContabilidadPage() {
             La pantalla la ven todos los que ven «Cobros y pagos». El usuario de solo lectura puede consultar y
             exportar, pero no ve <B>Registrar egreso</B>: mira <a href="#roles" style={link}>quién puede hacer qué</a>.
           </P>
+
+          <H3 id="cxp-lote">Pagar o regularizar varias compras de una vez</H3>
+          <P>
+            En las dos pestañas puedes marcar varias compras y registrarles sus egresos en una sola pasada: en{" "}
+            <B>Por pagar</B> las pagas y en <B>Por regularizar</B> les pones el egreso que les falta. Nada se registra
+            sin que antes veas una simulación con los egresos que se van a crear.
+          </P>
+          <P>Primero eliges las compras:</P>
+          <Bullets
+            items={[
+              <>Cada compra tiene una casilla. La casilla que está junto al proveedor marca <B>todas las compras de ese proveedor</B>.</>,
+              <>Al marcar la primera aparece una barra con la cuenta y el total, por ejemplo «3 compras seleccionadas», y dos botones: <B>Quitar selección</B> y <B>Registrar egresos en lote</B>.</>,
+              <>Un lote lleva máximo <B>100 compras</B>. Al llegar, las demás casillas quedan apagadas y la barra lo dice: «Llegaste al tope de 100 compras por lote. Registra este lote y sigue con las demás en otro.»</>,
+              "Una compra de un proveedor sin NIT no se puede marcar: «No se puede incluir en un lote: al proveedor le falta el NIT. Pónselo en la compra.»",
+              "La selección es de la pestaña que estás viendo: si cambias de pestaña, se vacía. Un lote no mezcla compras por pagar con compras por regularizar.",
+              "Las casillas las ve quien puede registrar egresos. El usuario de solo lectura no las ve.",
+            ]}
+          />
+          <P>
+            <B>Registrar egresos en lote</B> abre un asistente en el lugar de la lista. Tiene tres pasos y, al final,
+            el resultado:
+          </P>
+          <Table
+            head={["Paso", "Qué ves y qué haces"]}
+            rows={[
+              [<B key="b">1. Revisar</B>, <>Las compras elegidas. De cada una puedes cambiar la <B>Fecha del egreso</B> y el <B>Valor a pagar</B> (viene todo el saldo; escribe menos si es un abono), o quitarla del lote. Eliges <B>Cómo se agrupan</B> y, en <B>Cómo pagaste</B>, el banco o la caja, la forma de pago, la referencia y la nota, que van iguales en todos los egresos del lote. Sigue con <B>Simular</B>.</>],
+              [<B key="b">2. Simular</B>, <>«Esto es una simulación: todavía no se ha registrado nada.» Ves los egresos que se crearían, cada uno con su proveedor, su fecha, su total y sus compras («paga… · queda en…»). Aparte salen las compras que <B>no entran</B>, cada una con su motivo. <B>Cambiar algo</B> te devuelve al paso 1; <B>Continuar</B> sigue.</>],
+              [<B key="b">3. Confirmar</B>, <>El resumen «Vas a registrar»: cuántos egresos, el total, de qué cuenta sale y la forma de pago. El botón lleva la cifra, por ejemplo <B>«Registrar 2 egresos por $ 3.608.000,00»</B>. Mientras registra dice «Puede tardar más de un minuto. No cierres esta pantalla.»</>],
+              [<B key="b">Resultado</B>, <>Qué pasó con cada compra, una por una. Mira <a key="a" href="#cxp-lote-resultado" style={link}>qué significa cada resultado</a>.</>],
+            ]}
+          />
+          <P>Cómo se agrupan las compras en egresos:</P>
+          <Table
+            head={["Opción", "Qué hace"]}
+            rows={[
+              [<B key="b">Un egreso por proveedor</B>, "Es la que viene elegida. Las compras de un mismo proveedor y una misma fecha van en un solo egreso. Si las compras de un proveedor llevan fechas distintas, sale un egreso por cada fecha. Si un proveedor trae más de 50 compras con la misma fecha, salen varios egresos de hasta 50 compras cada uno."],
+              [<B key="b">Un egreso por compra</B>, "Cada compra queda con su propio egreso."],
+            ]}
+          />
+          <P>La fecha de cada pago:</P>
+          <Bullets
+            items={[
+              <>Cada egreso lleva por defecto <B>la fecha de su compra</B>. Sirve para regularizar, porque es cuando la compra figura pagada. Si estás pagando compras pendientes, pon el día en que de verdad salió la plata.</>,
+              <>Puedes cambiar la fecha fila por fila, o marcar <B>Misma fecha para todas</B> y escribir una sola.</>,
+              "Un egreso no lleva fecha futura.",
+              <>Si la fecha cae en un <a href="#periodos" style={link}>período cerrado</a>, la fila lo dice desde que abres el asistente («Esa fecha cae en un período cerrado… Pon otra fecha.») y no deja simular hasta que la cambies.</>,
+              <>Una fecha dentro de tus <a href="#saldos-iniciales-hasta" style={link}>saldos iniciales</a> sale rechazada en la simulación, con su motivo.</>,
+              "El valor de una fila no puede ser más que el saldo de esa compra.",
+            ]}
+          />
+          <Callout type="tip" title="Si algo cambió entre la simulación y la confirmación">
+            Si mientras revisabas alguien pagó una de esas compras, le registró una nota o cerró un período, al confirmar
+            no se registra nada. La pantalla vuelve a la simulación con el aviso «Algo cambió desde la simulación» y el
+            plan de ahora: lo revisas y confirmas otra vez.
+          </Callout>
+
+          <H3 id="cxp-lote-resultado">Qué significa cada resultado</H3>
+          <P>
+            El título del resultado dice cómo salió el lote: «Todos los egresos quedaron registrados», «El lote se
+            registró con novedades» o «No se registró ningún egreso». Debajo, cada compra lleva una etiqueta:
+          </P>
+          <Table
+            head={["Etiqueta", "Qué pasó", "Qué haces"]}
+            rows={[
+              [<B key="b">Registrada</B>, <>Su egreso quedó registrado. El enlace «Ver el egreso…» lo abre en otra pestaña.</>, "Nada."],
+              [<B key="b">Rechazada</B>, "No se le registró nada y no gastó número. La fila dice el motivo. En un egreso de varias compras, si una es rechazada al registrar, no se registra ninguna de ese egreso: las otras dicen que fue por otra compra del mismo egreso.", "Corrige el motivo y usa «Reintentar las fallidas»."],
+              [<B key="b">No aplicada</B>, "«El egreso tomó número, pero la compra cambió mientras se registraba y quedó anulado. Su número no se reusa.» El enlace «Ver el egreso anulado…» lo muestra. La compra no quedó pagada.", "«Reintentar las fallidas»."],
+              [<B key="b">Pendiente</B>, "«Todavía no se intentó: el registro quedó a medias.»", <>Termina el lote: mira <a key="a" href="#cxp-lote-corte" style={link}>qué hacer si se corta la conexión</a>.</>],
+              [<B key="b">En proceso</B>, "«Su egreso quedó a medio registrar. Se termina solo en unos minutos.»", "Espera y usa «Actualizar». No le registres otro egreso."],
+              [<B key="b">Sin confirmar</B>, "«No se sabe cómo quedó esta compra. Consulta el resultado otra vez.»", "«Actualizar»."],
+            ]}
+          />
+          <Bullets
+            items={[
+              <>Cada egreso del lote es un comprobante de egreso como cualquier otro: toma su número, queda en <a href="#recibos-y-egresos" style={link}>Egresos</a> y en tus libros, y se anula igual.</>,
+              "Si algo sale mal con un egreso, los demás siguen.",
+              <><B>Reintentar las fallidas</B> abre el asistente solo con las rechazadas y las no aplicadas. Es un lote nuevo: se simula y se confirma otra vez.</>,
+              "Solo se registra un lote a la vez por empresa. Si hay otro en curso, la pantalla dice «Hay un lote registrándose»: espera a que termine y consulta su resultado antes de enviar otro.",
+              <>Con <B>Volver a cuentas por pagar</B> regresas a la lista, ya actualizada.</>,
+              "Lo que llevas en los pasos 1 a 3 no se guarda: si recargas la página antes de confirmar, se pierde la selección. No se registró nada.",
+            ]}
+          />
+
+          <H3 id="cxp-lote-corte">Si se corta la conexión mientras se registra</H3>
+          <P>
+            Si la respuesta no llega (se cayó el internet o el registro tardó demasiado), puede que el lote sí se haya
+            registrado, entero o en parte. Por eso la pantalla <B>no lo vuelve a enviar por su cuenta</B>: «No llegó
+            la respuesta del servidor. No se reenvió nada: primero hay que consultar cómo quedó el lote.»
+          </P>
+          <Steps
+            items={[
+              <>Haz clic en <B>Consultar cómo quedó</B>. Mientras no se sepa, la pantalla no deja confirmar ni cambiar nada.</>,
+              "Si el lote se registró, ves su resultado, compra por compra.",
+              "Si no se registró, la pantalla lo dice («Se consultó el lote y no quedó registrado: no se escribió nada. Puedes confirmar de nuevo.») y confirmas otra vez.",
+              <>Si quedó a medias, el resultado dice «El registro quedó a medias»: lo que ya se registró está bien y no se repite. Haz clic en <B>Terminar de registrar</B> para completar el resto.</>,
+            ]}
+          />
+          <Bullets
+            items={[
+              <>Si sales sin saber cómo quedó, el lote queda guardado en ese navegador. Al volver a Cuentas por pagar lo encuentras arriba: <B>«Tienes un lote de egresos sin confirmar»</B>, con el botón <B>Ver cómo quedó</B>.</>,
+              <><B>Mientras no lo veas, no armes otro lote con esas compras ni las pagues una por una</B>: podrías pagarlas dos veces.</>,
+              "Un lote que todavía se está registrando se actualiza solo en pantalla cada pocos segundos. También puedes usar «Actualizar».",
+              <>«Terminar de registrar» aparece solo en el navegador desde donde se envió el lote. Desde otro equipo, el lote se ve en <a href="#cxp-lotes-recientes" style={link}>Lotes recientes</a>, pero no se puede terminar ahí: si no tienes cómo, escríbele a <a href="/docs/soporte" style={link}>soporte</a> con la hora del lote.</>,
+            ]}
+          />
+
+          <H3 id="cxp-lotes-recientes">Lotes recientes</H3>
+          <P>
+            Cuando tu empresa ya registró algún lote, en la cabecera de Cuentas por pagar aparece el botón{" "}
+            <B>Lotes recientes</B>. Abre los últimos diez, del más nuevo al más viejo.
+          </P>
+          <Bullets
+            items={[
+              "De cada lote ves la fecha y la hora, cómo está («Terminado», «Registrándose» o «Quedó a medias»), cuántas compras llevaba, cuántas quedaron registradas y cuántas tuvieron novedad.",
+              <><B>Ver resultado</B> abre el resultado de ese lote, compra por compra, con los enlaces a sus egresos.</>,
+              "Lo ve también el usuario de solo lectura, sin botones para registrar.",
+              "Desde aquí un lote se consulta, pero no se reintenta ni se termina.",
+            ]}
+          />
+
+          <H3 id="cxp-vencimiento">El vencimiento de la compra: «Vence» y «Plazo (días)»</H3>
+          <P>
+            Con la contabilidad activada, el formulario de una factura de proveedor o de un documento soporte trae dos
+            campos opcionales para decir hasta cuándo hay que pagarla. Llenas uno de los dos:
+          </P>
+          <Table
+            head={["Campo", "Qué escribes"]}
+            rows={[
+              [<B key="b">Plazo (días)</B>, "Los días para pagar desde la fecha de la compra, de 0 a 365. Con el plazo, «Vence» se calcula solo. Si después cambias la fecha de la compra, el vencimiento se vuelve a calcular."],
+              [<B key="b">Vence</B>, "Hasta cuándo hay que pagarla. Si escribes la fecha a mano, vale la fecha y el plazo se quita. No puede ser anterior a la fecha de la compra."],
+            ]}
+          />
+          <Bullets
+            items={[
+              <><B>El plazo se propone solo.</B> Al escribir el NIT del proveedor, si ya le registraste una compra con plazo, el formulario lo trae puesto y lo dice: «Plazo habitual de este proveedor: 30 días (compra…)». Es el plazo de la compra más reciente de ese proveedor que tenga uno. No pisa lo que ya hayas escrito.</>,
+              "Si dejas los dos campos vacíos al crear la compra, se usa el plazo habitual del proveedor, si ya tiene uno. Si la compra nace de una factura recibida, primero se usa el vencimiento que trae esa factura.",
+              "Si no hay ni lo uno ni lo otro, la compra queda sin vencimiento.",
+              <>En <B>Pagos y saldo</B> de la compra ves su vencimiento («Vence el 15 oct 2026 · plazo de 30 días» o «Sin fecha de vencimiento»). Con <B>Cambiar vencimiento</B> lo corriges y guardas con <B>Guardar vencimiento</B>. El usuario de solo lectura lo ve, pero no lo cambia.</>,
+              "El vencimiento no mueve tus libros ni el saldo de la compra: solo dice hasta cuándo hay que pagarla.",
+              "No aplica a las órdenes de compra, las notas del proveedor ni los gastos sin documento.",
+              "Las compras que ya tenías quedan sin vencimiento hasta que se lo pongas.",
+              "La lista de Compras no tiene una columna «Vence»: el vencimiento se ve en «Pagos y saldo» y en Cuentas por pagar.",
+            ]}
+          />
+          <Callout type="note" title="Una compra sin vencimiento no se marca como vencida">
+            Si una compra no tiene vencimiento, en Cuentas por pagar dice «Sin vencimiento propio», no lleva la
+            etiqueta «Vencida» y su antigüedad se cuenta desde la fecha de la factura, como siempre. Solo sale vencida
+            la compra que tiene vencimiento y ya pasó. Ponles el plazo a los proveedores que te dan crédito y las
+            compras nuevas ya salen con su vencimiento.
+          </Callout>
+
+          <H3 id="cxp-por-vencer">Antigüedad por vencimiento y el tramo «Por vencer»</H3>
+          <P>
+            En Cuentas por pagar, el selector <B>Antigüedad por</B> decide desde cuándo se cuenta la antigüedad:
+          </P>
+          <Table
+            head={["Opción", "Cómo cuenta"]}
+            rows={[
+              [<B key="b">Fecha de la factura</B>, "Como siempre: desde la fecha de la factura del proveedor, en cuatro tramos."],
+              [<B key="b">Vencimiento</B>, "Desde el día en que vence cada compra. Aparece un tramo más, de primero: «Por vencer», con lo que todavía no ha vencido. Los otros cuatro tramos cuentan los días que lleva vencida."],
+            ]}
+          />
+          <Bullets
+            items={[
+              "Por vencimiento, cada compra dice «Por vencer», «Vence hoy» o «Venció hace 38 días». El día del vencimiento todavía no cuenta como vencida.",
+              "Cada compra muestra «Vence el…» o «Sin vencimiento propio», y las vencidas llevan la etiqueta «Vencida».",
+              "La pantalla dice cuántas compras están vencidas y cuánto suman, por ejemplo «2 compras vencidas por $ 2.775.000,00».",
+              <>El <B>Exportar CSV</B> por vencimiento suma las columnas «Vence» y «Por vencer».</>,
+            ]}
+          />
+
+          <H3 id="cxp-informe">Informe «Antigüedad a una fecha», en PDF y Excel</H3>
+          <P>
+            El botón <B>Antigüedad a una fecha</B>, en la cabecera de Cuentas por pagar, descarga lo que le debías a
+            cada proveedor en la fecha que elijas, por tramos de antigüedad. Sirve, por ejemplo, para el cierre de un
+            mes.
+          </P>
+          <Table
+            head={["Campo", "Qué eliges"]}
+            rows={[
+              [<B key="b">Fecha de corte</B>, "El día al que quieres el informe. Viene la de hoy y no puede ser futura."],
+              [<B key="b">Antigüedad por</B>, "«Fecha de la factura» o «Vencimiento»."],
+              [<B key="b">Qué incluir</B>, "«Por pagar», «Por regularizar» o «Las dos»."],
+            ]}
+          />
+          <Bullets
+            items={[
+              <><B>Descargar Excel:</B> una hoja «Resumen», con un renglón por proveedor, una columna por tramo y el total, y una hoja «Detalle», con un renglón por compra. Los valores van como números, listos para sumar.</>,
+              <><B>Descargar PDF:</B> el mismo resumen y, debajo, el detalle agrupado por proveedor, en hoja horizontal.</>,
+              "El saldo de cada compra a esa fecha es lo que había que pagarle, menos los pagos hechos hasta ese día, con las notas del proveedor que llevan fecha hasta ese día.",
+              "Una compra marcada como pagada a mano no tiene fecha de pago: en un informe a una fecha pasada figura por regularizar desde su fecha. Las que están dentro de tus saldos iniciales no aparecen.",
+              "Si hay más compras de las que se alcanzan a leer, el informe lo dice arriba («Informe incompleto…»): le faltan las más recientes.",
+              "Lo descarga también el usuario de solo lectura.",
+            ]}
+          />
+          <Callout type="warning" title="Se calcula con los documentos vigentes hoy">
+            El informe no es una foto guardada de ese día: se arma con las compras, los pagos y las notas que existen
+            hoy. Una compra eliminada o cancelada después de la fecha de corte no aparece, y si hoy anulas un egreso, el
+            informe de una fecha pasada cambia. El PDF lo dice en su pie: «Calculado con los documentos vigentes el…».
+            Si necesitas conservar el informe de un cierre, guarda el archivo el día que lo descargas.
+          </Callout>
         </section>
 
         <section id="conciliacion" className="mb-10">
@@ -2011,6 +2234,10 @@ export default function ContabilidadPage() {
               ["Cerrar períodos, y simular, cerrar y reabrir el año", "Sí", "No", "No"],
               ["Ver recibos, egresos, transferencias y conciliaciones, y descargar sus PDF", "Sí", "Sí", "Sí"],
               [<>Ver Cuentas por pagar y exportarla a CSV</>, "Sí", "Sí", "Sí"],
+              [<>Pagar o regularizar varias compras de una vez (<a key="a" href="#cxp-lote" style={link}>egresos en lote</a>)</>, "Sí", "Sí", "No"],
+              [<>Ver «Lotes recientes» y el resultado de un lote ya enviado</>, "Sí", "Sí", "Sí"],
+              [<>Descargar el informe «Antigüedad a una fecha», en PDF y Excel</>, "Sí", "Sí", "Sí"],
+              [<>Escribir o cambiar el <a key="a" href="#cxp-vencimiento" style={link}>vencimiento</a> de una compra</>, "Sí", "Sí", "No, solo lo ve"],
               ["Registrar y anular recibos de caja, egresos y transferencias", "Sí", "Sí", "No"],
               ["Ver el comprobante contable de un recibo, un egreso o una transferencia, y el «PDF con cuentas contables»", "Sí", "No", "Sí"],
               ["Conciliación bancaria: subir extractos, cruzar, deshacer y «Registrar en libros»", "Sí", "Sí", "No"],
@@ -2046,8 +2273,6 @@ export default function ContabilidadPage() {
             items={[
               <><B>Retenciones dentro del recibo de caja.</B> Las retenciones del cliente se anotan en la factura con «Aplicar retenciones», no en el recibo.</>,
               <><B>Cruzar un anticipo contra una factura posterior.</B> El anticipo queda registrado, pero todavía no se puede aplicar después a una factura desde el recibo.</>,
-              <><B>Pagar a varios proveedores de una vez.</B> No hay egreso masivo: se registra un egreso por proveedor, que puede pagar varias de sus compras.</>,
-              <><B>Fecha de vencimiento en las compras.</B> La antigüedad de lo que debes se cuenta desde la fecha de la factura del proveedor.</>,
               <><B>Conexión directa con el banco.</B> Los movimientos del banco no se traen solos: el extracto lo descargas y lo subes tú.</>,
               <><B>Conciliación automática.</B> La pantalla sugiere los cruces, pero cada uno lo confirma una persona.</>,
               <><B>Inventario con varias bodegas, lotes, series o producción.</B> El inventario es de una sola bodega y costo promedio: mira <a href="#inventario-limites" style={link}>lo que no hace</a>.</>,
