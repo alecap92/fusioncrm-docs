@@ -1353,7 +1353,7 @@ export default function ContabilidadPage() {
               "La lista de Compras no tiene una columna «Vence»: el vencimiento se ve en «Pagos y saldo» y en Cuentas por pagar.",
             ]}
           />
-          <Callout type="info" title="Una compra sin vencimiento no se marca como vencida">
+          <Callout type="note" title="Una compra sin vencimiento no se marca como vencida">
             Si una compra no tiene vencimiento, en Cuentas por pagar dice «Sin vencimiento propio», no lleva la
             etiqueta «Vencida» y su antigüedad se cuenta desde la fecha de la factura, como siempre. Solo sale vencida
             la compra que tiene vencimiento y ya pasó. Ponles el plazo a los proveedores que te dan crédito y las
