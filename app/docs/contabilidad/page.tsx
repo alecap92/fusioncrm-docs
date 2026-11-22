@@ -66,25 +66,6 @@ function B({ children }: { children: ReactNode }) {
   return <strong style={fg}>{children}</strong>;
 }
 
-/**
- * EN CONSTRUCCIÓN (épica CA, cuentas por pagar, tanda 2): marca lo que todavía no está en producción.
- * Al desplegar se quitan este componente, <Pronto /> y todos sus usos.
- */
-function EnConstruccion() {
-  return (
-    <Callout type="warning" title="En construcción">
-      Lo que describe esta parte todavía no está disponible en tu cuenta. Queda escrito para cuando salga.
-    </Callout>
-  );
-}
-
-function Pronto() {
-  return (
-    <span className="ml-1 rounded px-1.5 py-0.5 text-xs font-semibold whitespace-nowrap" style={{ backgroundColor: "var(--callout-warning)", color: "var(--callout-warning-border)" }}>
-      En construcción
-    </span>
-  );
-}
 
 function H2({ children }: { children: ReactNode }) {
   return <h2 className="text-2xl font-bold mb-4" style={fg}>{children}</h2>;
@@ -1060,15 +1041,15 @@ export default function ContabilidadPage() {
               [<>Consultar las <a key="a" href="#cuentas-por-pagar" style={link}>cuentas por pagar</a>: las compras con saldo, las marcadas como pagadas sin egreso o las dos, con su antigüedad y el resumen por proveedor</>, "Cualquier acceso con permiso de compras. Es solo consulta."],
               [<>Listar solo las compras pagadas sin egreso</>, "Cualquier acceso con permiso de compras."],
               [<>Registrar el egreso de una compra marcada como pagada a mano</>, "Cualquier acceso que pueda registrar egresos. El egreso se aplica directamente: no hay que cambiar antes el estado de la compra. Si la compra ya tiene su pago, o está dentro de los saldos iniciales, el egreso se rechaza con un mensaje que lo explica."],
-              [<>Pagar o regularizar varias compras de una vez, con un <a key="a" href="#cxp-lote" style={link}>lote de egresos</a><Pronto /></>, "Cualquier acceso que pueda registrar egresos. Siempre en dos pasos: primero se simula y después se confirma el mismo lote; sin la simulación, el lote se rechaza. Máximo 100 compras por lote."],
-              [<>Consultar cómo quedó un lote de egresos<Pronto /></>, "Cualquier acceso con permiso de compras. Es solo consulta. Por la API también se listan los últimos lotes."],
-              [<>Consultar la antigüedad de las cuentas por pagar a una fecha, y pedirla por vencimiento<Pronto /></>, "Cualquier acceso con permiso de compras. El Excel y el PDF del informe se descargan desde la web o por la API, no por un asistente."],
-              [<>Escribir el vencimiento o el plazo de una compra al registrarla o al editarla<Pronto /></>, "Cualquier acceso que pueda escribir compras. Se manda la fecha en que vence o el plazo en días, no los dos."],
+              [<>Pagar o regularizar varias compras de una vez, con un <a key="a" href="#cxp-lote" style={link}>lote de egresos</a></>, "Cualquier acceso que pueda registrar egresos. Siempre en dos pasos: primero se simula y después se confirma el mismo lote; sin la simulación, el lote se rechaza. Máximo 100 compras por lote."],
+              [<>Consultar cómo quedó un lote de egresos</>, "Cualquier acceso con permiso de compras. Es solo consulta. Por la API también se listan los últimos lotes."],
+              [<>Consultar la antigüedad de las cuentas por pagar a una fecha, y pedirla por vencimiento</>, "Cualquier acceso con permiso de compras. El Excel y el PDF del informe se descargan desde la web o por la API, no por un asistente."],
+              [<>Escribir el vencimiento o el plazo de una compra al registrarla o al editarla</>, "Cualquier acceso que pueda escribir compras. Se manda la fecha en que vence o el plazo en días, no los dos."],
               ["Consultar los libros: catálogo de cuentas, balance de prueba, auxiliares y los borradores de IVA y de retención", <><B key="b">Solo con el acceso del propietario o del contador.</B> Es solo consulta.</>],
             ]}
           />
           <P>
-            Sobre el lote de egresos por la API o por un asistente:<Pronto />
+            Sobre el lote de egresos por la API o por un asistente:
           </P>
           <Bullets
             items={[
@@ -1120,7 +1101,7 @@ export default function ContabilidadPage() {
           <Bullets
             items={[
               <><B>Tarjetas de antigüedad:</B> «0 a 30 días», «31 a 60 días», «61 a 90 días» y «Más de 90 días», cada una con su valor y su cantidad de compras.</>,
-              <>La antigüedad se cuenta desde la <B>fecha de la factura</B> del proveedor hasta hoy. Todavía no hay fecha de vencimiento en las compras. Viene en camino contarla desde el <a href="#cxp-vencimiento" style={link}>vencimiento</a>.<Pronto /></>,
+              <>La antigüedad se cuenta desde la <B>fecha de la factura</B> del proveedor hasta hoy. También puedes verla contada desde el <a href="#cxp-por-vencer" style={link}>vencimiento</a> de cada compra.</>,
               <><B>Lista de proveedores:</B> de mayor a menor valor. De cada uno ves el nombre, el NIT, cuántas compras son, de cuándo es la más antigua, el total y cómo se reparte por antigüedad.</>,
               <>Toca un proveedor para ver sus compras: número, fecha, hace cuántos días y saldo. El número abre «Pagos y saldo» de esa compra. Si son muchas, usa <B>Cargar más</B>.</>,
               <><B>Buscar:</B> por nombre o por NIT. Si no sale nada, prueba con otro nombre o con el NIT sin puntos.</>,
@@ -1150,7 +1131,7 @@ export default function ContabilidadPage() {
               "Si después anulas ese egreso, la compra queda por pagar. No vuelve a figurar como pagada a mano.",
               <>Un proveedor sin NIT no puede recibir un egreso. La pantalla te lo dice y te lleva a ponérselo con <B>Ponerle el NIT</B>. Mientras no lo tenga, puede que sus compras no se vean completas.</>,
               "Una compra marcada como pagada que no debe nada (por ejemplo, con una nota crédito por todo su valor) no aparece: no hay nada que regularizar.",
-              <>Todavía no se pueden pagar varios proveedores de una vez: se registra un egreso por proveedor. Mira <a href="#pendiente" style={link}>lo que todavía no hay</a>. Viene en camino <a href="#cxp-lote" style={link}>pagar varias compras de una vez</a>.<Pronto /></>,
+              <>Para pagar o regularizar varias compras de una vez, incluso de varios proveedores, usa el <a href="#cxp-lote" style={link}>lote de egresos</a>.</>,
             ]}
           />
 
@@ -1203,13 +1184,7 @@ export default function ContabilidadPage() {
             exportar, pero no ve <B>Registrar egreso</B>: mira <a href="#roles" style={link}>quién puede hacer qué</a>.
           </P>
 
-          {/* EN CONSTRUCCIÓN (épica CA, cuentas por pagar, tanda 2): desde aquí hasta el final de la sección, y cada
-              <Pronto /> de la página, describen algo que todavía no está en producción (egresos en lote,
-              vencimiento de la compra e informe de antigüedad a una fecha). Al desplegar: quitar <EnConstruccion />
-              y <Pronto />, y corregir las frases de la tanda 1 que dicen «todavía no» (antigüedad, regularizar y
-              «Lo que todavía no hay»). */}
           <H3 id="cxp-lote">Pagar o regularizar varias compras de una vez</H3>
-          <EnConstruccion />
           <P>
             En las dos pestañas puedes marcar varias compras y registrarles sus egresos en una sola pasada: en{" "}
             <B>Por pagar</B> las pagas y en <B>Por regularizar</B> les pones el egreso que les falta. Nada se registra
@@ -1264,7 +1239,7 @@ export default function ContabilidadPage() {
             plan de ahora: lo revisas y confirmas otra vez.
           </Callout>
 
-          <H3 id="cxp-lote-resultado">Qué significa cada resultado<Pronto /></H3>
+          <H3 id="cxp-lote-resultado">Qué significa cada resultado</H3>
           <P>
             El título del resultado dice cómo salió el lote: «Todos los egresos quedaron registrados», «El lote se
             registró con novedades» o «No se registró ningún egreso». Debajo, cada compra lleva una etiqueta:
@@ -1291,7 +1266,7 @@ export default function ContabilidadPage() {
             ]}
           />
 
-          <H3 id="cxp-lote-corte">Si se corta la conexión mientras se registra<Pronto /></H3>
+          <H3 id="cxp-lote-corte">Si se corta la conexión mientras se registra</H3>
           <P>
             Si la respuesta no llega (se cayó el internet o el registro tardó demasiado), puede que el lote sí se haya
             registrado, entero o en parte. Por eso la pantalla <B>no lo vuelve a enviar por su cuenta</B>: «No llegó
@@ -1314,7 +1289,7 @@ export default function ContabilidadPage() {
             ]}
           />
 
-          <H3 id="cxp-lotes-recientes">Lotes recientes<Pronto /></H3>
+          <H3 id="cxp-lotes-recientes">Lotes recientes</H3>
           <P>
             Cuando tu empresa ya registró algún lote, en la cabecera de Cuentas por pagar aparece el botón{" "}
             <B>Lotes recientes</B>. Abre los últimos diez, del más nuevo al más viejo.
@@ -1329,7 +1304,6 @@ export default function ContabilidadPage() {
           />
 
           <H3 id="cxp-vencimiento">El vencimiento de la compra: «Vence» y «Plazo (días)»</H3>
-          <EnConstruccion />
           <P>
             Con la contabilidad activada, el formulario de una factura de proveedor o de un documento soporte trae dos
             campos opcionales para decir hasta cuándo hay que pagarla. Llenas uno de los dos:
@@ -1360,7 +1334,7 @@ export default function ContabilidadPage() {
             compras nuevas ya salen con su vencimiento.
           </Callout>
 
-          <H3 id="cxp-por-vencer">Antigüedad por vencimiento y el tramo «Por vencer»<Pronto /></H3>
+          <H3 id="cxp-por-vencer">Antigüedad por vencimiento y el tramo «Por vencer»</H3>
           <P>
             En Cuentas por pagar, el selector <B>Antigüedad por</B> decide desde cuándo se cuenta la antigüedad:
           </P>
@@ -1381,7 +1355,6 @@ export default function ContabilidadPage() {
           />
 
           <H3 id="cxp-informe">Informe «Antigüedad a una fecha», en PDF y Excel</H3>
-          <EnConstruccion />
           <P>
             El botón <B>Antigüedad a una fecha</B>, en la cabecera de Cuentas por pagar, descarga lo que le debías a
             cada proveedor en la fecha que elijas, por tramos de antigüedad. Sirve, por ejemplo, para el cierre de un
@@ -2261,10 +2234,10 @@ export default function ContabilidadPage() {
               ["Cerrar períodos, y simular, cerrar y reabrir el año", "Sí", "No", "No"],
               ["Ver recibos, egresos, transferencias y conciliaciones, y descargar sus PDF", "Sí", "Sí", "Sí"],
               [<>Ver Cuentas por pagar y exportarla a CSV</>, "Sí", "Sí", "Sí"],
-              [<>Pagar o regularizar varias compras de una vez (<a key="a" href="#cxp-lote" style={link}>egresos en lote</a>)<Pronto /></>, "Sí", "Sí", "No"],
-              [<>Ver «Lotes recientes» y el resultado de un lote ya enviado<Pronto /></>, "Sí", "Sí", "Sí"],
-              [<>Descargar el informe «Antigüedad a una fecha», en PDF y Excel<Pronto /></>, "Sí", "Sí", "Sí"],
-              [<>Escribir o cambiar el <a key="a" href="#cxp-vencimiento" style={link}>vencimiento</a> de una compra<Pronto /></>, "Sí", "Sí", "No, solo lo ve"],
+              [<>Pagar o regularizar varias compras de una vez (<a key="a" href="#cxp-lote" style={link}>egresos en lote</a>)</>, "Sí", "Sí", "No"],
+              [<>Ver «Lotes recientes» y el resultado de un lote ya enviado</>, "Sí", "Sí", "Sí"],
+              [<>Descargar el informe «Antigüedad a una fecha», en PDF y Excel</>, "Sí", "Sí", "Sí"],
+              [<>Escribir o cambiar el <a key="a" href="#cxp-vencimiento" style={link}>vencimiento</a> de una compra</>, "Sí", "Sí", "No, solo lo ve"],
               ["Registrar y anular recibos de caja, egresos y transferencias", "Sí", "Sí", "No"],
               ["Ver el comprobante contable de un recibo, un egreso o una transferencia, y el «PDF con cuentas contables»", "Sí", "No", "Sí"],
               ["Conciliación bancaria: subir extractos, cruzar, deshacer y «Registrar en libros»", "Sí", "Sí", "No"],
@@ -2300,8 +2273,6 @@ export default function ContabilidadPage() {
             items={[
               <><B>Retenciones dentro del recibo de caja.</B> Las retenciones del cliente se anotan en la factura con «Aplicar retenciones», no en el recibo.</>,
               <><B>Cruzar un anticipo contra una factura posterior.</B> El anticipo queda registrado, pero todavía no se puede aplicar después a una factura desde el recibo.</>,
-              <><B>Pagar a varios proveedores de una vez.</B> No hay egreso masivo: se registra un egreso por proveedor, que puede pagar varias de sus compras. Viene en camino: mira <a href="#cxp-lote" style={link}>pagar varias compras de una vez</a>.<Pronto /></>,
-              <><B>Fecha de vencimiento en las compras.</B> La antigüedad de lo que debes se cuenta desde la fecha de la factura del proveedor. Viene en camino: mira <a href="#cxp-vencimiento" style={link}>el vencimiento de la compra</a>.<Pronto /></>,
               <><B>Conexión directa con el banco.</B> Los movimientos del banco no se traen solos: el extracto lo descargas y lo subes tú.</>,
               <><B>Conciliación automática.</B> La pantalla sugiere los cruces, pero cada uno lo confirma una persona.</>,
               <><B>Inventario con varias bodegas, lotes, series o producción.</B> El inventario es de una sola bodega y costo promedio: mira <a href="#inventario-limites" style={link}>lo que no hace</a>.</>,

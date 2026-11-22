@@ -43,7 +43,7 @@
     "src/mcp/tools/users.ts",
     "src/mcp/tools/whatsapp-templates.ts"
   ],
-  "toolCount": 266,
+  "toolCount": 269,
   "tools": [
     {
       "name": "add_contacts_to_list",
@@ -1768,6 +1768,96 @@
       "group": "invoices"
     },
     {
+      "name": "create_disbursement_batch",
+      "description": "Pagar VARIAS compras de una vez: un LOTE de comprobantes de egreso (POST /api/treasury/disbursements/batch). Requiere purchases:write y la contabilidad activada (si no: 403 PLAN_MODULE_REQUIRED o 409 FDN_NOT_ENABLED / FDN_MIXED_OWNERSHIP / FDN-CONTABILIDAD-APAGADA). Solo compras (rows): sin conceptos ni anticipos (para eso, create_disbursement). De 1 a 100 filas; una compra va una sola vez por lote.\nSIEMPRE EN DOS PASOS, con el MISMO batchKey y el MISMO contenido. Paso 1, SIMULAR: dryRun: true (no escribe nada ni gasta números). Lee data.batch.rows[] FILA POR FILA (una por cada fila que mandaste, en su orden): status 'planned' (con date, amount y voucher = el índice del egreso en que saldrá) o 'refused' (con code y message: esa compra NO se pagará; p. ej. FDN-COMPRA-YA-PAGADA, FDN-PERIODO-CONGELADO, FDN-PAGO-EXCEDE-SALDO, FDN-COMPRA-NO-EXISTE, FDN-COMPROBANTE-TERCEROS si el proveedor no tiene NIT numérico). data.batch.vouchers[] son los egresos que se crearán (party, date, total, applications con balanceBefore y balanceAfter) y data.batch.totals { rows, planned, refused, vouchers, amount } el resumen. Muéstrale a la persona los egresos, el total Y las filas rechazadas con su motivo. Paso 2, EJECUTAR, solo con su aprobación: la misma llamada con dryRun: false y planToken = data.batch.planToken de la simulación. Sin planToken: 400 FDN-LOTE-SIN-SIMULAR. Si no quedó nada que ejecutar (planToken null o todo rechazado): 400 FDN-LOTE-VACIO (cuando el servicio lo manda, con batch = el plan y el motivo de cada fila).\n409 FDN-LOTE-PLAN-CAMBIO al ejecutar: algo cambió desde la simulación (un saldo, una nota, un período cerrado). NO se escribió nada. La respuesta trae en batch el plan NUEVO completo con su planToken: vuelve a mostrárselo a la persona y, si lo aprueba, ejecuta con ese planToken nuevo. Nunca ejecutes un plan que la persona no vio.\nbatchKey es OBLIGATORIO (8 a 100 letras, números, guion o guion bajo) y es la identidad del lote: hazlo DETERMINISTA (p. ej. 'lote-' + fecha + un hash de las compras), nunca aleatorio. Repetir el mismo batchKey con el mismo contenido NO duplica: si el lote ya terminó responde su resultado guardado (replayed: true); con otro contenido, 409 FDN-SOLICITUD-DISTINTA. La ejecución es síncrona y se espera hasta 90 segundos, sin reintento automático. Si la EJECUCIÓN se corta (red, tiempo de espera, o 503 con batchKey y el texto «No se recibió la respuesta del lote»: ese 503 NO trae retryable ni Retry-After porque todavía no hay que repetir), NO lo reenvíes con otra clave y NO pagues esas compras por otra vía: consulta get_disbursement_batch con ese batchKey (GET /treasury/disbursements/batch/{batchKey}); si no existe (404) o sale stale: true, repite la MISMA llamada (misma clave, mismo contenido); si está 'running', espera y vuelve a consultar; si está 'done', ese es el resultado. 409 FDN-LOTE-EN-CURSO: ese lote (u otro de la empresa; batchKey dice cuál) se está registrando: espera y consulta, no mandes otro.\ngrouping: 'supplier' (por defecto) = un egreso por cada proveedor y fecha; 'purchase' = un egreso por compra. Fecha de cada egreso: rows[i].date si viene; si no, date del lote («misma fecha para todas»); si no, la fecha de la compra. amount de una fila: lo que se le paga (texto decimal como '2380000.00', o número con máximo dos decimales); sin amount (o null) se paga TODO su saldo. bankAccountId (de list_bank_accounts; sin él, la cuenta por defecto: sin cuenta por defecto, 400 FDN-SIN-CUENTA-DE-DINERO-POR-DEFECTO), method, reference y note van iguales a todos los egresos del lote.\nResultado de la ejecución (200 aunque haya filas fallidas): data.batch.status ('done'), data.batch.totals { applied, refused, notApplied, pending, inProgress, vouchers, vouchersApplied, amountApplied } y rows[] con status: 'applied' (pagada; voucher { id, number: CE-n }), 'refused' (no se pagó y no gastó número: code y message; FDN-LOTE-EGRESO-NO-REGISTRADO = cayó porque otra compra de su mismo egreso fue rechazada), 'notApplied' (su egreso tomó número pero quedó ANULADO porque una compra cambió en medio: voucher { id, number } es el anulado; la compra NO quedó pagada), 'pending' (no se intentó) o 'inProgress' (su egreso quedó a medias y se termina solo). Informa a la persona fila por fila; NO des el lote por pagado solo porque respondió 200. Para reintentar las filas fallidas: un lote NUEVO, con OTRO batchKey y solo esas filas, simulando primero.\nCupo del empleado por API (es por cantidad y por hora; no hay tope por monto): la EJECUCIÓN de un lote cuenta UNA creación por FILA (aunque varias filas terminen en un solo egreso). Si las filas no caben en lo que le queda al usuario en la hora responde 429 API_QUOTA_EXCEEDED sin registrar nada, también en la simulación, que solo comprueba y nunca gasta. Solo gasta el lote que de verdad se recorrió: un rechazo (400, 403, 409, 503) devuelve el cupo, y repetir un lote ya terminado (replayed: true) no cobra otra vez. El propietario no tiene tope.\nCampos: esta herramienta es ESTRICTA. Un campo que no existe o está mal escrito, en la raíz o en una fila (p. ej. ammount en vez de amount), hace fallar la llamada ANTES de enviarla: nunca se descarta en silencio (una fila sin amount se pagaría por todo su saldo). Llamando a la API directamente, lo mismo responde 400 FIELD_NOT_ALLOWED. Sin batchKey válido o con dryRun que no es booleano: 400 BATCH_KEY_REQUIRED / BATCH_DRY_RUN_REQUIRED.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "batchKey": {
+            "type": "string",
+            "description": "Clave del lote, obligatoria y determinista (8 a 100: letras, números, - o _). La misma en la simulación, la ejecución y cualquier reintento"
+          },
+          "dryRun": {
+            "type": "boolean",
+            "description": "OBLIGATORIO. true = simular (primero, siempre); false = ejecutar (exige planToken)"
+          },
+          "planToken": {
+            "description": "Con dryRun: false: el data.batch.planToken que devolvió la simulación (o el del plan nuevo de un 409 FDN-LOTE-PLAN-CAMBIO)",
+            "type": "string"
+          },
+          "grouping": {
+            "description": "supplier (por defecto) = un egreso por proveedor y fecha; purchase = un egreso por compra",
+            "type": "string",
+            "enum": [
+              "supplier",
+              "purchase"
+            ]
+          },
+          "date": {
+            "description": "«Misma fecha para todas» (YYYY-MM-DD). Sin ella, cada fila usa su date o la fecha de su compra",
+            "type": "string"
+          },
+          "bankAccountId": {
+            "description": "Cuenta de dinero de la que sale (list_bank_accounts). Sin él, la de por defecto",
+            "type": "string"
+          },
+          "method": {
+            "description": "Forma de pago de todos los egresos, ej. Transferencia",
+            "type": "string"
+          },
+          "reference": {
+            "description": "Referencia del banco (igual en todos)",
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "rows": {
+            "minItems": 1,
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "purchaseId": {
+                  "type": "string",
+                  "description": "_id de la compra (el id de list_payables)"
+                },
+                "amount": {
+                  "description": "Valor a pagarle. Sin él (o null): todo su saldo",
+                  "type": [
+                    "string",
+                    "number",
+                    "null"
+                  ]
+                },
+                "date": {
+                  "description": "Fecha del pago de esta fila (YYYY-MM-DD). Sin ella: la del lote o la de la compra",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "purchaseId"
+              ],
+              "additionalProperties": false
+            },
+            "description": "Las compras que se pagan: de 1 a 100, cada una una sola vez"
+          }
+        },
+        "required": [
+          "batchKey",
+          "dryRun",
+          "rows"
+        ],
+        "additionalProperties": false
+      },
+      "group": "invoices"
+    },
+    {
       "name": "create_dynamic_contact_list",
       "description": "Crear una lista DINÁMICA de contactos.\nA diferencia de la estática, los contactos que pertenecen a la lista se recalculan en tiempo real\ncada vez que se consultan, aplicando los filtros almacenados contra la base de datos actual.\n\nSe REQUIERE al menos un filtro.\nEstructura de un filtro: { key: 'city', operator: 'contains', value: 'Bogotá' }\nOperadores: contains, equals, 'starts with', 'ends with', 'is empty', 'is not empty', greater_than, less_than.\nClaves de ejemplo: firstName, lastName, email, mobile, company, city, cityCode, stateCode, country, source, companyType, leadScore.\nCiudades (catálogo DANE): { key: 'cityCode', operator: 'equals', value: '05001' } (05001 = Medellín); todo un departamento: { key: 'stateCode', operator: 'equals', value: '05' } o { key: 'cityCode', operator: 'starts with', value: '05' }. city es texto y puede estar sin confirmar (cityCode vacío).\nFiltro especial: { key: 'hasDeals', operator: 'equals', value: true } para contactos con/sin negocios.",
       "inputSchema": {
@@ -2392,7 +2482,7 @@
     },
     {
       "name": "create_purchase",
-      "description": "Registrar una compra a un proveedor (POST /api/purchases). Requiere purchases:write.\nkind=invoice (default): factura del proveedor. Obligatorios: orderNumber (el número de la factura del proveedor), total y paymentMethod. Si cubre una OC abierta, manda orderRef con el id de la OC (ver list_open_purchase_orders): la OC queda completed con invoiceRef. 409 si la OC ya está facturada o cancelada.\nDocumento enlazado (solo kind=invoice): supportDocumentId (un documento soporte ya validado por la DIAN) o receivedId (una factura recibida). La compra toma la fecha del documento y queda marcada como la que lo registra: get_purchase devuelve el enlace. Si ese documento ya tiene compra responde 409 (no se duplica el gasto): búscala con list_purchases. Para PAGAR un documento soporte no crees una compra suelta ni un egreso al gasto (el gasto queda dos veces): crea esta compra enlazada con el total del documento y págala con create_disbursement. Las retenciones van en la compra (apply_purchase_withholdings), solo si de verdad se descontaron en el pago.\nkind=order: orden de compra. El servidor genera el consecutivo OC-n (settings.purchases.numberPrefix + contador): NO mandes orderNumber, se ignora. Obligatorios: total y paymentMethod. Sus retenciones son estimadas y no entran en informes ni certificados.\nEl proveedor puede ir como supplierId (contacto de la MISMA organización) o simplemente como supplierName + supplierNIT.\nEn cada ítem, si no se envía total se calcula como quantity × unitPrice, y tax vacío se toma como 0.\nCompra repetida: si ya hay una compra de ese proveedor con ese número, responde 409 con code PURCHASE_DUPLICATE y las compras que ya existen en existing y duplicates (no se guardó nada). Muéstraselas a la persona; solo si confirma que es otra compra, repite la misma llamada con allowDuplicate: true.\nCon la contabilidad encendida (empresas con libros; las demás no notan nada) una compra NO se marca pagada a mano: status 'completed' sin un pago registrado responde 409 FDN-COMPRA-PAGADA-SIN-EGRESO, porque una compra se paga con un comprobante de egreso. Regístrala en 'pending' y paga con create_disbursement (con la aprobación de la persona) o desde la web (Facturación → Cobros y pagos → Nuevo egreso). Excepción: una compra con fecha anterior o igual a los saldos iniciales de la empresa sí acepta 'completed'. OJO con un gasto sin documento (voucherType 'Sin documento' con conceptId): sin status nace 'completed' y responde ese mismo 409; mándalo siempre con status 'pending' y regístrale el egreso con create_disbursement (o desde la web).\nInventario (solo empresas con el inventario encendido): para que un renglón sume existencias manda en el ítem inventory: { itemId } (el _id del producto si no tiene variantes, o el _id de la variante; el producto debe tener «Maneja inventario», ver list_products con tracked). La respuesta trae inventoryApplied: [{ line, itemId, applied, reason? }] (line = posición del ítem desde 1): un ítem con applied false se guardó SIN mover inventario (reason: not-tracked = ese producto no es de la empresa o no maneja inventario; invalid; not-available = la empresa no lleva las compras donde vive el inventario). Sin inventory en ningún ítem, nada cambia.\nTarifa de IVA por renglón (opcional): cada ítem puede llevar vat: { class, percent } (class taxed = gravado, con percent 19, 5…; exempt = exento; excluded = excluido o no gravado, los dos con percent 0). Sirve para el borrador de la declaración de IVA de las empresas con contabilidad. Sin vat no pasa nada: la tarifa se deduce del IVA y el valor del renglón y queda marcada «sin confirmar». Si el IVA del ítem no corresponde a su tarifa (más de $2 de diferencia sobre total − tax) responde 400 con code PURCHASE_ITEM_VAT_INVALID y el renglón en line (desde 1): corrige tax o percent de ese ítem. get_purchase devuelve vat en los renglones que lo tienen guardado.",
+      "description": "Registrar una compra a un proveedor (POST /api/purchases). Requiere purchases:write.\nkind=invoice (default): factura del proveedor. Obligatorios: orderNumber (el número de la factura del proveedor), total y paymentMethod. Si cubre una OC abierta, manda orderRef con el id de la OC (ver list_open_purchase_orders): la OC queda completed con invoiceRef. 409 si la OC ya está facturada o cancelada.\nDocumento enlazado (solo kind=invoice): supportDocumentId (un documento soporte ya validado por la DIAN) o receivedId (una factura recibida). La compra toma la fecha del documento y queda marcada como la que lo registra: get_purchase devuelve el enlace. Si ese documento ya tiene compra responde 409 (no se duplica el gasto): búscala con list_purchases. Para PAGAR un documento soporte no crees una compra suelta ni un egreso al gasto (el gasto queda dos veces): crea esta compra enlazada con el total del documento y págala con create_disbursement. Las retenciones van en la compra (apply_purchase_withholdings), solo si de verdad se descontaron en el pago.\nkind=order: orden de compra. El servidor genera el consecutivo OC-n (settings.purchases.numberPrefix + contador): NO mandes orderNumber, se ignora. Obligatorios: total y paymentMethod. Sus retenciones son estimadas y no entran en informes ni certificados.\nEl proveedor puede ir como supplierId (contacto de la MISMA organización) o simplemente como supplierName + supplierNIT.\nEn cada ítem, si no se envía total se calcula como quantity × unitPrice, y tax vacío se toma como 0.\nCompra repetida: si ya hay una compra de ese proveedor con ese número, responde 409 con code PURCHASE_DUPLICATE y las compras que ya existen en existing y duplicates (no se guardó nada). Muéstraselas a la persona; solo si confirma que es otra compra, repite la misma llamada con allowDuplicate: true.\nCon la contabilidad encendida (empresas con libros; las demás no notan nada) una compra NO se marca pagada a mano: status 'completed' sin un pago registrado responde 409 FDN-COMPRA-PAGADA-SIN-EGRESO, porque una compra se paga con un comprobante de egreso. Regístrala en 'pending' y paga con create_disbursement (con la aprobación de la persona) o desde la web (Facturación → Cobros y pagos → Nuevo egreso). Excepción: una compra con fecha anterior o igual a los saldos iniciales de la empresa sí acepta 'completed'. OJO con un gasto sin documento (voucherType 'Sin documento' con conceptId): sin status nace 'completed' y responde ese mismo 409; mándalo siempre con status 'pending' y regístrale el egreso con create_disbursement (o desde la web).\nInventario (solo empresas con el inventario encendido): para que un renglón sume existencias manda en el ítem inventory: { itemId } (el _id del producto si no tiene variantes, o el _id de la variante; el producto debe tener «Maneja inventario», ver list_products con tracked). La respuesta trae inventoryApplied: [{ line, itemId, applied, reason? }] (line = posición del ítem desde 1): un ítem con applied false se guardó SIN mover inventario (reason: not-tracked = ese producto no es de la empresa o no maneja inventario; invalid; not-available = la empresa no lleva las compras donde vive el inventario). Sin inventory en ningún ítem, nada cambia.\nVencimiento (opcional, solo kind=invoice y empresas con las compras en el servicio nuevo): manda dueDate (el día en que vence) O termDays (plazo en días; el vencimiento queda en purchaseDate + termDays), nunca los dos (400). Sin ninguno, la compra toma el vencimiento del documento recibido si lo trae, y si no el último plazo que la empresa le puso a ese proveedor; sin plazo queda sin vencimiento (dueDate null) y su antigüedad cuenta desde purchaseDate. dueDate: null explícito = sin vencimiento. La respuesta trae dueDate y termDays. El vencimiento alimenta list_payables (ageBy: 'due') y get_payables_aging.\nTarifa de IVA por renglón (opcional): cada ítem puede llevar vat: { class, percent } (class taxed = gravado, con percent 19, 5…; exempt = exento; excluded = excluido o no gravado, los dos con percent 0). Sirve para el borrador de la declaración de IVA de las empresas con contabilidad. Sin vat no pasa nada: la tarifa se deduce del IVA y el valor del renglón y queda marcada «sin confirmar». Si el IVA del ítem no corresponde a su tarifa (más de $2 de diferencia sobre total − tax) responde 400 con code PURCHASE_ITEM_VAT_INVALID y el renglón en line (desde 1): corrige tax o percent de ese ítem. get_purchase devuelve vat en los renglones que lo tienen guardado.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -2541,6 +2631,19 @@
           "conceptId": {
             "description": "Concepto de gasto (expense_concepts): el id que devuelve list_expense_concepts. Clasifica la compra en los reportes y en los libros; obligatorio en un gasto sin documento (voucherType 'Sin documento'). Se valida (de la empresa y activo; si no, 400) y sale en la respuesta como conceptId",
             "type": "string"
+          },
+          "dueDate": {
+            "description": "Vencimiento de la factura (YYYY-MM-DD), nunca anterior a purchaseDate. null = sin vencimiento (no se aplica el plazo del proveedor). No lo mandes junto con termDays. Solo empresas con las compras en el servicio nuevo (si no, 409 FDN_NOT_ENABLED); no aplica a una orden de compra",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "termDays": {
+            "description": "Plazo en días (0 a 365): el vencimiento queda en purchaseDate + termDays y ese plazo se propone en las próximas compras del proveedor. No lo mandes junto con dueDate",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 365
           },
           "allowDuplicate": {
             "description": "Solo `true`, y solo para repetir una compra que acaba de responder 409 `PURCHASE_DUPLICATE` (ya hay una compra de ese proveedor con ese número; el 409 trae `existing` y `duplicates` con las que ya existen). Antes de mandarlo, muéstrale esas compras a la persona y espera a que confirme que es otra compra distinta. Nunca en el primer intento ni por tu cuenta. No se guarda: vale para esa sola llamada.",
@@ -4855,6 +4958,25 @@
       "group": "pipelines"
     },
     {
+      "name": "get_disbursement_batch",
+      "description": "Un lote de egresos por su batchKey, con su resultado (GET /api/treasury/disbursements/batch/:batchKey). Requiere purchases:read y la contabilidad activada. Solo lectura. Es lo que se consulta cuando la respuesta de create_disbursement_batch no llegó: data.batch.status 'running' (se está registrando; si además stale: true, el proceso murió a medias: repite create_disbursement_batch con la MISMA clave y el MISMO contenido para terminarlo) o 'done' (terminó: rows[] trae el resultado de cada fila, como en la ejecución). 404 FDN-LOTE-NO-EXISTE: la empresa no tiene un lote con esa clave (la ejecución nunca empezó: se puede enviar). 503 PAYABLES_BATCH_NOT_SUPPORTED: el servicio aún no admite lotes.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "batchKey": {
+            "type": "string",
+            "description": "La clave del lote (la misma de create_disbursement_batch)"
+          }
+        },
+        "required": [
+          "batchKey"
+        ],
+        "additionalProperties": false
+      },
+      "group": "invoices"
+    },
+    {
       "name": "get_document_template",
       "description": "Devuelve una plantilla PDF con sus etapas y campos. Cada campo trae pdfFieldName (\"etapa.campo\"), que es la clave que espera generate_document_template_pdf en values, además de label, type, si es requerido y valueTemplate (cómo se compone desde el contacto, p. ej. '{firstName} {lastName}'). Con includePdfFields=true también lista los campos reales del PDF (más lento: descarga el archivo). Solo lectura.",
       "inputSchema": {
@@ -5147,6 +5269,43 @@
         "properties": {}
       },
       "group": "settings"
+    },
+    {
+      "name": "get_payables_aging",
+      "description": "Antigüedad de las cuentas por pagar A UNA FECHA (GET /api/treasury/payables/aging). Requiere purchases:read y la contabilidad activada. Solo lectura. A diferencia de list_payables (lo que se debe hoy, paginado), este es el informe a un corte: el saldo de cada compra a asOf (lo que se le paga, menos los pagos hasta ese día, más o menos sus notas hasta ese día).\nasOf (YYYY-MM-DD; por defecto hoy; no puede ser futuro: 400). ageBy: 'date' (por defecto) = antigüedad desde la fecha de la factura; 'due' = desde el vencimiento, con el tramo 'notDue' (por vencer); una compra sin vencimiento cuenta desde la fecha de su factura también con 'due' y no se trata como vencida. state: 'open' (por defecto) | 'paidWithoutPayment' | 'all'. supplier: el NIT de un proveedor, para el informe de solo ese proveedor.\nDevuelve data.aging: asOf, ageBy, state, computedOn, issuer { nit, name }, totals { count, total, buckets } (buckets por tramo: 'notDue' solo con ageBy 'due', '0-30', '31-60', '61-90', '90+'), suppliers[{ nit, name, count, total, buckets, rows[{ id, number, date, dueDate, dueBasis, ageDays, ageBucket, state, total, payable, paid, balance }] }] y scanCapped. ⚠️ scanCapped: true = se llegó al tope de lectura y el informe está INCOMPLETO: le faltan las compras más recientes, así que los totales NO son la deuda completa ni sirven como «al menos» para decidir nada. No lo presentes como el informe: dile a la persona que salió incompleto y pídelo por proveedor (supplier = NIT), uno a la vez. Se calcula con los documentos vigentes hoy (una compra borrada después no aparece); una compra pagada a mano no tiene fecha de pago: en un corte pasado figura por regularizar desde su fecha. El mismo informe en Excel y PDF existe en la web y en la API (…/aging/export.xlsx y …/aging/export.pdf), no como tool. 503 PAYABLES_AGING_NOT_SUPPORTED: el servicio aún no admite el informe.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "asOf": {
+            "description": "Fecha de corte, YYYY-MM-DD. Por defecto hoy; no futura",
+            "type": "string"
+          },
+          "ageBy": {
+            "description": "date (por defecto) = desde la fecha de la factura; due = desde el vencimiento",
+            "type": "string",
+            "enum": [
+              "date",
+              "due"
+            ]
+          },
+          "state": {
+            "description": "open (por defecto), paidWithoutPayment o all",
+            "type": "string",
+            "enum": [
+              "open",
+              "paidWithoutPayment",
+              "all"
+            ]
+          },
+          "supplier": {
+            "description": "NIT de un proveedor: el informe de solo ese proveedor. Úsalo cuando el informe completo sale con scanCapped: true",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "group": "invoices"
     },
     {
       "name": "get_product",
@@ -7208,7 +7367,7 @@
     },
     {
       "name": "list_payables",
-      "description": "Cuentas por pagar, las más antiguas primero (GET /api/treasury/payables). Requiere purchases:read y la contabilidad activada. Solo lectura.\nstate elige qué compras salen: 'open' (por defecto) = las que tienen saldo y pueden recibir un pago; 'paidWithoutPayment' = las marcadas «pagada» a mano sin comprobante de egreso: su valor sigue en el saldo de proveedores de los libros hasta que se les registre el egreso; 'all' = las dos. Un state desconocido o un cursor ilegible responden 400 con el campo en errors. 503 PAYABLES_STATE_NOT_SUPPORTED (solo con state 'paidWithoutPayment' o 'all'): el servicio de contabilidad aún no admite el filtro; NO tomes otra lista por buena: repite en unos minutos.\nCada fila: id (el purchaseId de create_disbursement), number, date, supplier { name, nit }, total, payable, paid, balance (texto decimal), state ('open' | 'paidWithoutPayment'), ageDays (días desde la fecha del documento hasta asOf; null si la fecha no es un día) y ageBucket (tramo de antigüedad: '0-30' | '31-60' | '61-90' | '90+'). Una fila paidWithoutPayment trae paid '0.00' y balance igual a payable: es lo que falta regularizar.\ncount y totalBalance son de las filas del state y el supplier pedidos; truncated avisa que hay más que limit (por defecto 100, máximo 200). Para la página siguiente repite la llamada con cursor = el nextCursor recibido (null = no hay más).\nsummary resume TODO lo leído, no solo la página (y viene igual en cada página): byState { open, paidWithoutPayment }, cada uno con count y total, cuenta los dos estados siempre (con el supplier pedido); buckets [{ bucket, count, total }] es la antigüedad por tramo del state pedido; suppliers [{ nit, name, count, total, oldestDate, buckets }] agrupa por proveedor el state pedido, de mayor a menor total (un proveedor sin NIT va con nit null). Además: asOf (hoy en Bogotá), openingThrough (hasta qué día llegan los saldos iniciales, o null), frozenThrough (último día de un período cerrado, o null) y scanCapped (true = se llegó al tope de lectura: las cifras son «al menos»).\nPara pagar una compra 'open' o regularizar una 'paidWithoutPayment' se usa lo mismo: create_disbursement con el id de la fila, con la aprobación de la persona. El egreso se aplica directo; no hay que cambiar antes el estado de la compra.",
+      "description": "Cuentas por pagar, las más antiguas primero (GET /api/treasury/payables). Requiere purchases:read y la contabilidad activada. Solo lectura.\nstate elige qué compras salen: 'open' (por defecto) = las que tienen saldo y pueden recibir un pago; 'paidWithoutPayment' = las marcadas «pagada» a mano sin comprobante de egreso: su valor sigue en el saldo de proveedores de los libros hasta que se les registre el egreso; 'all' = las dos. Un state desconocido o un cursor ilegible responden 400 con el campo en errors. 503 PAYABLES_STATE_NOT_SUPPORTED (solo con state 'paidWithoutPayment' o 'all'): el servicio de contabilidad aún no admite el filtro; NO tomes otra lista por buena: repite en unos minutos.\nCada fila: id (el purchaseId de create_disbursement), number, date, supplier { name, nit }, total, payable, paid, balance (texto decimal), state ('open' | 'paidWithoutPayment'), ageDays (días desde la fecha del documento hasta asOf; null si la fecha no es un día) y ageBucket (tramo de antigüedad: '0-30' | '31-60' | '61-90' | '90+'). Una fila paidWithoutPayment trae paid '0.00' y balance igual a payable: es lo que falta regularizar.\ncount y totalBalance son de las filas del state y el supplier pedidos; truncated avisa que hay más que limit (por defecto 100, máximo 200). Para la página siguiente repite la llamada con cursor = el nextCursor recibido (null = no hay más).\nsummary resume TODO lo leído, no solo la página (y viene igual en cada página): byState { open, paidWithoutPayment }, cada uno con count y total, cuenta los dos estados siempre (con el supplier pedido); buckets [{ bucket, count, total }] es la antigüedad por tramo del state pedido; suppliers [{ nit, name, count, total, oldestDate, buckets }] agrupa por proveedor el state pedido, de mayor a menor total (un proveedor sin NIT va con nit null). Además: asOf (hoy en Bogotá), openingThrough (hasta qué día llegan los saldos iniciales, o null), frozenThrough (último día de un período cerrado, o null) y scanCapped (true = se llegó al tope de lectura: las cifras son «al menos»).\nVencimiento: cada fila trae además dueDate (el vencimiento de la compra, o null si no tiene), dueBasis ('dueDate' si se usa ese vencimiento, 'date' si se usa la fecha de la factura porque no tiene), daysOverdue (días de vencida a asOf; 0 si no ha vencido; null si la compra NO tiene vencimiento) y overdue (true/false). Una compra SIN vencimiento nunca se marca vencida (overdue false, daysOverdue null): no hay contra qué. summary.overdue { count, total } suma lo vencido siempre. ageBy elige desde cuándo se cuenta la antigüedad: 'date' (por defecto) = desde la fecha de la factura; 'due' = desde el vencimiento; una compra sin vencimiento cuenta su antigüedad desde la fecha de la factura también con 'due'. Con 'due', ageDays y ageBucket se cuentan desde ahí, aparece el tramo 'notDue' (por vencer) de primero en summary.buckets y en los buckets de cada proveedor, y cada proveedor trae overdueTotal. 503 PAYABLES_AGE_BY_NOT_SUPPORTED (solo con ageBy 'due'): el servicio aún no lo admite; NO tomes otra antigüedad por buena.\nPara pagar una compra 'open' o regularizar una 'paidWithoutPayment' se usa lo mismo: create_disbursement con el id de la fila, con la aprobación de la persona. El egreso se aplica directo; no hay que cambiar antes el estado de la compra. Para pagar VARIAS de una vez: create_disbursement_batch. Para el informe de antigüedad a una fecha (también pasada): get_payables_aging.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -7222,17 +7381,26 @@
             "type": "number"
           },
           "state": {
-            "description": "open (por defecto) = con saldo y pagables; paidWithoutPayment = marcadas pagadas a mano sin egreso; all = las dos",
+            "description": "open (por defecto) = con saldo y pagables; paidWithoutPayment = marcadas pagadas a mano sin egreso; all = las dos; overpaid = compras con más pagos que saldo (saldo negativo: hay que revisar sus pagos o sus notas). summary.overpaid dice siempre cuántas hay",
             "type": "string",
             "enum": [
               "open",
               "paidWithoutPayment",
-              "all"
+              "all",
+              "overpaid"
             ]
           },
           "cursor": {
             "description": "El nextCursor de la página anterior, tal cual",
             "type": "string"
+          },
+          "ageBy": {
+            "description": "Desde cuándo se cuenta la antigüedad: date (por defecto) = fecha de la factura; due = vencimiento (agrega el tramo notDue)",
+            "type": "string",
+            "enum": [
+              "date",
+              "due"
+            ]
           }
         }
       },
@@ -12076,6 +12244,19 @@
               "string",
               "null"
             ]
+          },
+          "dueDate": {
+            "description": "Vencimiento de la factura (YYYY-MM-DD), nunca anterior a purchaseDate; null lo quita. No lo mandes junto con termDays. Cambiarlo no toca libros ni saldos. Solo empresas con las compras en el servicio nuevo (si no, 409 FDN_NOT_ENABLED); no aplica a una orden de compra",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "termDays": {
+            "description": "Plazo en días (0 a 365): el vencimiento queda en purchaseDate + termDays (y se recalcula si después cambia purchaseDate). No lo mandes junto con dueDate",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 365
           },
           "allowDuplicate": {
             "description": "Solo `true`, y solo para repetir una compra que acaba de responder 409 `PURCHASE_DUPLICATE` (ya hay una compra de ese proveedor con ese número; el 409 trae `existing` y `duplicates` con las que ya existen). Antes de mandarlo, muéstrale esas compras a la persona y espera a que confirme que es otra compra distinta. Nunca en el primer intento ni por tu cuenta. No se guarda: vale para esa sola llamada.",
