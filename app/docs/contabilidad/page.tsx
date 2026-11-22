@@ -1353,11 +1353,11 @@ export default function ContabilidadPage() {
               "La lista de Compras no tiene una columna «Vence»: el vencimiento se ve en «Pagos y saldo» y en Cuentas por pagar.",
             ]}
           />
-          <Callout type="warning" title="Una compra sin vencimiento cuenta como vencida desde el día siguiente a su fecha">
-            Si una compra no tiene vencimiento, se toma su fecha como el día en que vence. En Cuentas por pagar dice
-            «Sin vencimiento propio» y, desde el día siguiente a su fecha, lleva la etiqueta «Vencida». Por eso, al
-            comienzo, casi todo lo que debes puede salir vencido: ponles el plazo a los proveedores que te dan crédito
-            y las compras nuevas ya salen con su vencimiento.
+          <Callout type="info" title="Una compra sin vencimiento no se marca como vencida">
+            Si una compra no tiene vencimiento, en Cuentas por pagar dice «Sin vencimiento propio», no lleva la
+            etiqueta «Vencida» y su antigüedad se cuenta desde la fecha de la factura, como siempre. Solo sale vencida
+            la compra que tiene vencimiento y ya pasó. Ponles el plazo a los proveedores que te dan crédito y las
+            compras nuevas ya salen con su vencimiento.
           </Callout>
 
           <H3 id="cxp-por-vencer">Antigüedad por vencimiento y el tramo «Por vencer»<Pronto /></H3>
