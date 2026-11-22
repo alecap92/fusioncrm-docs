@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: "Contabilidad: comprobantes, conciliación bancaria, estados financieros y cierre del año",
   description:
     "Lleva la contabilidad de tu empresa en el CRM: comprobantes automáticos, recibos de caja y egresos, conciliación bancaria, inventario con costo promedio, libros, estados financieros, revisión del período y cierre del año.",
-  keywords: ["contabilidad", "catálogo de cuentas", "PUC", "comprobantes contables", "recibo de caja", "comprobante de egreso", "balance de prueba", "auxiliar por tercero", "saldos iniciales", "importar desde Siigo", "conciliación bancaria", "extracto bancario", "transferencias entre cuentas", "balance general", "estado de resultados", "libro diario", "mayor y balances", "cierre del año", "inventario", "kardex", "costo promedio", "revisión contable", "registro de cambios"],
+  keywords: ["contabilidad", "catálogo de cuentas", "PUC", "comprobantes contables", "recibo de caja", "comprobante de egreso", "cuentas por pagar", "balance de prueba", "auxiliar por tercero", "saldos iniciales", "importar desde Siigo", "conciliación bancaria", "extracto bancario", "transferencias entre cuentas", "balance general", "estado de resultados", "libro diario", "mayor y balances", "cierre del año", "inventario", "kardex", "costo promedio", "revisión contable", "registro de cambios"],
   alternates: { canonical: "/docs/contabilidad" },
   openGraph: {
     title: "Contabilidad: comprobantes, conciliación bancaria, estados financieros y cierre del año",
@@ -39,6 +39,8 @@ const toc = [
   { id: "registrar-pago", label: "«Registrar pago» y compras" },
   { id: "gasto-sin-documento", label: "Gasto sin documento" },
   { id: "api-y-mcp", label: "Cobros por API y asistente" },
+  { id: "cuentas-por-pagar", label: "Cuentas por pagar" },
+  { id: "regularizar", label: "Regularizar una compra pagada" },
   { id: "conciliacion", label: "Conciliación bancaria" },
   { id: "inventario", label: "Inventario" },
   { id: "importar", label: "Importar desde otro software" },
@@ -59,6 +61,26 @@ const link = { color: "#d1345b" };
 
 function B({ children }: { children: ReactNode }) {
   return <strong style={fg}>{children}</strong>;
+}
+
+/**
+ * EN CONSTRUCCIÓN (épica CA, cuentas por pagar, tanda 1): marca lo que todavía no está en producción.
+ * Al desplegar se quitan este componente, <Pronto /> y todos sus usos.
+ */
+function EnConstruccion() {
+  return (
+    <Callout type="warning" title="En construcción">
+      Lo que describe esta parte todavía no está disponible en tu cuenta. Queda escrito para cuando salga.
+    </Callout>
+  );
+}
+
+function Pronto() {
+  return (
+    <span className="ml-1 rounded px-1.5 py-0.5 text-xs font-semibold whitespace-nowrap" style={{ backgroundColor: "var(--callout-warning)", color: "var(--callout-warning-border)" }}>
+      En construcción
+    </span>
+  );
 }
 
 function H2({ children }: { children: ReactNode }) {
@@ -164,7 +186,7 @@ export default function ContabilidadPage() {
           <Table
             head={["Menú", "Grupo", "Qué encuentras"]}
             rows={[
-              [<B key="b">Facturación</B>, "Cobros y pagos", "Recibos de caja, Egresos, Transferencias y Conciliación bancaria."],
+              [<B key="b">Facturación</B>, "Cobros y pagos", <>Recibos de caja, Egresos, <a key="a" href="#cuentas-por-pagar" style={link}>Cuentas por pagar</a><Pronto />, Transferencias y Conciliación bancaria.</>],
               [<B key="b">Facturación</B>, "Inventario", <>Existencias y Ajustes de inventario. Aparece solo si tu empresa tiene el <a href="#inventario" style={link}>inventario</a> encendido.</>],
               [<B key="b">Contabilidad</B>, "Libros", "Comprobantes, Balance de prueba, Libro diario y Mayor y balances."],
               [<B key="b">Contabilidad</B>, "Estados y cierre", "Estados financieros, Revisión y Cierre del año."],
@@ -724,7 +746,8 @@ export default function ContabilidadPage() {
           />
           <P>
             Los dos están en el grupo «Cobros y pagos» del menú Facturación. En pantalla el egreso se llama «Egreso»;
-            «Comprobante de egreso» es el nombre que lleva su PDF.
+            «Comprobante de egreso» es el nombre que lleva su PDF. Para saber qué compras te falta pagar, proveedor
+            por proveedor, está <a href="#cuentas-por-pagar" style={link}>Cuentas por pagar</a>.<Pronto />
           </P>
           <P>
             Un solo recibo puede cobrar <B>varias facturas o documentos internos del mismo cliente</B>, y un solo
@@ -763,6 +786,7 @@ export default function ContabilidadPage() {
               "«Otra cuenta» solo la pueden usar el propietario y el contador.",
               "Un comprobante lleva máximo 50 documentos y 20 conceptos. Si son más, regístralo en dos.",
               "Un pago mayor que lo que se debe se rechaza.",
+              <>En un egreso, la lista de compras del proveedor trae también las que están marcadas como pagadas sin egreso, con la etiqueta «Pagada a mano». Marcarlas es la forma de <a href="#regularizar" style={link}>regularizarlas</a>.<Pronto /></>,
               "Un recibo no aplica retenciones: cobra contra el saldo que la factura tenga en ese momento.",
               <>Si todavía no hay bancos ni cajas, la pantalla te pide crear uno primero en <a href="#bancos-y-caja" style={link}>Bancos y caja</a>.</>,
             ]}
@@ -917,9 +941,9 @@ export default function ContabilidadPage() {
             items={[
               "El proveedor de la compra debe tener NIT. Si no lo tiene, edita la compra y ponlo primero.",
               "Cada pago de la lista enlaza a su comprobante de egreso.",
-              "Una compra marcada como pagada a mano dice «Marcada como pagada sin comprobante de egreso». Para pagarla con un egreso, devuélvela antes a «Pendiente» desde «Cambiar estado».",
+              <>Una compra marcada como pagada a mano, sin egreso, se regulariza ahí mismo: el botón dice <B>Registrar egreso</B> y ya no hay que devolverla antes a «Pendiente». La ventana enlaza a todas las que faltan en <a href="#cuentas-por-pagar" style={link}>Cuentas por pagar</a>.<Pronto /></>,
               <>Una compra con pagos no se puede eliminar ni cambiar de estado a mano: su estado lo fijan sus pagos. Para corregirla, <a href="#compra-con-pagos" style={link}>anula primero su egreso</a>.</>,
-              "Mientras haya compras marcadas como pagadas sin egreso, el balance de prueba avisa que el saldo de proveedores las incluye, con un enlace a Egresos.",
+              <>Mientras haya compras marcadas como pagadas sin egreso, los libros <a href="#aviso-pagadas-sin-egreso" style={link}>lo avisan</a>, con cuántas son, cuánto suman y el enlace «Ver en cuentas por pagar».<Pronto /></>,
             ]}
           />
 
@@ -934,7 +958,7 @@ export default function ContabilidadPage() {
             items={[
               "Es el mismo egreso que sale de «Pagos y saldo» con «Pagar»: usa el camino que te quede más a la mano.",
               <>Una compra con fecha dentro de tus <a href="#saldos-iniciales-hasta" style={link}>saldos iniciales</a> conserva la opción «Pagada»: su pago ya viene contado en esos saldos.</>,
-              "Una compra que ya estaba marcada como pagada a mano conserva su estado: no se le cambia a la fuerza.",
+              <>Una compra que ya estaba marcada como pagada a mano conserva su estado: no se le cambia a la fuerza. Para que su pago quede en tus libros, regístrale el egreso directamente, sin devolverla a «Pendiente»: mira <a href="#regularizar" style={link}>cómo regularizarla</a>.<Pronto /></>,
               <>La regla es la misma por la <a href="#api-y-mcp" style={link}>API y por un asistente</a>: marcar una compra como pagada sin egreso se rechaza, con un mensaje que lo explica.</>,
             ]}
           />
@@ -1030,12 +1054,134 @@ export default function ContabilidadPage() {
               ["Ver los documentos soporte y registrar la compra que paga uno", "Cualquier acceso con permiso de compras. Emitir un documento soporte sigue siendo desde la web."],
               ["Ver las retenciones practicadas a cada proveedor en el año", "Cualquier acceso con permiso de compras. El certificado en PDF se descarga desde la web."],
               ["Anular un recibo de caja o un comprobante de egreso", <><B key="b">Solo con el acceso del propietario</B>, y con el motivo escrito.</>],
+              [<>Consultar las <a key="a" href="#cuentas-por-pagar" style={link}>cuentas por pagar</a>: las compras con saldo, las marcadas como pagadas sin egreso o las dos, con su antigüedad y el resumen por proveedor<Pronto /></>, "Cualquier acceso con permiso de compras. Es solo consulta."],
+              [<>Listar solo las compras pagadas sin egreso<Pronto /></>, "Cualquier acceso con permiso de compras."],
+              [<>Registrar el egreso de una compra marcada como pagada a mano<Pronto /></>, "Cualquier acceso que pueda registrar egresos. El egreso se aplica directamente: no hay que cambiar antes el estado de la compra. Si la compra ya tiene su pago, o está dentro de los saldos iniciales, el egreso se rechaza con un mensaje que lo explica."],
               ["Consultar los libros: catálogo de cuentas, balance de prueba, auxiliares y los borradores de IVA y de retención", <><B key="b">Solo con el acceso del propietario o del contador.</B> Es solo consulta.</>],
             ]}
           />
           <P>
             Lo que no se hace por estos caminos: anular una transferencia, cerrar o reabrir una conciliación, escribir
             comprobantes contables y cerrar el año. Eso es de la web.
+          </P>
+        </section>
+
+        {/* EN CONSTRUCCIÓN (épica CA, cuentas por pagar, tanda 1): esta sección y cada <Pronto /> de la página
+            describen algo que todavía no está en producción. Al desplegar: quitar <EnConstruccion /> y <Pronto />. */}
+        <section id="cuentas-por-pagar" className="mb-10">
+          <H2>Cuentas por pagar</H2>
+          <EnConstruccion />
+          <P>
+            <B>Facturación → Cuentas por pagar</B>, en el grupo «Cobros y pagos», junto a Egresos, muestra a quién le
+            debes y desde cuándo. Es lo mismo que <a href="/docs/invoices#receivables" style={link}>Cuentas por
+            cobrar</a>, del lado de tus proveedores. Aparece con la contabilidad activada.
+          </P>
+          <P>
+            También es el sitio donde se arregla un caso frecuente: compras que figuran como pagadas pero no tienen
+            un comprobante de egreso. Pasa con las compras que se marcaron como pagadas antes de activar la
+            contabilidad y con las que llegaron así de una importación. Sin el egreso, tus libros siguen diciendo
+            que las debes.
+          </P>
+
+          <H3 id="cxp-pestanas">Las dos pestañas</H3>
+          <Table
+            head={["Pestaña", "Qué trae", "Qué haces ahí"]}
+            rows={[
+              [<B key="b">Por pagar</B>, "Las compras que todavía debes, con su saldo. «A pagar» ya descuenta las retenciones y las notas del proveedor.", "Pagarlas con un egreso."],
+              [<B key="b">Por regularizar</B>, "Las compras marcadas como pagadas que no tienen egreso.", <>Registrarles el egreso con la fecha en que las pagaste, para que el saldo de proveedores baje. Mira <a key="a" href="#regularizar" style={link}>cómo</a>.</>],
+            ]}
+          />
+          <P>
+            Cada pestaña muestra cuántas compras tiene y cuánto suman. Cuando no queda ninguna por regularizar, esa
+            pestaña dice <B>«Todo al día»</B>: lo que los libros dicen que debes a proveedores es lo que de verdad
+            debes.
+          </P>
+
+          <H3 id="cxp-antiguedad">Antigüedad y proveedores</H3>
+          <Bullets
+            items={[
+              <><B>Tarjetas de antigüedad:</B> «0 a 30 días», «31 a 60 días», «61 a 90 días» y «Más de 90 días», cada una con su valor y su cantidad de compras.</>,
+              <>La antigüedad se cuenta desde la <B>fecha de la factura</B> del proveedor hasta hoy. Todavía no hay fecha de vencimiento en las compras.</>,
+              <><B>Lista de proveedores:</B> de mayor a menor valor. De cada uno ves el nombre, el NIT, cuántas compras son, de cuándo es la más antigua, el total y cómo se reparte por antigüedad.</>,
+              <>Toca un proveedor para ver sus compras: número, fecha, hace cuántos días y saldo. El número abre «Pagos y saldo» de esa compra. Si son muchas, usa <B>Cargar más</B>.</>,
+              <><B>Buscar:</B> por nombre o por NIT. Si no sale nada, prueba con otro nombre o con el NIT sin puntos.</>,
+              <><B>Exportar CSV:</B> descarga lo que estás viendo, es decir, los proveedores de la lista y las compras de los que tengas abiertos.</>,
+              "Al volver del formulario del egreso, la pantalla queda como la dejaste: la misma pestaña, la búsqueda y los proveedores abiertos.",
+            ]}
+          />
+
+          <H3 id="regularizar">Regularizar una compra pagada sin egreso, paso a paso</H3>
+          <Steps
+            items={[
+              <>Abre <B>Facturación → Cuentas por pagar</B> y pasa a la pestaña <B>Por regularizar</B>. El <a href="#aviso-pagadas-sin-egreso" style={link}>aviso de los libros</a> te lleva directo con «Ver en cuentas por pagar».</>,
+              "Toca el proveedor para ver sus compras.",
+              <>En la fila de la compra, haz clic en <B>Registrar egreso</B>. Se abre un egreso nuevo con el proveedor y la compra ya puestos. La compra lleva la etiqueta <B>«Pagada a mano»</B>.</>,
+              <>Revisa la <B>Fecha</B>. Viene propuesta la fecha de la compra, que es cuando figura pagada. Si el pago fue otro día, cámbiala por el día en que salió la plata.</>,
+              <>Elige el <B>Banco o caja</B> de donde salió y la <B>Forma de pago</B>, como en <a href="#recibos-y-egresos" style={link}>cualquier egreso</a>.</>,
+              <>Haz clic en <B>Revisar</B> y después en <B>Guardar</B>.</>,
+              "La compra sale de «Por regularizar» y el saldo de proveedores de tus libros baja por ese valor.",
+            ]}
+          />
+          <Bullets
+            items={[
+              <><B>Ya no hay que devolver la compra a «Pendiente»</B> antes de registrarle el egreso.</>,
+              <>El botón <B>Registrar egreso</B> que está junto al nombre del proveedor abre un solo egreso para una o varias de sus compras. La fecha de la compra se propone solo cuando marcas una sola compra pagada a mano; con más de una, queda la de hoy y la escribes tú.</>,
+              "En cuanto escribes una fecha, el formulario no la vuelve a cambiar.",
+              "Si el egreso es por menos de lo que se debe, la compra pasa a «Por pagar» con el resto como saldo.",
+              "Si después anulas ese egreso, la compra queda por pagar. No vuelve a figurar como pagada a mano.",
+              <>Un proveedor sin NIT no puede recibir un egreso. La pantalla te lo dice y te lleva a ponérselo con <B>Ponerle el NIT</B>. Mientras no lo tenga, puede que sus compras no se vean completas.</>,
+              "Una compra marcada como pagada que no debe nada (por ejemplo, con una nota crédito por todo su valor) no aparece: no hay nada que regularizar.",
+              <>Todavía no se pueden pagar varios proveedores de una vez: se registra un egreso por proveedor. Mira <a href="#pendiente" style={link}>lo que todavía no hay</a>.</>,
+            ]}
+          />
+
+          <H3 id="compras-pagadas-sin-egreso">El mismo camino desde Compras</H3>
+          <P>
+            En <a href="/docs/invoices#purchases" style={link}>Compras</a> hay un filtro <B>Pagadas sin egreso</B>.
+            Al ponerlo ves esas compras de todos los meses, sin perder el mes que tenías elegido. Abre{" "}
+            <B>Pagos y saldo</B> de una y haz clic en <B>Registrar egreso</B>.
+          </P>
+          <Bullets
+            items={[
+              "El filtro aparece con la contabilidad activada, en la lista de facturas de compra.",
+              "Si el filtro no se puede aplicar, la pantalla lo dice y deja la lista sin filtrar: no muestra una lista incompleta como si fuera la correcta.",
+            ]}
+          />
+
+          <H3 id="cxp-saldos-iniciales">Compras anteriores a tus saldos iniciales</H3>
+          <P>
+            Una compra marcada como pagada con fecha dentro de tus{" "}
+            <a href="#saldos-iniciales-hasta" style={link}>saldos iniciales</a> no aparece en «Por regularizar» ni
+            cuenta para el aviso de los libros. Su pago ya viene contado en esos saldos, así que no se le registra un
+            egreso. Si abres «Pagos y saldo» de una de esas compras, la pantalla te lo explica; y si se intenta el
+            egreso por otro camino, se rechaza con el mismo motivo.
+          </P>
+          <P>
+            Si tu empresa no tiene saldos iniciales, cuentan todas las compras marcadas como pagadas sin egreso.
+          </P>
+
+          <H3 id="cxp-periodo-cerrado">Si la compra es de un período cerrado</H3>
+          <P>
+            Una compra por regularizar cuya fecha cae en un <a href="#periodos" style={link}>período cerrado</a> lleva
+            la etiqueta <B>«Período cerrado»</B>. Su egreso no puede llevar esa fecha: el formulario abre con la fecha
+            de hoy y lo avisa. Para usar la fecha de la compra hay que reabrir ese período primero.
+          </P>
+
+          <H3 id="cxp-mensajes">Mensajes que puedes ver</H3>
+          <Table
+            head={["Mensaje", "Qué significa"]}
+            rows={[
+              ["«Todo al día»", "No hay compras marcadas como pagadas sin su egreso."],
+              ["«No le debes a ningún proveedor»", "No hay compras con saldo. Cuando registres una compra que no hayas pagado, aparece aquí hasta que le hagas el egreso."],
+              ["«Ningún proveedor coincide»", "La búsqueda no encontró a nadie. Prueba con otro nombre o con el NIT sin puntos."],
+              ["«Hay más compras de las que se alcanzan a leer de una vez»", "Las cifras de la pantalla son un mínimo. A medida que registres egresos van entrando las que faltan."],
+              ["«Esta lista todavía no está disponible»", <>Inténtalo de nuevo en unos minutos. Si sigue igual, escríbele a <a key="a" href="/docs/soporte" style={link}>soporte</a>.</>],
+              ["«Puede que no estén todas: este proveedor no tiene NIT…»", "Ponle el NIT al proveedor en sus compras para verlas completas y poder registrarles el egreso."],
+            ]}
+          />
+          <P>
+            La pantalla la ven todos los que ven «Cobros y pagos». El usuario de solo lectura puede consultar y
+            exportar, pero no ve <B>Registrar egreso</B>: mira <a href="#roles" style={link}>quién puede hacer qué</a>.
           </P>
         </section>
 
@@ -1524,6 +1670,21 @@ export default function ContabilidadPage() {
             estás viendo con las fechas y los filtros elegidos.
           </P>
 
+          <H3 id="aviso-pagadas-sin-egreso">El aviso de compras pagadas sin egreso</H3>
+          <P>
+            Si hay compras marcadas como pagadas que no tienen comprobante de egreso, su valor sigue en el saldo de
+            proveedores. Los libros lo avisan en el balance de prueba, en los auxiliares que tocan proveedores, en el
+            balance general y en el mayor y balances.
+          </P>
+          <Bullets
+            items={[
+              <>El aviso dice cuántas son y cuánto suman, por ejemplo «12 compras por $8,4 M sin egreso», y trae el enlace <B>Ver en cuentas por pagar</B>, que abre la pestaña <a href="#cuentas-por-pagar" style={link}>Por regularizar</a>.<Pronto /></>,
+              <>El valor del aviso va abreviado; el exacto está en esa pestaña.<Pronto /></>,
+              <>No cuenta las compras con fecha dentro de tus <a href="#cxp-saldos-iniciales" style={link}>saldos iniciales</a>: su pago ya está en esos saldos.<Pronto /></>,
+              "El aviso se quita solo cuando la última de esas compras tiene su egreso.",
+            ]}
+          />
+
           <H3 id="diario-y-mayor">Libro diario y mayor y balances</H3>
           <P>
             Son dos libros más, cada uno con su entrada en el menú Contabilidad. Los ven el propietario, el contador
@@ -1669,7 +1830,7 @@ export default function ContabilidadPage() {
               [<B key="b">Documentos en los libros</B>, "Si todas tus ventas, compras y pagos ya tienen su comprobante.", <>Te lista lo que falta, con el enlace a cada documento. Entra con «Ir a Comprobantes» y usa <B>Sincronizar ahora</B>. Si un documento no se pudo contabilizar, ábrelo y corrige lo que dice el aviso.</>],
               [<B key="b">Saldos al revés</B>, "Si alguna cuenta quedó con el saldo contrario al que debería tener. Por ejemplo, un banco con saldo negativo.", "Abre «Ver sus movimientos» y busca con tu contador el movimiento que la dejó así: suele ser algo registrado en la cuenta equivocada, o un ingreso que falta registrar."],
               [<B key="b">Lo que te deben</B>, "Si la cartera, factura por factura, coincide con la cuenta de clientes en los libros.", "Te muestra las dos cifras, la diferencia y los clientes donde está, cada uno con «Ver su auxiliar». Lee las notas del control: los saldos iniciales, los comprobantes hechos a mano y los anticipos explican diferencias que no son errores."],
-              [<B key="b">Lo que debes</B>, "Lo mismo con tus proveedores: lo que debes, compra por compra, contra la cuenta de proveedores.", "Igual que el anterior. Además avisa si hay compras marcadas como pagadas sin un egreso: su pago no está en los libros. Págalas con un egreso desde «Ir a Egresos»."],
+              [<B key="b">Lo que debes</B>, "Lo mismo con tus proveedores: lo que debes, compra por compra, contra la cuenta de proveedores.", "Igual que el anterior. Además avisa si hay compras marcadas como pagadas sin un egreso: su pago no está en los libros. Regístrales el egreso desde «Ver en cuentas por pagar» (en construcción; hoy el enlace dice «Ir a Egresos»)."],
               [<B key="b">Saltos de numeración</B>, "Si falta algún número en tus comprobantes, recibos o egresos.", "Te dice qué números faltan de cada tipo. Con «Ver los de este tipo» abres la lista, incluidos los anulados, para revisarla con tu contador."],
               [<B key="b">Posibles repetidos</B>, "Comprobantes hechos a mano con las mismas líneas y la misma fecha, recibos o egresos con el mismo tercero, fecha, valor y cuenta, y compras con el mismo proveedor y el mismo número.", "Abre cada uno y compáralos. Puede que estén bien: míralos antes de anular algo."],
               [<B key="b">Comprobantes hechos a mano</B>, "Qué se registró a mano en el período, por tipo y uno por uno.", "Nada, si los reconoces. Es la lista que tu contador querrá ver antes de cerrar."],
@@ -1871,6 +2032,7 @@ export default function ContabilidadPage() {
               ["Registrar y anular comprobantes manuales y saldos iniciales", "Sí", "No", "No"],
               ["Cerrar períodos, y simular, cerrar y reabrir el año", "Sí", "No", "No"],
               ["Ver recibos, egresos, transferencias y conciliaciones, y descargar sus PDF", "Sí", "Sí", "Sí"],
+              [<>Ver Cuentas por pagar y exportarla a CSV<Pronto /></>, "Sí", "Sí", "Sí"],
               ["Registrar y anular recibos de caja, egresos y transferencias", "Sí", "Sí", "No"],
               ["Ver el comprobante contable de un recibo, un egreso o una transferencia, y el «PDF con cuentas contables»", "Sí", "No", "Sí"],
               ["Conciliación bancaria: subir extractos, cruzar, deshacer y «Registrar en libros»", "Sí", "Sí", "No"],
@@ -1887,7 +2049,7 @@ export default function ContabilidadPage() {
           <P>Lo que ve cada uno en el menú:</P>
           <Bullets
             items={[
-              <><B>Empleado:</B> en Facturación ve «Cobros y pagos» (Recibos de caja, Egresos, Transferencias y Conciliación bancaria) e «Inventario». No ve el menú Contabilidad.</>,
+              <><B>Empleado:</B> en Facturación ve «Cobros y pagos» (Recibos de caja, Egresos, Cuentas por pagar<Pronto />, Transferencias y Conciliación bancaria) e «Inventario». No ve el menú Contabilidad.</>,
               <><B>Usuario de solo lectura:</B> ve lo mismo y, además, el menú Contabilidad, menos «Saldos iniciales» y «Ajustes de contabilidad». No le aparecen los botones de crear, guardar, anular, cerrar, «Registrar en libros» ni «Sincronizar ahora». Si abre un formulario por un enlace, la pantalla le dice «No disponible para tu rol».</>,
               <><B>Contador:</B> además de la contabilidad, entra a <B>Productos</B> para marcar «Maneja inventario» (edita productos, pero no los crea ni los elimina), configura <B>Retenciones</B> en Ajustes → Contabilidad y ve <B>Facturación electrónica</B> en solo lectura: puede consultar la resolución y la numeración, pero las cambia el propietario.</>,
             ]}
@@ -1906,6 +2068,8 @@ export default function ContabilidadPage() {
             items={[
               <><B>Retenciones dentro del recibo de caja.</B> Las retenciones del cliente se anotan en la factura con «Aplicar retenciones», no en el recibo.</>,
               <><B>Cruzar un anticipo contra una factura posterior.</B> El anticipo queda registrado, pero todavía no se puede aplicar después a una factura desde el recibo.</>,
+              <><B>Pagar a varios proveedores de una vez.</B> No hay egreso masivo: se registra un egreso por proveedor, que puede pagar varias de sus compras.</>,
+              <><B>Fecha de vencimiento en las compras.</B> La antigüedad de lo que debes se cuenta desde la fecha de la factura del proveedor.</>,
               <><B>Conexión directa con el banco.</B> Los movimientos del banco no se traen solos: el extracto lo descargas y lo subes tú.</>,
               <><B>Conciliación automática.</B> La pantalla sugiere los cruces, pero cada uno lo confirma una persona.</>,
               <><B>Inventario con varias bodegas, lotes, series o producción.</B> El inventario es de una sola bodega y costo promedio: mira <a href="#inventario-limites" style={link}>lo que no hace</a>.</>,
