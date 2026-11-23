@@ -45,6 +45,8 @@ const toc = [
   { id: "cxp-vencimiento", label: "Vencimiento de la compra" },
   { id: "cxp-informe", label: "Antigüedad a una fecha" },
   { id: "conciliacion", label: "Conciliación bancaria" },
+  { id: "banco-pagar-cobrar", label: "Pagar o cobrar desde el extracto" },
+  { id: "ajuste-al-peso", label: "Ajuste al peso" },
   { id: "inventario", label: "Inventario" },
   { id: "importar", label: "Importar desde otro software" },
   { id: "libros", label: "Libros" },
@@ -66,6 +68,25 @@ function B({ children }: { children: ReactNode }) {
   return <strong style={fg}>{children}</strong>;
 }
 
+/**
+ * EN CONSTRUCCIÓN (épica CA, cuentas por pagar, tanda 3: desde el banco): marca lo que todavía no está en producción.
+ * Al desplegar se quitan este componente, <Pronto /> y todos sus usos.
+ */
+function EnConstruccion() {
+  return (
+    <Callout type="warning" title="En construcción">
+      Lo que describe esta parte todavía no está disponible en tu cuenta. Queda escrito para cuando salga.
+    </Callout>
+  );
+}
+
+function Pronto() {
+  return (
+    <span className="ml-1 rounded px-1.5 py-0.5 text-xs font-semibold whitespace-nowrap" style={{ backgroundColor: "var(--callout-warning)", color: "var(--callout-warning-border)" }}>
+      En construcción
+    </span>
+  );
+}
 
 function H2({ children }: { children: ReactNode }) {
   return <h2 className="text-2xl font-bold mb-4" style={fg}>{children}</h2>;
@@ -424,6 +445,55 @@ export default function ContabilidadPage() {
           />
           <P>
             Las facturas electrónicas, los estados financieros y los comprobantes contables siguen saliendo en carta.
+          </P>
+
+          {/* EN CONSTRUCCIÓN (épica CA, cuentas por pagar, tanda 3): el ajuste al peso todavía no está en
+              producción. Al desplegar, quitar <Pronto /> y <EnConstruccion />. */}
+          <H3 id="ajuste-al-peso">Ajuste al peso<Pronto /></H3>
+          <EnConstruccion />
+          <P>
+            A veces el banco mueve unos pesos o centavos distintos de lo que se debía: una factura por
+            $ 1.190.000,40 y el cliente consigna $ 1.190.000. Sin ajuste, esa factura quedaría con un saldo de 40
+            centavos para siempre. Con el <B>ajuste al peso</B>, el documento queda pagado o cobrado completo y la
+            diferencia se registra aparte, en una cuenta de ajuste.
+          </P>
+          <P>
+            Se configura en <B>Ajustes → Contabilidad → Preferencias</B>, bloque <B>Ajuste al peso</B>, campo{" "}
+            <B>Hasta cuánto por documento</B>. Vale para toda la empresa y lo cambian el propietario y el contador.
+          </P>
+          <Table
+            head={["Valor", "Qué pasa"]}
+            rows={[
+              ["$ 1.000 (viene así)", "Una diferencia de hasta $ 1.000 en un documento se registra como ajuste."],
+              ["Otro valor, hasta $ 10.000", "Ese es el tope por documento."],
+              ["0", "El ajuste queda apagado: cualquier diferencia queda como saldo del documento o como sobrante."],
+            ]}
+          />
+          <Bullets
+            items={[
+              <><B>Es por documento, no por comprobante.</B> Un comprobante lleva un solo ajuste, el del último documento que paga o cobra. Ejemplo: tres facturas de $ 417.000 y entran $ 1.248.100. Faltan $ 2.900, que es más que el tope: no hay ajuste y la última factura queda con un saldo de $ 2.900.</>,
+              "El ajuste tiene que ser menor que la plata que de verdad se movió por ese documento. Si una factura es de $ 1.000 y entra $ 1, eso es un abono de $ 1, no un ajuste de $ 999.",
+              "Funciona en los dos sentidos (el banco movió de más o de menos) y tanto en recibos de caja como en egresos.",
+              <>Hoy se aplica al <a href="#banco-pagar-cobrar" style={link}>registrar un pago o un cobro desde el extracto</a>: la revisión te muestra el ajuste antes de registrar.</>,
+              "En el comprobante y en su PDF aparece como un renglón «Ajuste al peso».",
+              "Cambiar el tope no toca los comprobantes que ya están registrados.",
+            ]}
+          />
+          <P>
+            <B>A qué cuenta va.</B> Debajo del tope, la pantalla te muestra las dos cuentas del ajuste. Se cambian
+            en <a href="#cuentas-por-defecto" style={link}>Cuentas por defecto</a>:
+          </P>
+          <Table
+            head={["Cuenta", "Cuándo se usa"]}
+            rows={[
+              ["A tu favor", "Entró de más al cobrar, o salió de menos al pagar."],
+              ["En contra", "Entró de menos al cobrar, o salió de más al pagar."],
+            ]}
+          />
+          <P>
+            Vienen con una cuenta de otros ingresos y una de gastos bancarios. Pregúntale a tu contador si quiere
+            otras: el cambio vale para los comprobantes nuevos, y los que ya están registrados conservan la cuenta que
+            tenían.
           </P>
 
           <H3 id="firmantes">Firmantes de los estados</H3>
@@ -1045,6 +1115,10 @@ export default function ContabilidadPage() {
               [<>Consultar cómo quedó un lote de egresos</>, "Cualquier acceso con permiso de compras. Es solo consulta. Por la API también se listan los últimos lotes."],
               [<>Consultar la antigüedad de las cuentas por pagar a una fecha, y pedirla por vencimiento</>, "Cualquier acceso con permiso de compras. El Excel y el PDF del informe se descargan desde la web o por la API, no por un asistente."],
               [<>Escribir el vencimiento o el plazo de una compra al registrarla o al editarla</>, "Cualquier acceso que pueda escribir compras. Se manda la fecha en que vence o el plazo en días, no los dos."],
+              [<>Consultar qué compras o facturas podrían corresponder a una línea del extracto<Pronto /></>, "Cualquier acceso que pueda leer la conciliación. Para una salida hace falta el permiso de compras; para una entrada, el de facturas. Es solo consulta."],
+              [<>Registrar el pago o el cobro de una <a key="a" href="#banco-pagar-cobrar" style={link}>línea del extracto</a>, que queda cruzada<Pronto /></>, "Un acceso con permiso de escritura de facturas y de compras, los dos, porque además de registrar cruza la línea. Siempre en dos pasos: primero se simula y después se confirma lo mismo."],
+              [<>Atar un lote de egresos a una salida del extracto<Pronto /></>, "Cualquier acceso que pueda registrar egresos. El lote toma la fecha y el banco de la línea y solo se confirma si suma lo que salió."],
+              [<>Registrar un recibo o un egreso con <a key="a" href="#ajuste-al-peso" style={link}>ajuste al peso</a><Pronto /></>, "Cualquier acceso que pueda registrar recibos o egresos. El ajuste no puede pasar del tope de la empresa."],
               ["Consultar los libros: catálogo de cuentas, balance de prueba, auxiliares y los borradores de IVA y de retención", <><B key="b">Solo con el acceso del propietario o del contador.</B> Es solo consulta.</>],
             ]}
           />
@@ -1061,6 +1135,21 @@ export default function ContabilidadPage() {
               "Las filas fallidas se reintentan en un lote nuevo, con otra clave, simulando primero.",
               "Para los usuarios con cupo por hora en la API (los que no son el propietario), confirmar un lote cuenta una creación por cada compra enviada. Simular no gasta cupo, pero avisa si el lote no cabe. No hay un tope por valor.",
               "Herramientas nuevas para un asistente: registrar un lote de egresos, consultar un lote y consultar la antigüedad a una fecha. La consulta de cuentas por pagar acepta además la antigüedad por vencimiento.",
+            ]}
+          />
+          <P>
+            Sobre registrar desde una línea del extracto por la API o por un asistente:<Pronto />
+          </P>
+          <Bullets
+            items={[
+              "La fecha, el valor y la cuenta de dinero no se envían: salen de la línea del extracto y de su conciliación.",
+              "La simulación no registra nada: devuelve cómo quedaría el comprobante, qué documento queda con saldo, el ajuste al peso y a dónde va lo que sobra. Un asistente debe mostrártela antes de confirmar.",
+              "Si algo cambió entre la simulación y la confirmación, no se registra nada y hay que simular otra vez.",
+              <>Que responda bien no quiere decir que la línea quedó cruzada. La respuesta lo dice aparte. Si el comprobante quedó registrado y la línea no se cruzó, <B>no se registra otra vez</B>: se cruza la línea con ese comprobante o se repite exactamente la misma solicitud.</>,
+              <>Una línea lleva un solo comprobante. Si ya tiene uno, la solicitud se rechaza y la respuesta dice cuál es, para cruzarlo o anularlo. Mira <a href="#banco-ya-registrado" style={link}>si el movimiento ya tiene un comprobante</a>.</>,
+              "Repetir la misma solicitud no duplica nada: devuelve el mismo comprobante y, si la línea seguía sin cruzar, lo intenta de nuevo.",
+              "Para los usuarios con cupo por hora en la API (los que no son el propietario), registrar cuenta una creación. Simular no gasta cupo. Si la respuesta dice que quedó «en proceso», cada repetición que vuelva a quedar en proceso cuenta otra creación: espera unos minutos entre intentos.",
+              "Herramientas nuevas para un asistente: consultar los documentos que corresponden a una línea del extracto y registrar el comprobante de una línea. El lote de egresos acepta la línea del extracto, y el recibo y el egreso aceptan el ajuste al peso.",
             ]}
           />
           <P>
@@ -1238,6 +1327,12 @@ export default function ContabilidadPage() {
             no se registra nada. La pantalla vuelve a la simulación con el aviso «Algo cambió desde la simulación» y el
             plan de ahora: lo revisas y confirmas otra vez.
           </Callout>
+
+          <P>
+            Viene en camino: si los pagos salieron del banco en un solo movimiento, armar el lote{" "}
+            <a href="#banco-varios-proveedores" style={link}>desde esa línea del extracto</a>, para que quede
+            cruzada al terminar.<Pronto />
+          </P>
 
           <H3 id="cxp-lote-resultado">Qué significa cada resultado</H3>
           <P>
@@ -1551,6 +1646,148 @@ export default function ContabilidadPage() {
             <a href="#recibos-y-egresos" style={link}>Egresos o Recibos de caja</a> y crúzalo a mano. Se puede cruzar
             con el extracto si su fecha es hasta 31 días después del final del período, y el resumen lo muestra aparte.
           </P>
+          <P>
+            Viene en camino: desde el mismo botón, <a href="#banco-pagar-cobrar" style={link}>pagar compras o cobrar
+            facturas</a> con el movimiento del banco, y que la línea quede cruzada sola.<Pronto />
+          </P>
+
+          {/* EN CONSTRUCCIÓN (épica CA, cuentas por pagar, tanda 3: desde el banco): desde aquí hasta
+              #conciliado, y cada <Pronto /> de la página, describen algo que todavía no está en producción
+              (pagar compras o cobrar facturas desde una línea del extracto, el lote desde una salida del banco,
+              el aviso de movimiento ya registrado y el ajuste al peso). Al desplegar: quitar <EnConstruccion /> y
+              <Pronto />, y corregir en #registrar-en-libros, arriba, las frases que quedan viejas: «la línea queda
+              lista para que confirmes su cruce» (queda cruzada sola) y la descripción del botón (ya no es solo
+              para comisiones e intereses). Después, correr node scripts/sync-mcp-tools.mjs. */}
+          <H3 id="banco-pagar-cobrar">Pagar compras o cobrar facturas desde el extracto<Pronto /></H3>
+          <EnConstruccion />
+          <P>
+            Muchas líneas del extracto no son comisiones: son el pago a un proveedor o la consignación de un cliente
+            que todavía no registraste. Para esas no hace falta salir a Egresos ni a Recibos de caja:{" "}
+            <B>Registrar en libros</B> aplica el movimiento a tus compras o a tus facturas, con la fecha y el valor
+            del banco, y <B>deja la línea cruzada</B> en el mismo paso.
+          </P>
+          <P>El diálogo tiene tres caminos:</P>
+          <Table
+            head={["Camino", "Cuándo aparece", "Qué registra"]}
+            rows={[
+              [<B key="b">Pagar compras</B>, "La línea es plata que sale del banco.", "Un comprobante de egreso aplicado a una o varias compras de un proveedor. Sirve para las compras por pagar y para las que estaban marcadas como pagadas sin egreso."],
+              [<B key="b">Cobrar facturas</B>, "La línea es plata que entra al banco.", "Un recibo de caja aplicado a una o varias facturas (o documentos internos de venta) de un cliente."],
+              [<B key="b">Otro concepto</B>, "Siempre.", "Lo de arriba: una comisión, el 4×1000, unos intereses o un gasto que no tiene compra. Con este camino la línea también queda cruzada sola."],
+            ]}
+          />
+          <P>
+            Si la pantalla encuentra compras o facturas que podrían corresponder a ese movimiento, abre en el primer
+            camino. Si no encuentra ninguna, abre en «Otro concepto». Puedes cambiar de camino cuando quieras.
+          </P>
+          <Steps
+            items={[
+              <>En una línea del banco sin cruzar, haz clic en <B>Registrar en libros</B>. Arriba ves la fecha, el valor y la cuenta de dinero del extracto: no se cambian.</>,
+              <>En <B>Qué compras pagó</B> (o <B>Qué facturas cobró</B>), marca los documentos que cubrió ese movimiento. La lista trae los que podrían corresponder, cada uno con su saldo y el motivo por el que se sugiere.</>,
+              <>Si el documento no está en la lista, búscalo por NIT, nombre o número y presiona Enter.</>,
+              <>Haz clic en <B>Revisar</B>. En <B>Revisa antes de registrar</B> ves cómo quedaría todo, sin que se haya registrado nada todavía.</>,
+              <>Confirma con el botón, que lleva la cifra: <B>«Registrar egreso por $ 2.380.000,00»</B> o <B>«Registrar recibo por…»</B>.</>,
+              <>La línea pasa a <B>Cruzada</B>, con el enlace a su comprobante. No hay que confirmar nada más.</>,
+            ]}
+          />
+          <P>Por qué se sugiere cada documento:</P>
+          <Table
+            head={["Motivo", "Qué quiere decir"]}
+            rows={[
+              [<B key="b">Mismo valor</B>, "El saldo del documento es igual a lo que movió el banco."],
+              [<B key="b">Diferencia de centavos</B>, <>El saldo difiere en unos pesos o centavos que caben en el <a key="a" href="#ajuste-al-peso" style={link}>ajuste al peso</a> de tu empresa.</>],
+              [<B key="b">Suma lo que le debes a este proveedor</B>, "Todas las compras por pagar de ese proveedor suman lo que salió del banco. Vienen juntas y se marcan todas con un clic. En una entrada dice «Suma lo que te debe este cliente»."],
+              [<B key="b">El extracto lo nombra</B>, "La descripción o la referencia del banco trae el NIT o el nombre completo de ese proveedor o cliente."],
+              [<B key="b">Coincide con tu búsqueda</B>, "Lo encontraste tú con el buscador."],
+            ]}
+          />
+          <Bullets
+            items={[
+              <><B>Son sugerencias: quien decide eres tú.</B> Nada se registra hasta que revisas y confirmas.</>,
+              "Un comprobante es de un solo proveedor o de un solo cliente, y lleva máximo 50 documentos.",
+              "Si marcas facturas de varios clientes, la pantalla te pide dejar las de uno solo: un recibo es de un cliente. Lo de los demás va en otro recibo.",
+              <>Si marcas compras de varios proveedores, te ofrece <a href="#banco-varios-proveedores" style={link}>registrarlas en lote</a>.</>,
+              "El valor del banco se reparte entre los documentos en el orden en que los marcaste.",
+              "Lo que ya marcaste se queda arriba de la lista, en «Ya marcadas», aunque busques otra cosa. Ahí mismo lo puedes quitar.",
+              "Si el banco recorta el nombre del proveedor o del cliente, puede que la pantalla no lo sugiera: búscalo.",
+            ]}
+          />
+          <P>
+            <B>El comprobante vale lo que dice el banco</B>, no el saldo del documento. En la revisión ves qué pasa
+            con la diferencia:
+          </P>
+          <Table
+            head={["Si el banco movió…", "Qué se registra"]}
+            rows={[
+              ["Lo mismo que se debía", "Los documentos quedan pagados o cobrados completos."],
+              ["Menos de lo que se debía", "Un abono. El último documento que marcaste queda con saldo, y la revisión te dice cuánto."],
+              ["Unos pesos o centavos de más o de menos", <>Si la diferencia cabe en el <a key="a" href="#ajuste-al-peso" style={link}>ajuste al peso</a>, el documento queda completo y la diferencia se registra como ajuste. La revisión lo explica.</>],
+              ["Más de lo que se debía, en un pago", "Lo que sobra queda como anticipo al proveedor."],
+              ["Más de lo que se debía, en un cobro", <>Lo que sobra queda como <B key="b">saldo a favor del cliente</B>. Si esa plata no es del cliente, en «A dónde va el sobrante» puedes elegir <B>Otro ingreso</B>.</>],
+            ]}
+          />
+          <Bullets
+            items={[
+              <>Si una factura de venta queda con saldo, la pantalla te pregunta: «¿El cliente te retuvo?». Las retenciones no se registran aquí: se anotan en la factura con «Aplicar retenciones», y con ellas baja el saldo que queda.</>,
+              <>Si mientras revisabas alguien pagó uno de esos documentos o le registró una nota, al confirmar no se registra nada. La pantalla vuelve a la revisión con el aviso <B>«Algo cambió desde la simulación»</B> y lo que se registraría ahora: lo revisas y confirmas otra vez.</>,
+              <>Si la línea tenía un <a href="#cruzar" style={link}>cruce roto</a>, también puedes registrarla: el cruce nuevo reemplaza al roto.</>,
+              "Si después anulas ese comprobante, el cruce queda roto y la línea vuelve a quedar libre para registrarla de nuevo.",
+              "El botón lo ve quien puede registrar recibos y egresos. El usuario de solo lectura no lo ve.",
+            ]}
+          />
+          <Callout type="warning" title="Si el comprobante se registró y la línea no quedó cruzada">
+            Puede pasar, por ejemplo, si otra persona cerró la conciliación o cruzó esa línea en el mismo momento. La
+            pantalla lo dice: «El comprobante quedó registrado, pero la línea no se cruzó», con el motivo y el enlace
+            al comprobante. <strong>No lo registres otra vez</strong>: el movimiento ya está en tus libros. La línea
+            queda marcada para que la cruces a mano.
+          </Callout>
+
+          <H3 id="banco-varios-proveedores">Una salida del banco que pagó a varios proveedores<Pronto /></H3>
+          <P>
+            Un egreso es para un solo proveedor. Si una sola salida del banco pagó compras de varios, al marcarlas el
+            diálogo te avisa: «Son pagos a varios proveedores». Con <B>Registrarlos en lote</B> se abre el asistente
+            de <a href="#cxp-lote" style={link}>egresos en lote</a> con esas compras, y sale un egreso por proveedor.
+          </P>
+          <P>Es el mismo asistente de Cuentas por pagar, con estas diferencias:</P>
+          <Bullets
+            items={[
+              "No pide fecha ni banco: son los de la línea del extracto, iguales para todos los egresos. Arriba ves la línea con su fecha, lo que salió y la cuenta.",
+              <><B>Los egresos tienen que sumar exactamente lo que salió del banco.</B> La pantalla te muestra cuánto falta o cuánto sobra, y no deja continuar hasta que cuadre. Para cuadrar, cambia el valor a pagar de una compra o quita filas.</>,
+              "Aquí no hay anticipos ni ajuste al peso: si la diferencia es de centavos, ajusta el valor a pagar de una compra.",
+              <>Cuando todos los egresos quedan registrados, <B>la línea queda cruzada con todos</B>.</>,
+              "Si alguno no queda registrado, la línea no se cruza. Los egresos que sí quedaron siguen en tus libros: registra lo que falta desde Egresos, con la fecha del banco, y cruza la línea a mano con todos.",
+              "En este lote no hay «Reintentar las fallidas»: un lote nuevo ya no sumaría lo que salió del banco.",
+              <>Si el lote queda a medias, la línea queda reservada para ese lote hasta que lo termines. Mira <a href="#cxp-lote-corte" style={link}>qué hacer si se corta la conexión</a>.</>,
+              "Una compra de un proveedor sin NIT no puede ir en un lote: ponle el NIT en la compra o desmárcala.",
+              "Si otra persona cambió la conciliación mientras armabas el lote, la pantalla te pide volver a la conciliación y armarlo otra vez. No se registró nada.",
+            ]}
+          />
+
+          <H3 id="banco-ya-registrado">Si el movimiento ya tiene un comprobante<Pronto /></H3>
+          <P>
+            Una línea del extracto lleva un solo comprobante (o los egresos de un solo lote). Si ya se registró uno
+            desde esa línea y vuelves a intentarlo, la pantalla no crea otro. Te avisa, por ejemplo:{" "}
+            <B>«Este movimiento ya tiene el comprobante CE-16 por $ 2.000.000,00»</B>, y te da dos salidas:
+          </P>
+          <Table
+            head={["Botón", "Cuándo usarlo", "Qué pasa"]}
+            rows={[
+              [<B key="b">Cruzar la línea con CE-16</B>, "Ese comprobante es el de este movimiento y solo le falta el cruce.", "La línea queda cruzada con él. Si la pantalla todavía no ve ese comprobante entre los movimientos de tus libros, vuelve a cargar la conciliación y te deja la línea marcada: marca el movimiento en «En tus libros» y confirma el cruce."],
+              [<B key="b">Ver CE-16 (para anularlo)</B>, "Ese comprobante está mal.", "Se abre el comprobante. Si lo anulas, la línea queda libre y la puedes registrar de nuevo."],
+            ]}
+          />
+          <Bullets
+            items={[
+              <>Si el aviso dice <B>«Alguien está registrando este movimiento ahora mismo»</B>, otra persona (o tú, en otra pestaña) lo está registrando en ese instante. Espera un par de minutos y vuelve a intentarlo: si ya quedó registrado, verás su comprobante.</>,
+              "Si el movimiento tiene los egresos de un lote, el aviso los lista. Si el lote quedó a medias, termínalo desde Cuentas por pagar; si ya está completo, cruza la línea con sus egresos.",
+              "El aviso sale desde la revisión, antes de registrar nada.",
+            ]}
+          />
+          <Callout type="warning" title="La pantalla solo reconoce lo que se registró desde el extracto">
+            Si ese pago o ese cobro ya lo habías registrado por otro camino (desde Egresos, desde Recibos de caja o
+            con «Registrar pago» en la factura), la pantalla no lo sabe y no te va a avisar. Antes de registrar una
+            línea, mira si en <strong>En tus libros</strong> ya hay un movimiento con ese valor: si está, no lo
+            registres otra vez, crúzalo.
+          </Callout>
 
           <H3 id="conciliado">El resumen y qué significa «Conciliado»</H3>
           <Table
@@ -2241,6 +2478,8 @@ export default function ContabilidadPage() {
               ["Registrar y anular recibos de caja, egresos y transferencias", "Sí", "Sí", "No"],
               ["Ver el comprobante contable de un recibo, un egreso o una transferencia, y el «PDF con cuentas contables»", "Sí", "No", "Sí"],
               ["Conciliación bancaria: subir extractos, cruzar, deshacer y «Registrar en libros»", "Sí", "Sí", "No"],
+              [<><a key="a" href="#banco-pagar-cobrar" style={link}>Pagar compras o cobrar facturas</a> desde una línea del extracto, y armar el lote desde una salida<Pronto /></>, "Sí", "Sí", "No"],
+              [<>Cambiar el tope del <a key="a" href="#ajuste-al-peso" style={link}>ajuste al peso</a> y sus cuentas<Pronto /></>, "Sí", "No", "No"],
               ["Cerrar y reabrir una conciliación", "Sí", "No", "No"],
               ["«Registrar pago» en una factura y «Registrar el pago» de una compra", "Sí", "Sí", "No"],
               ["Abrir «Contabilidad de este documento» en una factura o una compra", "Sí", "Sí, sin la sección de comprobantes", "Sí"],
