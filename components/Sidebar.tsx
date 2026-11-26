@@ -184,6 +184,7 @@ const navigation: NavItem[] = [
       { title: "Cómo escribirle a un cliente (WhatsApp)", href: "/docs/conversations#iniciar-whatsapp" },
       { title: "Tipos de mensajes", href: "/docs/conversations#message-types" },
       { title: "WhatsApp", href: "/docs/conversations#whatsapp" },
+      { title: "Reenviar mensajes", href: "/docs/conversations#forward" },
       { title: "Respuestas rápidas", href: "/docs/conversations#quick-replies" },
       { title: "Asignación de chats", href: "/docs/conversations#assignment" },
       { title: "Kanban, líneas y pipelines", href: "/docs/conversations#kanban" },
