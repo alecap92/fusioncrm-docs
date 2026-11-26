@@ -362,6 +362,14 @@ export default function InvoicesPage() {
             anotaste uno mal, elimínalo con su botón y vuelve a registrarlo. Las facturas rechazadas,
             anuladas o en borrador no se pueden cobrar.
           </p>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <strong style={{ color: "var(--foreground)" }}>Pagos en pesos enteros.</strong> Una factura puede tener
+            centavos (por ejemplo $ 119.697,94) y el cliente transferir $ 119.698. Escribe el valor que entró al
+            banco: si la diferencia con el saldo es menor a $ 1, por encima o por debajo, la factura queda pagada y
+            la diferencia se guarda como <strong style={{ color: "var(--foreground)" }}>ajuste al peso</strong>, a la
+            vista en el abono. Con una diferencia de $ 1 o más no hay ajuste: si falta, queda como abono parcial; si
+            sobra, el valor no puede pasar del saldo.
+          </p>
           <Callout type="note" title="Con la contabilidad activada">
             «Registrar pago» pide además el banco o la caja y crea un recibo de caja. Un abono que nació de un
             recibo no se elimina aquí: se quita anulando el recibo. Ver{" "}
