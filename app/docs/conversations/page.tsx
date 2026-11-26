@@ -229,6 +229,25 @@ export default function ConversationsPage() {
           </Callout>
         </section>
 
+        <section id="forward" className="mb-10">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Reenviar un mensaje, una cotización o una factura</h2>
+          <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Puedes reenviar a otro cliente lo que ya está en un chat de WhatsApp, sin descargarlo y volverlo a subir.
+          </p>
+          <ol className="space-y-2 pl-4 mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <li>1. En el mensaje, pulsa el menú <strong style={{ color: "var(--foreground)" }}>⋮</strong> y elige <strong style={{ color: "var(--foreground)" }}>"Reenviar"</strong>. En una cotización o factura del chat, pulsa <strong style={{ color: "var(--foreground)" }}>"Reenviar"</strong> en su tarjeta.</li>
+            <li>2. Elige a quién. Primero ves los clientes que te escribieron en las últimas 24 horas; escribe un nombre o un número para buscar a los demás.</li>
+            <li>3. Pulsa <strong style={{ color: "var(--foreground)" }}>"Reenviar a …"</strong>. El mensaje sale por la línea de WhatsApp de ese chat y aparece en su conversación.</li>
+          </ol>
+          <Callout type="note">
+            Solo puedes reenviar a quien te escribió en las últimas 24 horas: los demás aparecen deshabilitados con
+            "Ventana de 24 h cerrada" (envíales una plantilla primero) o "No contactar". Al cliente le llega como un
+            mensaje nuevo, sin la etiqueta "Reenviado". Una cotización reenviada va solo como PDF: no cambia de estado
+            ni lleva el enlace para verla en línea. No se reenvían cotizaciones vencidas o anuladas, ni facturas
+            rechazadas o anuladas (tampoco las anuladas por nota crédito).
+          </Callout>
+        </section>
+
         <section id="quick-replies" className="mb-10">
           <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--foreground)" }}>Respuestas rápidas</h2>
           <p className="mb-4" style={{ color: "var(--muted-foreground)" }}>

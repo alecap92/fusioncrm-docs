@@ -17,6 +17,7 @@ const searchIndex = [
   { title: "Gestión de Pipelines", href: "/docs/pipelines", section: "Pipelines", keywords: ["pipeline", "etapas", "stages"] },
   { title: "Conversaciones WhatsApp y Email", href: "/docs/conversations", section: "Conversaciones", keywords: ["conversaciones", "whatsapp", "chat", "mensajes"] },
   { title: "Tipos de mensajes WhatsApp", href: "/docs/conversations#message-types", section: "Conversaciones", keywords: ["mensajes", "tipos", "imagen", "documento", "ubicacion"] },
+  { title: "Reenviar un mensaje, cotización o factura", href: "/docs/conversations#forward", section: "Conversaciones", keywords: ["reenviar", "compartir", "mensaje", "cotizacion", "factura", "otro cliente"] },
   { title: "Templates WhatsApp", href: "/docs/whatsapp-templates", section: "Templates", keywords: ["templates", "plantillas", "whatsapp"] },
   { title: "Bandeja de entrada de correo", href: "/docs/email", section: "Email", keywords: ["email", "correo", "inbox", "bandeja"] },
   { title: "Campañas de email masivo", href: "/docs/mass-campaigns", section: "Campañas", keywords: ["masivo", "campanas", "email marketing", "bulk"] },
