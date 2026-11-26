@@ -127,6 +127,7 @@ export default function QuotesPage() {
             <li>• Ajustar la cantidad de cada ítem</li>
             <li>• Aplicar un descuento por ítem, en valor (no en porcentaje)</li>
             <li>• Elegir el impuesto de cada ítem entre las tasas que usan tus productos</li>
+            <li>• Ver el total al centavo: cada ítem se calcula como cantidad × precio − descuento, más su impuesto, y el total es la suma de los ítems. Es la misma cuenta de la factura, así que lo cotizado y lo facturado coinciden; el PDF y el enlace público muestran los centavos cuando el valor los tiene</li>
             <li>• Reordenar ítems con los botones Subir y Bajar</li>
             <li>• Agregar más líneas con «Agregar Item» y eliminarlas con el botón de la papelera</li>
           </ul>
